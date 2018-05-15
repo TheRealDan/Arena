@@ -1,0 +1,48 @@
+# Colors used in commands and feedback
+Color:
+  Main: "&6"
+  Secondary: "&f"
+#
+# Disable this if you want to use your own event-based messages and particles
+Default_Handler_Enabled: true
+#
+# Icon options for the Join Battle UI
+Join_UI:
+  Join_Battle:
+    Icon:
+      Name: "&6Join Battle"
+      Material: IRON_SWORD
+      Durability: 0
+      Lore:
+      - "&7Battle: %battle%"
+      - "&7Players: %players%"
+  Create_Battle:
+    Icon:
+      Name: "&6Create Duel"
+      Material: DIAMOND_SWORD
+      Durability: 0
+      Lore: []
+#
+# Icons for the Battle Picker UI
+Battle_Picker:
+  Duel:
+    Icon:
+      Name: "&6Duel"
+      Material: DIAMOND_SWORD
+      Durability: 0
+      Lore:
+      - "&71v1"
+  FFA:
+    Icon:
+      Name: "&6FFA"
+      Material: IRON_SWORD
+      Durability: 0
+      Lore:
+      - "&7No teams, all against all"
+  TeamBattle:
+    Icon:
+      Name: "&6Team Battle"
+      Material: IRON_CHESTPLATE
+      Durability: 0
+      Lore:
+      - "&7Two teams, friendly fire disabled"

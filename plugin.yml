@@ -1,0 +1,7 @@
+name: GalacticWarFront
+version: 1.0
+main: me.therealdan.galacticwarfront.GalacticWarFront
+author: TheRealDan
+commands:
+  GalacticWarFront:
+  GWF:
