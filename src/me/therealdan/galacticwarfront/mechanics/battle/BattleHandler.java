@@ -28,18 +28,16 @@ public class BattleHandler implements Listener {
     private BattleHandler() {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(GalacticWarFront.getInstance(), () -> {
             for (Battle battle : Battle.values()) {
-                if (System.currentTimeMillis() - battle.getStartTime() > 60 * 1000) {
-                    if (battle.getTimeRemaining() <= 0) {
-                        battle.end(BattleLeaveEvent.Reason.BATTLE_FINISHED);
+                if (battle.getTimeRemaining() <= 0) {
+                    battle.end(BattleLeaveEvent.Reason.BATTLE_FINISHED);
 
-                    } else if (battle.getPlayers().size() <= 1) {
-                        battle.end(BattleLeaveEvent.Reason.NOT_ENOUGH_PLAYERS);
+                } else if (battle.getPlayers().size() <= 1 && battle.getTimePassed() > 60 * 1000) {
+                    battle.end(BattleLeaveEvent.Reason.NOT_ENOUGH_PLAYERS);
 
-                    } else if (battle instanceof Team) {
-                        Team team = (Team) battle;
-                        if (team.getTeam1Players().size() == 0 || team.getTeam2Players().size() == 0)
-                            team.end(BattleLeaveEvent.Reason.NOT_ENOUGH_PLAYERS);
-                    }
+                } else if (battle instanceof Team) {
+                    Team team = (Team) battle;
+                    if (team.getTeam1Players().size() == 0 || team.getTeam2Players().size() == 0)
+                        team.end(BattleLeaveEvent.Reason.NOT_ENOUGH_PLAYERS);
                 }
             }
         }, 20, 20);
