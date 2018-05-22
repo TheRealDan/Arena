@@ -17,8 +17,8 @@ public class Party {
 
     private static HashSet<Party> parties = new HashSet<>();
 
+    private LinkedList<UUID> members = new LinkedList<>();
     private HashSet<UUID> invites = new HashSet<>();
-    private HashSet<UUID> members = new HashSet<>();
     private HashSet<UUID> team2 = new HashSet<>();
     private boolean open = false;
 
@@ -140,6 +140,17 @@ public class Party {
         return invites.contains(player.getUniqueId());
     }
 
+    public List<Player> getLargestTeam() {
+        int team2Size = team2.size();
+        int team1Size = members.size() - team2Size;
+
+        return getTeam(!(team2Size > team1Size));
+    }
+
+    public List<Player> getTeam(boolean one) {
+        return one ? getTeam1() : getTeam2();
+    }
+
     public List<Player> getTeam1() {
         List<Player> team1 = new ArrayList<>();
         for (Player player : getPlayers())
@@ -163,7 +174,7 @@ public class Party {
         return players;
     }
 
-    public static Party get(Player player) {
+    public static Party byPlayer(Player player) {
         for (Party party : values())
             if (party.contains(player))
                 return party;
