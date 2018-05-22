@@ -98,9 +98,7 @@ public class DefaultHandler implements BattleListener {
             case LEAVE:
             case LOGOUT:
                 event.getBattle().getKillCounter().remove(event.getPlayer().getUniqueId());
-                break;
 
-            case BATTLE_FINISHED:
                 String title = GalacticWarFront.SECOND + event.getPlayer().getName();
                 String sub = GalacticWarFront.MAIN + "Has left the " + GalacticWarFront.SECOND + event.getBattle().getType();
 
