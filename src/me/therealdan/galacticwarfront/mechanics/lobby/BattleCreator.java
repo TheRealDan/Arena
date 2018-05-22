@@ -3,6 +3,9 @@ package me.therealdan.galacticwarfront.mechanics.lobby;
 import me.therealdan.galacticwarfront.GalacticWarFront;
 import me.therealdan.galacticwarfront.mechanics.battle.Arena;
 import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
+import me.therealdan.galacticwarfront.mechanics.battle.battle.Duel;
+import me.therealdan.galacticwarfront.mechanics.battle.battle.FFA;
+import me.therealdan.galacticwarfront.mechanics.battle.battle.Team;
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
 import me.therealdan.galacticwarfront.mechanics.party.Party;
 import me.therealdan.galacticwarfront.util.Icon;
@@ -19,11 +22,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class BattleCreator implements Listener {
 
     private static BattleCreator battleCreator;
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
 
     private HashSet<UUID> battleCreatorUIOpen = new HashSet<>();
     private HashSet<UUID> arenaPickerUIOpen = new HashSet<>();
@@ -33,13 +38,14 @@ public class BattleCreator implements Listener {
     private HashMap<UUID, Long> gracePeriod = new HashMap<>();
     private HashMap<UUID, Long> battleDuration = new HashMap<>();
 
-    private ItemStack duelIcon, ffaIcon, teamBattleIcon, gracePeriodIcon, battleDurationIcon;
+    private ItemStack duelIcon, ffaIcon, teamBattleIcon, gracePeriodIcon, battleDurationIcon, startGameIcon, noFreeArenaIcon;
     private List<Integer> team1Slots, team2Slots;
 
     private int battleTypeSlot = 0;
     private int arenaSlot = 1;
     private int battleDurationSlot = 2;
     private int gracePeriodSlot = 3;
+    private int startGameSlot = 8;
 
     private BattleCreator() {
     }
@@ -54,16 +60,46 @@ public class BattleCreator implements Listener {
 
         if (event.getSlot() == battleTypeSlot) {
             toggleBattleType(player, event.isLeftClick());
+            openBattleCreator(player);
             return;
         } else if (event.getSlot() == arenaSlot) {
-            player.closeInventory();
             openArenaPicker(player);
             return;
         } else if (event.getSlot() == battleDurationSlot) {
             toggleBattleDuration(player, event.isLeftClick(), event.isShiftClick());
+            openBattleCreator(player);
             return;
         } else if (event.getSlot() == gracePeriodSlot) {
             toggleGracePeriod(player, event.isLeftClick(), event.isShiftClick());
+            openBattleCreator(player);
+            return;
+        } else if (getStartGameIcon().isSimilar(event.getCurrentItem())) {
+            Arena arena = getArena(player);
+            if (arena.inUse()) return;
+            Battle battle = null;
+            Party party = Party.byPlayer(player);
+            switch (getBattleType(player)) {
+                case FFA:
+                    battle = new FFA(arena, player);
+                    break;
+                case Duel:
+                    if (party == null) return;
+                    if (party.getPlayers().size() < 2) return;
+                    battle = new Duel(arena, player, party.getPlayers().get(1));
+                    break;
+                case Team:
+                    if (party == null) return;
+                    if (party.getTeam1().size() == 0) return;
+                    if (party.getTeam2().size() == 0) return;
+                    Team team = new Team(arena, player);
+                    for (Player each : party.getPlayers())
+                        team.add(each, party.isTeam1(each));
+                    battle = team;
+                    break;
+            }
+            battle.setGracePeriod(getGracePeriod(player) / 1000);
+            battle.setTimeRemaining(getBattleDuration(player) / 1000);
+            player.closeInventory();
             return;
         }
 
@@ -73,6 +109,7 @@ public class BattleCreator implements Listener {
         for (Player each : party.getPlayers()) {
             if (getPlayerIcon(each).isSimilar(event.getCurrentItem())) {
                 party.changeTeam(each);
+                openBattleCreator(player);
                 return;
             }
         }
@@ -89,7 +126,6 @@ public class BattleCreator implements Listener {
         for (Arena arena : Arena.values()) {
             if (getArenaIcon(arena).isSimilar(event.getCurrentItem())) {
                 setArena(player, arena);
-                player.closeInventory();
                 openBattleCreator(player);
                 return;
             }
@@ -126,6 +162,8 @@ public class BattleCreator implements Listener {
         inventory.setItem(battleDurationSlot, getBattleDurationIcon(player));
         inventory.setItem(gracePeriodSlot, getGracePeriodIcon(player));
 
+        inventory.setItem(startGameSlot, getStartGameIcon());
+
         if (party != null) {
             int i = 0;
             for (Player each : party.getTeam1())
@@ -159,12 +197,6 @@ public class BattleCreator implements Listener {
     private void toggleBattleType(Player player, boolean next) {
         Battle.Type battleType = getBattleType(player);
         battleType = battleType.toggle(next);
-
-        if (battleType.equals(Battle.Type.Team) || battleType.equals(Battle.Type.Duel)) {
-            Party party = Party.byPlayer(player);
-            if (party == null || party.getTeam1().size() == 0 || party.getTeam2().size() == 0)
-                battleType = Battle.Type.FFA;
-        }
 
         this.battleType.put(player.getUniqueId(), battleType);
     }
@@ -206,7 +238,15 @@ public class BattleCreator implements Listener {
     }
 
     private Battle.Type getBattleType(Player player) {
-        return battleType.getOrDefault(player.getUniqueId(), Battle.Type.FFA);
+        Battle.Type battleType = this.battleType.getOrDefault(player.getUniqueId(), Battle.Type.FFA);
+
+        if (battleType.equals(Battle.Type.Team) || battleType.equals(Battle.Type.Duel)) {
+            Party party = Party.byPlayer(player);
+            if (party == null || party.getTeam1().size() == 0 || party.getTeam2().size() == 0)
+                battleType = Battle.Type.FFA;
+        }
+
+        return battleType;
     }
 
     private long getGracePeriod(Player player) {
@@ -242,7 +282,11 @@ public class BattleCreator implements Listener {
 
     private ItemStack getArenaIcon(Player player) {
         Arena arena = getArena(player);
-        if (arena == null) arena = Arena.values().get(0);
+        if (arena == null) {
+            if (noFreeArenaIcon == null)
+                noFreeArenaIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "No_Free_Arena.Team", false);
+            return noFreeArenaIcon;
+        }
         return getArenaIcon(arena);
     }
 
@@ -257,10 +301,15 @@ public class BattleCreator implements Listener {
 
     private ItemStack getGracePeriodIcon(Player player) {
         if (gracePeriodIcon == null) gracePeriodIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.Grace_Period", false);
+
+        Date date = new Date(0);
+        date.setTime(getGracePeriod(player));
+        String gracePeriod = simpleDateFormat.format(date);
+
         List<String> lore = new ArrayList<>();
         for (String line : gracePeriodIcon.getItemMeta().getLore()) {
             lore.add(ChatColor.translateAlternateColorCodes('&', line
-                    .replace("%graceperiod%", Long.toString(getGracePeriod(player)))
+                    .replace("%graceperiod%", gracePeriod)
             ));
         }
 
@@ -273,10 +322,16 @@ public class BattleCreator implements Listener {
 
     private ItemStack getBattleDurationIcon(Player player) {
         if (battleDurationIcon == null) battleDurationIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.Battle_Duration", false);
+
+        Date date = new Date();
+        date.setHours(0);
+        date.setTime(getBattleDuration(player));
+        String battleDuration = simpleDateFormat.format(date);
+
         List<String> lore = new ArrayList<>();
         for (String line : battleDurationIcon.getItemMeta().getLore()) {
             lore.add(ChatColor.translateAlternateColorCodes('&', line
-                    .replace("%battleduration%", Long.toString(getBattleDuration(player)))
+                    .replace("%battleduration%", battleDuration)
             ));
         }
 
@@ -285,6 +340,12 @@ public class BattleCreator implements Listener {
         itemMeta.setLore(lore);
         icon.setItemMeta(itemMeta);
         return icon;
+    }
+
+    private ItemStack getStartGameIcon() {
+        if (startGameIcon == null)
+            startGameIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.Start_Game", false);
+        return startGameIcon;
     }
 
     private ItemStack getPlayerIcon(Player player) {
@@ -319,7 +380,7 @@ public class BattleCreator implements Listener {
             int slot = 14;
             while (slot < 54) {
                 for (int i = 0; i < 4; i++)
-                    team1Slots.add(slot + i);
+                    team2Slots.add(slot + i);
                 slot += 9;
             }
         }
