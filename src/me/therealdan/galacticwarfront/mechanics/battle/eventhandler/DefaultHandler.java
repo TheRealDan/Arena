@@ -2,23 +2,25 @@ package me.therealdan.galacticwarfront.mechanics.battle.eventhandler;
 
 import me.therealdan.galacticwarfront.GalacticWarFront;
 import me.therealdan.galacticwarfront.events.*;
-import me.therealdan.galacticwarfront.mechanics.battle.battle.TeamBattle;
-import org.bukkit.*;
-import org.bukkit.entity.EntityType;
+import me.therealdan.galacticwarfront.mechanics.battle.battle.Team;
+import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
 import java.util.Random;
 
 public class DefaultHandler implements BattleListener {
+
+    private static DefaultHandler defaultHandler;
 
     private HashSet<Item> blood = new HashSet<>();
 
@@ -28,7 +30,7 @@ public class DefaultHandler implements BattleListener {
     private int hold = 40;
     private int down = 20;
 
-    public DefaultHandler() {
+    private DefaultHandler() {
         this.scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(GalacticWarFront.getInstance(), new Runnable() {
@@ -58,7 +60,7 @@ public class DefaultHandler implements BattleListener {
         String sub = GalacticWarFront.SECOND + event.getStarted().getName() + GalacticWarFront.MAIN + " has started a " + GalacticWarFront.SECOND + event.getBattle().getType();
 
         for (Player player : Bukkit.getOnlinePlayers())
-            if (GalacticWarFront.getInstance().getLobby().contains(player))
+            if (Lobby.getInstance().contains(player))
                 sendTitle(player, title, sub);
     }
 
@@ -79,9 +81,9 @@ public class DefaultHandler implements BattleListener {
         String title = GalacticWarFront.SECOND + event.getPlayer().getName();
         String sub = GalacticWarFront.MAIN + "Has joined the " + GalacticWarFront.SECOND + event.getBattle().getType();
 
-        if (event.getBattle() instanceof TeamBattle) {
-            TeamBattle teamBattle = (TeamBattle) event.getBattle();
-            sub = GalacticWarFront.MAIN + "Has joined " + GalacticWarFront.SECOND + "Team " + (teamBattle.isTeam1(event.getPlayer()) ? "1" : "2");
+        if (event.getBattle() instanceof Team) {
+            Team team = (Team) event.getBattle();
+            sub = GalacticWarFront.MAIN + "Has joined " + GalacticWarFront.SECOND + "Team " + (team.isTeam1(event.getPlayer()) ? "1" : "2");
         }
 
         for (Player player : event.getBattle().getPlayers())
@@ -160,7 +162,7 @@ public class DefaultHandler implements BattleListener {
     private void update(Player player) {
         String name = player.getName();
 
-        Team team = getScoreboard().getTeam(name) == null ? getScoreboard().registerNewTeam(name) : getScoreboard().getTeam(name);
+        org.bukkit.scoreboard.Team team = getScoreboard().getTeam(name) == null ? getScoreboard().registerNewTeam(name) : getScoreboard().getTeam(name);
 
         team.setPrefix("");
         team.setSuffix("");
@@ -174,5 +176,10 @@ public class DefaultHandler implements BattleListener {
 
     private Scoreboard getScoreboard() {
         return scoreboard;
+    }
+
+    public static DefaultHandler getInstance() {
+        if (defaultHandler == null) defaultHandler = new DefaultHandler();
+        return defaultHandler;
     }
 }

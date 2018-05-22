@@ -4,10 +4,8 @@ import me.therealdan.galacticwarfront.GalacticWarFront;
 import me.therealdan.galacticwarfront.events.BattleDamageEvent;
 import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
 import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
-import me.therealdan.galacticwarfront.mechanics.battle.battle.TeamBattle;
+import me.therealdan.galacticwarfront.mechanics.battle.battle.Team;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -18,12 +16,16 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class BattleHandler implements Listener {
 
-    public BattleHandler() {
+    private static BattleHandler battleHandler;
+
+    private BattleHandler() {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(GalacticWarFront.getInstance(), new Runnable() {
             @Override
             public void run() {
@@ -38,10 +40,10 @@ public class BattleHandler implements Listener {
                 if (battle.getPlayers().size() <= 1)
                     battle.end(BattleLeaveEvent.Reason.BATTLE_FINISHED);
 
-                if (battle instanceof TeamBattle) {
-                    TeamBattle teamBattle = (TeamBattle) battle;
-                    if (teamBattle.getTeam1Players().size() == 0 || teamBattle.getTeam2Players().size() == 0)
-                        teamBattle.end(BattleLeaveEvent.Reason.BATTLE_FINISHED);
+                if (battle instanceof Team) {
+                    Team team = (Team) battle;
+                    if (team.getTeam1Players().size() == 0 || team.getTeam2Players().size() == 0)
+                        team.end(BattleLeaveEvent.Reason.BATTLE_FINISHED);
                 }
             }
         }
@@ -184,4 +186,8 @@ public class BattleHandler implements Listener {
         }
     }
 
+    public static BattleHandler getInstance() {
+        if (battleHandler == null) battleHandler = new BattleHandler();
+        return battleHandler;
+    }
 }
