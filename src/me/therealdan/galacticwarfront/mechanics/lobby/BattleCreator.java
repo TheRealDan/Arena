@@ -224,19 +224,19 @@ public class BattleCreator implements Listener {
 
     private ItemStack getDuelIcon() {
         if (duelIcon == null)
-            duelIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Picker.Duel", false);
+            duelIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.Duel", false);
         return duelIcon;
     }
 
     private ItemStack getFFAIcon() {
         if (ffaIcon == null)
-            ffaIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Picker.FFA", false);
+            ffaIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.FFA", false);
         return ffaIcon;
     }
 
     private ItemStack getTeamBattleIcon() {
         if (teamBattleIcon == null)
-            teamBattleIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Picker.Team", false);
+            teamBattleIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.Team", false);
         return teamBattleIcon;
     }
 
@@ -256,7 +256,7 @@ public class BattleCreator implements Listener {
     }
 
     private ItemStack getGracePeriodIcon(Player player) {
-        if (gracePeriodIcon == null) gracePeriodIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Picker.Grace_Period", false);
+        if (gracePeriodIcon == null) gracePeriodIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.Grace_Period", false);
         List<String> lore = new ArrayList<>();
         for (String line : gracePeriodIcon.getItemMeta().getLore()) {
             lore.add(ChatColor.translateAlternateColorCodes('&', line
@@ -272,7 +272,7 @@ public class BattleCreator implements Listener {
     }
 
     private ItemStack getBattleDurationIcon(Player player) {
-        if (battleDurationIcon == null) battleDurationIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Picker.Battle_Duration", false);
+        if (battleDurationIcon == null) battleDurationIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.Battle_Duration", false);
         List<String> lore = new ArrayList<>();
         for (String line : battleDurationIcon.getItemMeta().getLore()) {
             lore.add(ChatColor.translateAlternateColorCodes('&', line
