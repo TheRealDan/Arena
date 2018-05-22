@@ -53,14 +53,16 @@ public class Party {
     }
 
     private void save() {
-        getData().set("Party." + UUID.randomUUID().toString() + ".Open", open);
+        String id = UUID.randomUUID().toString();
+
+        getData().set("Party." + id + ".Open", open);
 
         for (UUID uuid : invites)
-            getData().set("Party." + UUID.randomUUID().toString() + ".Invites." + uuid, Bukkit.getPlayer(uuid).getName());
+            getData().set("Party." + id + ".Invites." + uuid, Bukkit.getPlayer(uuid).getName());
         for (UUID uuid : members)
-            getData().set("Party." + UUID.randomUUID().toString() + ".Members." + uuid, Bukkit.getPlayer(uuid).getName());
+            getData().set("Party." + id + ".Members." + uuid, Bukkit.getPlayer(uuid).getName());
         for (UUID uuid : team2)
-            getData().set("Party." + UUID.randomUUID().toString() + ".Team2." + uuid, Bukkit.getPlayer(uuid).getName());
+            getData().set("Party." + id + ".Team2." + uuid, Bukkit.getPlayer(uuid).getName());
     }
 
     public void setOpen(boolean open) {
