@@ -26,27 +26,23 @@ public class BattleHandler implements Listener {
     private static BattleHandler battleHandler;
 
     private BattleHandler() {
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(GalacticWarFront.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                task();
-            }
-        }, 20, 20);
-    }
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(GalacticWarFront.getInstance(), () -> {
+            for (Battle battle : Battle.values()) {
+                if (System.currentTimeMillis() - battle.getStartTime() > 60 * 1000) {
+                    if (battle.getTimeRemaining() <= 0) {
+                        battle.end(BattleLeaveEvent.Reason.BATTLE_FINISHED);
 
-    private void task() {
-        for (Battle battle : Battle.values()) {
-            if (System.currentTimeMillis() - battle.getStartTime() > 60 * 1000) {
-                if (battle.getPlayers().size() <= 1)
-                    battle.end(BattleLeaveEvent.Reason.BATTLE_FINISHED);
+                    } else if (battle.getPlayers().size() <= 1) {
+                        battle.end(BattleLeaveEvent.Reason.NOT_ENOUGH_PLAYERS);
 
-                if (battle instanceof Team) {
-                    Team team = (Team) battle;
-                    if (team.getTeam1Players().size() == 0 || team.getTeam2Players().size() == 0)
-                        team.end(BattleLeaveEvent.Reason.BATTLE_FINISHED);
+                    } else if (battle instanceof Team) {
+                        Team team = (Team) battle;
+                        if (team.getTeam1Players().size() == 0 || team.getTeam2Players().size() == 0)
+                            team.end(BattleLeaveEvent.Reason.NOT_ENOUGH_PLAYERS);
+                    }
                 }
             }
-        }
+        }, 20, 20);
     }
 
     @EventHandler
