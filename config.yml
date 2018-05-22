@@ -24,25 +24,34 @@ Join_UI:
       Lore: []
 #
 # Icons for the Battle Picker UI
-Battle_Picker:
+Battle_Creator:
   Duel:
-    Icon:
-      Name: "&6Duel"
-      Material: DIAMOND_SWORD
-      Durability: 0
-      Lore:
-      - "&71v1"
+    Name: "&6Duel"
+    Material: DIAMOND_SWORD
+    Durability: 0
+    Lore:
+    - "&71v1"
   FFA:
-    Icon:
-      Name: "&6FFA"
-      Material: IRON_SWORD
-      Durability: 0
-      Lore:
-      - "&7No teams, all against all"
+    Name: "&6FFA"
+    Material: IRON_SWORD
+    Durability: 0
+    Lore:
+    - "&7No teams, all against all"
   TeamBattle:
-    Icon:
-      Name: "&6Team Battle"
-      Material: IRON_CHESTPLATE
-      Durability: 0
-      Lore:
-      - "&7Two teams, friendly fire disabled"
+    Name: "&6Team Battle"
+    Material: IRON_CHESTPLATE
+    Durability: 0
+    Lore:
+    - "&7Two teams, friendly fire disabled"
+  Grace_Period:
+    Name: "&6Grace Period"
+    Material: IRON_CHESTPLATE
+    Durability: 0
+    Lore:
+    - "&7Duration: &f%graceperiod%"
+  Battle_Duration:
+    Name: "&6Battle Duration"
+    Material: WATCH
+    Durability: 0
+    Lore:
+    - "&7Time Limit: &f%battleduration%"
