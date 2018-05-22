@@ -49,6 +49,7 @@ public class BattleLeaveEvent extends Event {
 
     public enum Reason {
         BATTLE_FINISHED,
+        NOT_ENOUGH_PLAYERS,
         LEAVE, LOGOUT,
         SERVER_SHUTDOWN,
         CUSTOM_PLUGIN
