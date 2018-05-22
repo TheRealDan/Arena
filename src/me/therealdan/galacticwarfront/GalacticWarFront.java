@@ -19,13 +19,6 @@ public class GalacticWarFront extends JavaPlugin {
     private static GalacticWarFront galacticWarFront;
     public static String MAIN, SECOND;
 
-    private Lobby lobby;
-    private PartyHandler partyHandler;
-    private BattleCreator battleCreator;
-    private BattleHandler battleHandler;
-
-    private DefaultHandler defaultHandler;
-
     @Override
     public void onEnable() {
         galacticWarFront = this;
@@ -37,12 +30,12 @@ public class GalacticWarFront extends JavaPlugin {
         Arena.load();
         Party.load();
 
-        getServer().getPluginManager().registerEvents(getLobby(), this);
-        getServer().getPluginManager().registerEvents(getPartyHandler(), this);
-        getServer().getPluginManager().registerEvents(getBattleCreator(), this);
-        getServer().getPluginManager().registerEvents(getBattleHandler(), this);
+        getServer().getPluginManager().registerEvents(Lobby.getInstance(), this);
+        getServer().getPluginManager().registerEvents(PartyHandler.getInstance(), this);
+        getServer().getPluginManager().registerEvents(BattleCreator.getInstance(), this);
+        getServer().getPluginManager().registerEvents(BattleHandler.getInstance(), this);
 
-        if (getConfig().getBoolean("Default_Handler_Enabled")) getServer().getPluginManager().registerEvents(getDefaultHandler(), this);
+        if (getConfig().getBoolean("Default_Handler_Enabled")) getServer().getPluginManager().registerEvents(DefaultHandler.getInstance(), this);
 
         getCommand("GalacticWarFront").setExecutor(new GalacticWarFrontCommand());
         getCommand("GWF").setExecutor(new GalacticWarFrontCommand());
@@ -53,38 +46,13 @@ public class GalacticWarFront extends JavaPlugin {
         for (Battle battle : Battle.values())
             battle.end(BattleLeaveEvent.Reason.SERVER_SHUTDOWN);
 
+        DefaultHandler.getInstance().unload();
+
+        Lobby.getInstance().unload();
+
         Arena.unload();
         Party.unload();
         KillCounter.unload();
-
-        getLobby().unload();
-
-        getDefaultHandler().unload();
-    }
-
-    public Lobby getLobby() {
-        if (lobby == null) lobby = new Lobby();
-        return lobby;
-    }
-
-    public PartyHandler getPartyHandler() {
-        if (partyHandler == null) partyHandler = new PartyHandler();
-        return partyHandler;
-    }
-
-    public BattleCreator getBattleCreator() {
-        if (battleCreator == null) battleCreator = new BattleCreator();
-        return battleCreator;
-    }
-
-    public BattleHandler getBattleHandler() {
-        if (battleHandler == null) battleHandler = new BattleHandler();
-        return battleHandler;
-    }
-
-    public DefaultHandler getDefaultHandler() {
-        if (defaultHandler == null) defaultHandler = new DefaultHandler();
-        return defaultHandler;
     }
 
     public static GalacticWarFront getInstance() {
