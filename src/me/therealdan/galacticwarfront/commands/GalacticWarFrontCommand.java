@@ -4,6 +4,7 @@ import me.therealdan.galacticwarfront.GalacticWarFront;
 import me.therealdan.galacticwarfront.mechanics.battle.Arena;
 import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
 import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
+import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
 import me.therealdan.galacticwarfront.mechanics.party.Party;
 import me.therealdan.galacticwarfront.util.WXYZ;
 import org.bukkit.Bukkit;
@@ -27,10 +28,10 @@ public class GalacticWarFrontCommand implements CommandExecutor {
             if (args[0].equalsIgnoreCase("Join")) {
                 Battle battle = Battle.get(player);
                 if (battle == null) {
-                    if (GalacticWarFront.getInstance().getLobby().contains(player)) {
-                        GalacticWarFront.getInstance().getLobby().open(player);
+                    if (Lobby.getInstance().contains(player)) {
+                        Lobby.getInstance().open(player);
                     } else {
-                        GalacticWarFront.getInstance().getLobby().join(player);
+                        Lobby.getInstance().join(player);
                     }
                 } else {
                     player.sendMessage(GalacticWarFront.MAIN + "Please leave the Battle you are in first.");
@@ -43,14 +44,14 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                     return true;
                 }
                 battle.remove(player, BattleLeaveEvent.Reason.LEAVE);
-                GalacticWarFront.getInstance().getLobby().join(player);
+                Lobby.getInstance().join(player);
             } else if (args[0].equalsIgnoreCase("Party")) {
                 party(player, args);
                 return true;
             } else if (args[0].equalsIgnoreCase("Lobby") && lobbySetup(player)) {
                 if (args.length > 1) {
                     if (args[1].equalsIgnoreCase("Spawnpoint")) {
-                        GalacticWarFront.getInstance().getLobby().setSpawnpoint(player.getLocation());
+                        Lobby.getInstance().setSpawnpoint(player.getLocation());
                         player.sendMessage(GalacticWarFront.MAIN + "Set spawnpoint for lobby to your location");
                         return true;
                     }
@@ -73,7 +74,7 @@ public class GalacticWarFrontCommand implements CommandExecutor {
     }
 
     private void party(Player player, String[] args) {
-        Party party = Party.get(player);
+        Party party = Party.byPlayer(player);
         if (args.length > 1) {
             if (args[1].equalsIgnoreCase("Create") && party == null) {
                 new Party(player);
@@ -81,7 +82,7 @@ public class GalacticWarFrontCommand implements CommandExecutor {
             } else if (args[1].equalsIgnoreCase("Join") && party == null) {
                 try {
                     Player target = Bukkit.getPlayer(args[2]);
-                    party = Party.get(target);
+                    party = Party.byPlayer(target);
                     if (party == null) {
                         player.sendMessage(GalacticWarFront.SECOND + target.getName() + GalacticWarFront.MAIN + " is not in a Party.");
                         return;
@@ -107,7 +108,7 @@ public class GalacticWarFrontCommand implements CommandExecutor {
             } else if (args[1].equalsIgnoreCase("Invite") && party != null) {
                 try {
                     Player target = Bukkit.getPlayer(args[2]);
-                    if (Party.get(target) != null) {
+                    if (Party.byPlayer(target) != null) {
                         player.sendMessage(GalacticWarFront.SECOND + target.getName() + GalacticWarFront.MAIN + " already has a Party.");
                         return;
                     }
@@ -256,7 +257,7 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                                 }
                             }
                         }
-                        player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Edit [ID] SpawnPoints List General:TeamBattle:Team2");
+                        player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Edit [ID] SpawnPoints List General:Team:Team2");
                         player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Edit [ID] SpawnPoints Add General:Team1:Team2");
                         player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Edit [ID] SpawnPoints Clear General:Team1:Team2");
                         return;
