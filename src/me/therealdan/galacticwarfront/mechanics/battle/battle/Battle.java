@@ -25,6 +25,8 @@ public interface Battle {
 
     void setGracePeriod(long secondsStartingNow);
 
+    void setTimeRemaining(long secondsStartingNow);
+
     boolean isOpen();
 
     boolean contains(Player player);
@@ -33,11 +35,15 @@ public interface Battle {
 
     boolean canPvP();
 
-    long getGracePeriod();
+    long getTimePassed();
+
+    long getGraceTimeRemaining();
+
+    long getTimeRemaining();
 
     long getStartTime();
 
-    String getType();
+    Type getType();
 
     Location getRandomSpawnpoint(Player player);
 
@@ -57,8 +63,53 @@ public interface Battle {
     static List<Battle> values() {
         List<Battle> battles = new ArrayList<>();
         battles.addAll(Duel.values());
-        battles.addAll(TeamBattle.values());
+        battles.addAll(Team.values());
         battles.addAll(FFA.values());
         return battles;
+    }
+
+    enum Type {
+        FFA, Duel, Team;
+
+        public boolean hasTeams() {
+            switch (this) {
+                case FFA:
+                    return false;
+                case Duel:
+                case Team:
+                    return true;
+            }
+            return false;
+        }
+
+        public Type toggle(boolean next) {
+            return next ? next() : previous();
+        }
+
+        public Type next() {
+            switch (this) {
+                case FFA:
+                    return Duel;
+                case Duel:
+                    return Team;
+                case Team:
+                    return FFA;
+                default:
+                    return FFA;
+            }
+        }
+
+        public Type previous() {
+            switch (this) {
+                case FFA:
+                    return Team;
+                case Duel:
+                    return FFA;
+                case Team:
+                    return Duel;
+                default:
+                    return FFA;
+            }
+        }
     }
 }

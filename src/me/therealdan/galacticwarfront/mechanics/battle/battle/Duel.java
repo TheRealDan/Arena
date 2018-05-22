@@ -4,6 +4,7 @@ import me.therealdan.galacticwarfront.GalacticWarFront;
 import me.therealdan.galacticwarfront.events.*;
 import me.therealdan.galacticwarfront.mechanics.battle.Arena;
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
+import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
 import me.therealdan.galacticwarfront.util.PlayerHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -20,6 +21,7 @@ public class Duel implements Battle {
     private KillCounter killCounter;
     private UUID player1, player2;
     private long gracePeriod = 0;
+    private long battleDuration = 0;
 
     private HashSet<UUID> players = new HashSet<>();
     private long startTime = System.currentTimeMillis();
@@ -66,7 +68,7 @@ public class Duel implements Battle {
 
     @Override
     public void remove(Player player, BattleLeaveEvent.Reason reason) {
-        BattleLeaveEvent battleLeaveEvent = new BattleLeaveEvent(this, player, reason, GalacticWarFront.getInstance().getLobby().getSpawnpoint());
+        BattleLeaveEvent battleLeaveEvent = new BattleLeaveEvent(this, player, reason, Lobby.getInstance().getSpawnpoint());
         Bukkit.getPluginManager().callEvent(battleLeaveEvent);
 
         player.teleport(battleLeaveEvent.getSpawn());
@@ -100,8 +102,12 @@ public class Duel implements Battle {
 
     @Override
     public void setGracePeriod(long secondsStartingNow) {
-        long secondsPassed = System.currentTimeMillis() - getStartTime() / 1000;
-        this.gracePeriod = secondsPassed + secondsStartingNow;
+        this.gracePeriod = getTimePassed() + (secondsStartingNow * 1000);
+    }
+
+    @Override
+    public void setTimeRemaining(long secondsStartingNow) {
+        this.battleDuration = getTimePassed() + (secondsStartingNow * 1000);
     }
 
     @Override
@@ -121,14 +127,22 @@ public class Duel implements Battle {
 
     @Override
     public boolean canPvP() {
-        if (System.currentTimeMillis() - getStartTime() < getGracePeriod() * 1000) return false;
-
-        return true;
+        return getGraceTimeRemaining() <= 0;
     }
 
     @Override
-    public long getGracePeriod() {
-        return gracePeriod;
+    public long getTimePassed() {
+        return System.currentTimeMillis() - getStartTime();
+    }
+
+    @Override
+    public long getGraceTimeRemaining() {
+        return Math.max(gracePeriod - System.currentTimeMillis(), 0);
+    }
+
+    @Override
+    public long getTimeRemaining() {
+        return Math.max(battleDuration - System.currentTimeMillis(), 0);
     }
 
     @Override
@@ -145,8 +159,8 @@ public class Duel implements Battle {
     }
 
     @Override
-    public String getType() {
-        return "Duel";
+    public Type getType() {
+        return Type.Duel;
     }
 
     @Override

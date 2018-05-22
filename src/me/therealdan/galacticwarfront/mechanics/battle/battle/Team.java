@@ -4,6 +4,7 @@ import me.therealdan.galacticwarfront.GalacticWarFront;
 import me.therealdan.galacticwarfront.events.*;
 import me.therealdan.galacticwarfront.mechanics.battle.Arena;
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
+import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
 import me.therealdan.galacticwarfront.util.PlayerHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -12,31 +13,32 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-public class TeamBattle implements Battle {
+public class Team implements Battle {
 
-    private static HashSet<TeamBattle> teamBattles = new HashSet<>();
+    private static HashSet<Team> teams = new HashSet<>();
 
     private Arena arena;
     private KillCounter killCounter;
     private long gracePeriod = 0;
+    private long battleDuration = 0;
     private boolean open = false;
 
     private HashSet<UUID> team1 = new HashSet<>();
     private HashSet<UUID> team2 = new HashSet<>();
     private long startTime = System.currentTimeMillis();
 
-    public TeamBattle(Arena arena, Player started) {
+    public Team(Arena arena, Player started) {
         this.arena = arena;
 
         BattleStartEvent battleStartEvent = new BattleStartEvent(this, started);
         Bukkit.getPluginManager().callEvent(battleStartEvent);
 
-        teamBattles.add(this);
+        teams.add(this);
     }
 
     @Override
     public void end(BattleLeaveEvent.Reason reason) {
-        if (!teamBattles.contains(this)) return;
+        if (!teams.contains(this)) return;
 
         BattleFinishEvent battleFinishEvent = new BattleFinishEvent(this);
         Bukkit.getPluginManager().callEvent(battleFinishEvent);
@@ -44,7 +46,7 @@ public class TeamBattle implements Battle {
         for (Player player : getPlayers())
             remove(player, BattleLeaveEvent.Reason.BATTLE_FINISHED);
 
-        teamBattles.remove(this);
+        teams.remove(this);
     }
 
     @Override
@@ -70,7 +72,7 @@ public class TeamBattle implements Battle {
 
     @Override
     public void remove(Player player, BattleLeaveEvent.Reason reason) {
-        BattleLeaveEvent battleLeaveEvent = new BattleLeaveEvent(this, player, reason, GalacticWarFront.getInstance().getLobby().getSpawnpoint());
+        BattleLeaveEvent battleLeaveEvent = new BattleLeaveEvent(this, player, reason, Lobby.getInstance().getSpawnpoint());
         Bukkit.getPluginManager().callEvent(battleLeaveEvent);
 
         player.teleport(battleLeaveEvent.getSpawn());
@@ -105,8 +107,12 @@ public class TeamBattle implements Battle {
 
     @Override
     public void setGracePeriod(long secondsStartingNow) {
-        long secondsPassed = System.currentTimeMillis() - getStartTime() / 1000;
-        this.gracePeriod = secondsPassed + secondsStartingNow;
+        this.gracePeriod = getTimePassed() + (secondsStartingNow * 1000);
+    }
+
+    @Override
+    public void setTimeRemaining(long secondsStartingNow) {
+        this.battleDuration = getTimePassed() + (secondsStartingNow * 1000);
     }
 
     @Override
@@ -130,14 +136,22 @@ public class TeamBattle implements Battle {
 
     @Override
     public boolean canPvP() {
-        if (System.currentTimeMillis() - getStartTime() < getGracePeriod() * 1000) return false;
-
-        return true;
+        return getGraceTimeRemaining() <= 0;
     }
 
     @Override
-    public long getGracePeriod() {
-        return gracePeriod;
+    public long getTimePassed() {
+        return System.currentTimeMillis() - getStartTime();
+    }
+
+    @Override
+    public long getGraceTimeRemaining() {
+        return Math.max(gracePeriod - System.currentTimeMillis(), 0);
+    }
+
+    @Override
+    public long getTimeRemaining() {
+        return Math.max(battleDuration - System.currentTimeMillis(), 0);
     }
 
     @Override
@@ -146,8 +160,8 @@ public class TeamBattle implements Battle {
     }
 
     @Override
-    public String getType() {
-        return "Team Battle";
+    public Type getType() {
+        return Type.Team;
     }
 
     @Override
@@ -203,14 +217,14 @@ public class TeamBattle implements Battle {
         return players;
     }
 
-    public static TeamBattle get(Player player) {
-        for (TeamBattle teamBattle : values())
-            if (teamBattle.contains(player))
-                return teamBattle;
+    public static Team get(Player player) {
+        for (Team team : values())
+            if (team.contains(player))
+                return team;
         return null;
     }
 
-    public static List<TeamBattle> values() {
-        return new ArrayList<>(teamBattles);
+    public static List<Team> values() {
+        return new ArrayList<>(teams);
     }
 }
