@@ -33,6 +33,8 @@ public class Team implements Battle {
         BattleStartEvent battleStartEvent = new BattleStartEvent(this, started);
         Bukkit.getPluginManager().callEvent(battleStartEvent);
 
+        add(started);
+
         teams.add(this);
     }
 
@@ -55,6 +57,8 @@ public class Team implements Battle {
     }
 
     public void add(Player player, boolean team1) {
+        if (contains(player)) return;
+
         Battle battle = Battle.get(player);
         if (battle != null) battle.remove(player, BattleLeaveEvent.Reason.LEAVE);
 
@@ -107,12 +111,12 @@ public class Team implements Battle {
 
     @Override
     public void setGracePeriod(long secondsStartingNow) {
-        this.gracePeriod = getTimePassed() + (secondsStartingNow * 1000);
+        this.gracePeriod = System.currentTimeMillis() + (secondsStartingNow * 1000);
     }
 
     @Override
     public void setTimeRemaining(long secondsStartingNow) {
-        this.battleDuration = getTimePassed() + (secondsStartingNow * 1000);
+        this.battleDuration = System.currentTimeMillis() + (secondsStartingNow * 1000);
     }
 
     @Override

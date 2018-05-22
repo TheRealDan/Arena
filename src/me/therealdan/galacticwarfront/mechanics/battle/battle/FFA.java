@@ -50,6 +50,8 @@ public class FFA implements Battle {
 
     @Override
     public void add(Player player) {
+        if (contains(player)) return;
+
         Battle battle = Battle.get(player);
         if (battle != null) battle.remove(player, BattleLeaveEvent.Reason.LEAVE);
 
@@ -97,12 +99,12 @@ public class FFA implements Battle {
 
     @Override
     public void setGracePeriod(long secondsStartingNow) {
-        this.gracePeriod = getTimePassed() + (secondsStartingNow * 1000);
+        this.gracePeriod = System.currentTimeMillis() + (secondsStartingNow * 1000);
     }
 
     @Override
     public void setTimeRemaining(long secondsStartingNow) {
-        this.battleDuration = getTimePassed() + (secondsStartingNow * 1000);
+        this.battleDuration = System.currentTimeMillis() + (secondsStartingNow * 1000);
     }
 
     @Override
