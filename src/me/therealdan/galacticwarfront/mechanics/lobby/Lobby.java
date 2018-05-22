@@ -34,6 +34,8 @@ import java.util.UUID;
 
 public class Lobby implements Listener {
 
+    private static Lobby lobby;
+
     private static File file;
     private static FileConfiguration data;
     private static String path = "data/lobby.yml";
@@ -44,7 +46,7 @@ public class Lobby implements Listener {
 
     private HashSet<UUID> uiOpen = new HashSet<>();
 
-    public Lobby() {
+    private Lobby() {
         if (getData().contains("Lobby.Spawnpoint"))
             spawnpoint = new WXYZ(getData().getString("Lobby.Spawnpoint"));
     }
@@ -90,7 +92,7 @@ public class Lobby implements Listener {
         if (!event.getCurrentItem().getItemMeta().hasDisplayName()) return;
 
         if (getCreateBattleIcon().isSimilar(event.getCurrentItem())) {
-            GalacticWarFront.getInstance().getBattleCreator().openArenaPicker(player);
+            BattleCreator.getInstance().openBattleCreator(player);
         } else {
             for (Battle battle : Battle.values()) {
                 if (battle.isOpen()) {
@@ -197,7 +199,7 @@ public class Lobby implements Listener {
         for (String line : itemMeta.getLore()) {
             lore.add(line
                     .replace("%players%", players)
-                    .replace("%battle%", battle.getType())
+                    .replace("%battle%", battle.getType().toString())
                     .replace("%arena%", battle.getArena().getName())
             );
         }
@@ -231,5 +233,10 @@ public class Lobby implements Listener {
             file = new File(GalacticWarFront.getInstance().getDataFolder(), path);
         }
         return file;
+    }
+
+    public static Lobby getInstance() {
+        if (lobby == null) lobby = new Lobby();
+        return lobby;
     }
 }
