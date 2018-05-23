@@ -1,9 +1,9 @@
 package me.therealdan.galacticwarfront;
 
-import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
-import me.therealdan.galacticwarfront.mechanics.battle.BattleHandler;
-import me.therealdan.galacticwarfront.mechanics.battle.Arena;
 import me.therealdan.galacticwarfront.commands.GalacticWarFrontCommand;
+import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
+import me.therealdan.galacticwarfront.mechanics.battle.Arena;
+import me.therealdan.galacticwarfront.mechanics.battle.BattleHandler;
 import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
 import me.therealdan.galacticwarfront.mechanics.battle.eventhandler.DefaultHandler;
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
