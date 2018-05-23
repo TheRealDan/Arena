@@ -1,9 +1,10 @@
 package me.therealdan.galacticwarfront.commands;
 
 import me.therealdan.galacticwarfront.GalacticWarFront;
-import me.therealdan.galacticwarfront.mechanics.battle.Arena;
 import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
+import me.therealdan.galacticwarfront.mechanics.battle.Arena;
 import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
+import me.therealdan.galacticwarfront.mechanics.lobby.BattleCreator;
 import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
 import me.therealdan.galacticwarfront.mechanics.party.Party;
 import me.therealdan.galacticwarfront.util.WXYZ;
@@ -37,6 +38,13 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                     player.sendMessage(GalacticWarFront.MAIN + "Please leave the Battle you are in first.");
                 }
                 return true;
+            } else if (args[0].equalsIgnoreCase("Create")) {
+                Battle battle = Battle.get(player);
+                if (battle == null) {
+                    BattleCreator.getInstance().openBattleCreator(player);
+                } else {
+                    player.sendMessage("Please leave the Battle you are in first.");
+                }
             } else if (args[0].equalsIgnoreCase("Leave")) {
                 Battle battle = Battle.get(player);
                 if (battle == null) {
@@ -65,6 +73,7 @@ public class GalacticWarFrontCommand implements CommandExecutor {
         }
 
         player.sendMessage(GalacticWarFront.MAIN + "/GWF Join " + GalacticWarFront.SECOND + "Join GalacticWarFront Lobby");
+        player.sendMessage(GalacticWarFront.MAIN + "/GWF Create " + GalacticWarFront.SECOND + "Create a game");
         player.sendMessage(GalacticWarFront.MAIN + "/GWF Leave " + GalacticWarFront.SECOND + "Leave current game");
         player.sendMessage(GalacticWarFront.MAIN + "/GWF Party " + GalacticWarFront.SECOND + "Create or Join a Party");
         if (lobbySetup(player)) player.sendMessage(GalacticWarFront.MAIN + "/GWF Lobby " + GalacticWarFront.SECOND + "Setup GalacticWarFront Lobby");
