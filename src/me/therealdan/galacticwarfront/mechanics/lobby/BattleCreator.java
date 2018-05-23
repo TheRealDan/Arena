@@ -256,6 +256,20 @@ public class BattleCreator implements Listener {
     private Battle.Type getBattleType(Player player) {
         Battle.Type battleType = this.battleType.getOrDefault(player.getUniqueId(), Battle.Type.FFA);
 
+        // TODO - Better conditions
+
+        switch (battleType) {
+            case FFA:
+
+                break;
+            case Duel:
+
+                break;
+            case Team:
+
+                break;
+        }
+
         if (battleType.equals(Battle.Type.Team) || battleType.equals(Battle.Type.Duel)) {
             Party party = Party.byPlayer(player);
             if (party == null || party.getTeam1().size() == 0 || party.getTeam2().size() == 0)
