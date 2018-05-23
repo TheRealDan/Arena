@@ -162,7 +162,18 @@ public class BattleCreator implements Listener {
         inventory.setItem(battleDurationSlot, getBattleDurationIcon(player));
         inventory.setItem(gracePeriodSlot, getGracePeriodIcon(player));
 
-        inventory.setItem(startGameSlot, getStartGameIcon());
+        boolean canStart = true;
+        if (getArena(player) == null || getArena(player).inUse()) canStart = false;
+        if (battleType.hasTeams()) {
+            if (getArena(player) == null || !getArena(player).hasTeamSpawnpoints())
+                canStart = false;
+            if (party == null || party.getTeam1().size() == 0 || party.getTeam2().size() == 0)
+                canStart = false;
+        } else {
+            if (getArena(player) == null || !getArena(player).hasSpawnpoints())
+                canStart = false;
+        }
+        if (canStart) inventory.setItem(startGameSlot, getStartGameIcon());
 
         if (party != null) {
             int i = 0;
