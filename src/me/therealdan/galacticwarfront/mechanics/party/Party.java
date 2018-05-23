@@ -164,11 +164,11 @@ public class Party {
     }
 
     public List<Player> getTeam2() {
-        List<Player> team1 = new ArrayList<>();
+        List<Player> team2 = new ArrayList<>();
         for (Player player : getPlayers())
             if (!isTeam1(player))
-                team1.add(player);
-        return team1;
+                team2.add(player);
+        return team2;
     }
 
     public List<Player> getPlayers() {
