@@ -124,6 +124,14 @@ public class Arena {
         return false;
     }
 
+    public boolean hasSpawnpoints() {
+        return getSpawnpoints().size() > 0;
+    }
+
+    public boolean hasTeamSpawnpoints() {
+        return getTeam1Spawnpoints().size() > 0 && getTeam2Spawnpoints().size() > 0;
+    }
+
     public String getID() {
         return id;
     }
