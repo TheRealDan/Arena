@@ -47,7 +47,7 @@ Battle_Creator:
     Durability: 0
     Lore:
     - "&7No teams, all against all"
-  TeamBattle:
+  Team:
     Name: "&6Team Battle"
     Material: IRON_CHESTPLATE
     Durability: 0
