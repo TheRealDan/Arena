@@ -230,7 +230,7 @@ public class BattleCreator implements Listener {
 
         battleDuration += (next ? 1000L : -1000L) * (shift ? 1 : 60);
 
-        long maxDuration = 30 * 60 * 1000;
+        long maxDuration = 15 * 60 * 1000;
 
         this.battleDuration.put(player.getUniqueId(), Math.min(Math.max(battleDuration, 0L), maxDuration));
     }
@@ -275,7 +275,7 @@ public class BattleCreator implements Listener {
     }
 
     private long getBattleDuration(Player player) {
-        return battleDuration.getOrDefault(player.getUniqueId(), 15 * 60 * 1000L);
+        return battleDuration.getOrDefault(player.getUniqueId(), 3 * 60 * 1000L);
     }
 
     private ItemStack getDuelIcon() {
