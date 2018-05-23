@@ -81,11 +81,16 @@ public class BattleCreator implements Listener {
             switch (getBattleType(player)) {
                 case FFA:
                     battle = new FFA(arena, player);
+                    if (party != null)
+                        for (Player each : party.getPlayers())
+                            battle.add(each);
                     break;
                 case Duel:
                     if (party == null) return;
                     if (party.getPlayers().size() < 2) return;
                     battle = new Duel(arena, player, party.getPlayers().get(1));
+                    for (Player each : party.getPlayers())
+                        battle.add(each);
                     break;
                 case Team:
                     if (party == null) return;
