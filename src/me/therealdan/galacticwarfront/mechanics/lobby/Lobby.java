@@ -47,6 +47,8 @@ public class Lobby implements Listener {
     private HashSet<UUID> uiOpen = new HashSet<>();
 
     private Lobby() {
+        teleportOnJoin = GalacticWarFront.getInstance().getConfig().getBoolean("Teleport_On_Join");
+
         if (getData().contains("Lobby.Spawnpoint"))
             spawnpoint = new WXYZ(getData().getString("Lobby.Spawnpoint"));
     }

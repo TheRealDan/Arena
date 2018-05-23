@@ -6,6 +6,9 @@ Color:
 # Disable this if you want to use your own event-based messages and particles
 Default_Handler_Enabled: true
 #
+#
+Teleport_On_Join: false
+#
 # Icon options for the Join Battle UI
 Join_UI:
   Join_Battle:
