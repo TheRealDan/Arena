@@ -115,6 +115,8 @@ public class Party {
         player.sendMessage(GalacticWarFront.MAIN + "You left the Party.");
 
         members.remove(player.getUniqueId());
+        invites.remove(player.getUniqueId());
+        team2.remove(player.getUniqueId());
 
         for (Player each : getPlayers())
             each.sendMessage(GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " has left the Party.");
