@@ -27,6 +27,8 @@ public interface Battle {
 
     void setTimeRemaining(long secondsStartingNow);
 
+    void setOpen(boolean open);
+
     boolean isOpen();
 
     boolean contains(Player player);
