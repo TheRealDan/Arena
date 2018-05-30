@@ -66,7 +66,7 @@ public class Team implements Battle {
         String mostKillsTeam = team1Kills >= team2Kills ? "Team 1" : "Team 2";
 
         BattleFinishEvent event = new BattleFinishEvent(this);
-        event.setBattleMessage(GalacticWarFront.SECOND + mostKillsTeam + GalacticWarFront.MAIN + " got the most kills, with " + GalacticWarFront.SECOND + mostKills + GalacticWarFront.MAIN + " kills.");
+        if (mostKills > 0) event.setBattleMessage(GalacticWarFront.SECOND + mostKillsTeam + GalacticWarFront.MAIN + " got the most kills, with " + GalacticWarFront.SECOND + mostKills + GalacticWarFront.MAIN + " kills.");
         Bukkit.getPluginManager().callEvent(event);
 
         if (event.getBattleMessage() != null)

@@ -57,10 +57,10 @@ public class Duel implements Battle {
     public void end(BattleLeaveEvent.Reason reason) {
         if (!duels.contains(this)) return;
 
-        OfflinePlayer mostKills = Bukkit.getOfflinePlayer(getKillCounter().getMostKills());
+        OfflinePlayer mostKills = getKillCounter().getMostKills() != null ? Bukkit.getOfflinePlayer(getKillCounter().getMostKills()) : null;
 
         BattleFinishEvent event = new BattleFinishEvent(this);
-        event.setBattleMessage(GalacticWarFront.SECOND + mostKills.getName() + GalacticWarFront.MAIN + " got the most kills, with " + getKillCounter().getKills(mostKills.getUniqueId()) + GalacticWarFront.MAIN + " kills.");
+        if (mostKills != null) event.setBattleMessage(GalacticWarFront.SECOND + mostKills.getName() + GalacticWarFront.MAIN + " got the most kills, with " + getKillCounter().getKills(mostKills.getUniqueId()) + GalacticWarFront.MAIN + " kills.");
         Bukkit.getPluginManager().callEvent(event);
 
         if (event.getBattleMessage() != null)
