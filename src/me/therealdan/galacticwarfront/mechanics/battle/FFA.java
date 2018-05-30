@@ -39,7 +39,7 @@ public class FFA implements Battle {
 
         BattleStartEvent event = new BattleStartEvent(this, started);
         event.setBattleMessage(GalacticWarFront.MAIN + "Your " + GalacticWarFront.SECOND + "FFA" + GalacticWarFront.MAIN + " on " + GalacticWarFront.SECOND + arena.getName() + GalacticWarFront.MAIN + " has begun.");
-        if (isOpen()) event.setLobbyMessage(GalacticWarFront.SECOND + started.getName() + GalacticWarFront.MAIN + " has started an FFA on " + GalacticWarFront.SECOND + arena.getName());
+        if (isOpen()) event.setLobbyMessage(GalacticWarFront.SECOND + started.getName() + GalacticWarFront.MAIN + " has started an " + GalacticWarFront.SECOND + "FFA" + GalacticWarFront.MAIN + " on " + GalacticWarFront.SECOND + arena.getName());
         Bukkit.getPluginManager().callEvent(event);
 
         if (event.getPlayerMessage() != null)
