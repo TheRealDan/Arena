@@ -6,8 +6,10 @@ import me.therealdan.galacticwarfront.mechanics.battle.Arena;
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
 import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
 import me.therealdan.galacticwarfront.util.PlayerHandler;
+import me.therealdan.party.Party;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -21,16 +23,34 @@ public class FFA implements Battle {
     private KillCounter killCounter;
     private long gracePeriod = 0;
     private long battleDuration = 0;
-    private boolean open = true;
+    private boolean open;
 
     private HashSet<UUID> players = new HashSet<>();
     private long startTime = System.currentTimeMillis();
 
-    public FFA(Arena arena, Player started) {
+    public FFA(Arena arena, Player started, Party party) {
         this.arena = arena;
+        this.open = party.isOpen();
 
-        BattleStartEvent battleStartEvent = new BattleStartEvent(this, started);
-        Bukkit.getPluginManager().callEvent(battleStartEvent);
+        add(started);
+        for (Player player : party.getPlayers())
+            add(player);
+
+        BattleStartEvent event = new BattleStartEvent(this, started);
+        event.setBattleMessage(GalacticWarFront.MAIN + "Your FFA on " + GalacticWarFront.SECOND + arena.getName() + GalacticWarFront.MAIN + " has begun.");
+        if (isOpen()) event.setLobbyMessage(GalacticWarFront.SECOND + started.getName() + GalacticWarFront.MAIN + " has started an FFA on " + GalacticWarFront.SECOND + arena.getName());
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getPlayerMessage() != null)
+            started.sendMessage(event.getPlayerMessage());
+
+        if (event.getBattleMessage() != null)
+            for (Player player : getPlayers())
+                player.sendMessage(event.getBattleMessage());
+
+        if (event.getLobbyMessage() != null)
+            for (Player player : Lobby.getInstance().getPlayers())
+                player.sendMessage(event.getLobbyMessage());
 
         ffas.add(this);
     }
@@ -39,8 +59,19 @@ public class FFA implements Battle {
     public void end(BattleLeaveEvent.Reason reason) {
         if (!ffas.contains(this)) return;
 
-        BattleFinishEvent battleFinishEvent = new BattleFinishEvent(this);
-        Bukkit.getPluginManager().callEvent(battleFinishEvent);
+        OfflinePlayer mostKills = Bukkit.getOfflinePlayer(getKillCounter().getMostKills());
+
+        BattleFinishEvent event = new BattleFinishEvent(this);
+        event.setBattleMessage(GalacticWarFront.SECOND + mostKills.getName() + GalacticWarFront.MAIN + " got the most kills, with " + getKillCounter().getKills(mostKills.getUniqueId()) + GalacticWarFront.MAIN + " kills.");
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getBattleMessage() != null)
+            for (Player player : getPlayers())
+                player.sendMessage(event.getBattleMessage());
+
+        if (event.getLobbyMessage() != null)
+            for (Player player : Lobby.getInstance().getPlayers())
+                player.sendMessage(event.getLobbyMessage());
 
         for (Player player : getPlayers())
             remove(player, BattleLeaveEvent.Reason.BATTLE_FINISHED);
@@ -57,26 +88,52 @@ public class FFA implements Battle {
 
         this.players.add(player.getUniqueId());
 
-        BattleJoinEvent battleJoinEvent = new BattleJoinEvent(this, player);
-        Bukkit.getPluginManager().callEvent(battleJoinEvent);
+        BattleJoinEvent event = new BattleJoinEvent(this, player);
+        event.setBattleMessage(GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " has joined the " + GalacticWarFront.SECOND + getType().name());
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getBattleMessage() != null)
+            for (Player each : getPlayers())
+                each.sendMessage(event.getBattleMessage());
 
         respawn(player);
     }
 
     @Override
     public void remove(Player player, BattleLeaveEvent.Reason reason) {
-        BattleLeaveEvent battleLeaveEvent = new BattleLeaveEvent(this, player, reason, Lobby.getInstance().getSpawnpoint());
-        Bukkit.getPluginManager().callEvent(battleLeaveEvent);
+        BattleLeaveEvent event = new BattleLeaveEvent(this, player, reason, Lobby.getInstance().getSpawnpoint());
+        switch (reason) {
+            case LEAVE:
+            case LOGOUT:
+                event.setBattleMessage(GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " has left the " + GalacticWarFront.SECOND + getType().name());
+                break;
+        }
+        Bukkit.getPluginManager().callEvent(event);
 
-        player.teleport(battleLeaveEvent.getSpawn());
+        if (event.getBattleMessage() != null)
+            for (Player each : getPlayers())
+                each.sendMessage(event.getBattleMessage());
+
+        player.teleport(event.getSpawn());
 
         this.players.remove(player.getUniqueId());
     }
 
     @Override
     public void kill(Player player, Player killer) {
-        BattleDeathEvent battleDeathEvent = new BattleDeathEvent(this, player, killer);
-        Bukkit.getPluginManager().callEvent(battleDeathEvent);
+        getKillCounter().addDeath(player.getUniqueId());
+        if (killer != null) getKillCounter().addKill(killer.getUniqueId());
+
+        BattleDeathEvent event = new BattleDeathEvent(this, player, killer);
+        event.setBattleMessage(killer != null ?
+                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " was killed by " + GalacticWarFront.SECOND + killer.getName() :
+                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " Killed themselves."
+        );
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getBattleMessage() != null)
+            for (Player each : getPlayers())
+                each.sendMessage(event.getBattleMessage());
 
         respawn(player);
     }

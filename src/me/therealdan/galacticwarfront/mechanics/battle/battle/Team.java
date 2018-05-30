@@ -6,6 +6,7 @@ import me.therealdan.galacticwarfront.mechanics.battle.Arena;
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
 import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
 import me.therealdan.galacticwarfront.util.PlayerHandler;
+import me.therealdan.party.Party;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -21,19 +22,35 @@ public class Team implements Battle {
     private KillCounter killCounter;
     private long gracePeriod = 0;
     private long battleDuration = 0;
-    private boolean open = false;
+    private boolean open;
 
     private HashSet<UUID> team1 = new HashSet<>();
     private HashSet<UUID> team2 = new HashSet<>();
     private long startTime = System.currentTimeMillis();
 
-    public Team(Arena arena, Player started) {
+    public Team(Arena arena, Player started, Party party) {
         this.arena = arena;
-
-        BattleStartEvent battleStartEvent = new BattleStartEvent(this, started);
-        Bukkit.getPluginManager().callEvent(battleStartEvent);
+        this.open = party.isOpen();
 
         add(started);
+        for (Player player : party.getPlayers())
+            add(player, party.isTeam(player, 1));
+
+        BattleStartEvent event = new BattleStartEvent(this, started);
+        event.setBattleMessage(GalacticWarFront.MAIN + "Your Team Battle on " + GalacticWarFront.SECOND + arena.getName() + GalacticWarFront.MAIN + " has begun.");
+        if (isOpen()) event.setLobbyMessage(GalacticWarFront.SECOND + started.getName() + GalacticWarFront.MAIN + " has started a Team Battle on " + GalacticWarFront.SECOND + arena.getName());
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getPlayerMessage() != null)
+            started.sendMessage(event.getPlayerMessage());
+
+        if (event.getBattleMessage() != null)
+            for (Player player : getPlayers())
+                player.sendMessage(event.getBattleMessage());
+
+        if (event.getLobbyMessage() != null)
+            for (Player player : Lobby.getInstance().getPlayers())
+                player.sendMessage(event.getLobbyMessage());
 
         teams.add(this);
     }
@@ -42,8 +59,22 @@ public class Team implements Battle {
     public void end(BattleLeaveEvent.Reason reason) {
         if (!teams.contains(this)) return;
 
-        BattleFinishEvent battleFinishEvent = new BattleFinishEvent(this);
-        Bukkit.getPluginManager().callEvent(battleFinishEvent);
+        int team1Kills = getTotalKills(true);
+        int team2Kills = getTotalKills(false);
+        int mostKills = Math.max(team1Kills, team2Kills);
+        String mostKillsTeam = team1Kills >= team2Kills ? "Team 1" : "Team 2";
+
+        BattleFinishEvent event = new BattleFinishEvent(this);
+        event.setBattleMessage(GalacticWarFront.SECOND + mostKillsTeam + GalacticWarFront.MAIN + " got the most kills, with " + GalacticWarFront.SECOND + mostKills + GalacticWarFront.MAIN + " kills.");
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getBattleMessage() != null)
+            for (Player player : getPlayers())
+                player.sendMessage(event.getBattleMessage());
+
+        if (event.getLobbyMessage() != null)
+            for (Player player : Lobby.getInstance().getPlayers())
+                player.sendMessage(event.getLobbyMessage());
 
         for (Player player : getPlayers())
             remove(player, BattleLeaveEvent.Reason.BATTLE_FINISHED);
@@ -68,18 +99,33 @@ public class Team implements Battle {
             this.team2.add(player.getUniqueId());
         }
 
-        BattleJoinEvent battleJoinEvent = new BattleJoinEvent(this, player);
-        Bukkit.getPluginManager().callEvent(battleJoinEvent);
+        BattleJoinEvent event = new BattleJoinEvent(this, player);
+        event.setBattleMessage(GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " has joined " + GalacticWarFront.SECOND + "Team " + (isTeam1(player) ? "1" : "2"));
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getBattleMessage() != null)
+            for (Player each : getPlayers())
+                each.sendMessage(event.getBattleMessage());
 
         respawn(player);
     }
 
     @Override
     public void remove(Player player, BattleLeaveEvent.Reason reason) {
-        BattleLeaveEvent battleLeaveEvent = new BattleLeaveEvent(this, player, reason, Lobby.getInstance().getSpawnpoint());
-        Bukkit.getPluginManager().callEvent(battleLeaveEvent);
+        BattleLeaveEvent event = new BattleLeaveEvent(this, player, reason, Lobby.getInstance().getSpawnpoint());
+        switch (reason) {
+            case LEAVE:
+            case LOGOUT:
+                event.setBattleMessage(GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " has left the " + GalacticWarFront.SECOND + getType().name());
+                break;
+        }
+        Bukkit.getPluginManager().callEvent(event);
 
-        player.teleport(battleLeaveEvent.getSpawn());
+        if (event.getBattleMessage() != null)
+            for (Player each : getPlayers())
+                each.sendMessage(event.getBattleMessage());
+
+        player.teleport(event.getSpawn());
 
         this.team1.remove(player.getUniqueId());
         this.team2.remove(player.getUniqueId());
@@ -87,8 +133,19 @@ public class Team implements Battle {
 
     @Override
     public void kill(Player player, Player killer) {
-        BattleDeathEvent battleDeathEvent = new BattleDeathEvent(this, player, killer);
-        Bukkit.getPluginManager().callEvent(battleDeathEvent);
+        getKillCounter().addDeath(player.getUniqueId());
+        if (killer != null) getKillCounter().addKill(killer.getUniqueId());
+
+        BattleDeathEvent event = new BattleDeathEvent(this, player, killer);
+        event.setBattleMessage(killer != null ?
+                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " was killed by " + GalacticWarFront.SECOND + killer.getName() :
+                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " Killed themselves."
+        );
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getBattleMessage() != null)
+            for (Player each : getPlayers())
+                each.sendMessage(event.getBattleMessage());
 
         respawn(player);
     }
@@ -166,6 +223,13 @@ public class Team implements Battle {
     @Override
     public long getStartTime() {
         return startTime;
+    }
+
+    public int getTotalKills(boolean team1) {
+        int totalKills = 0;
+        for (Player player : team1 ? getTeam1Players() : getTeam2Players())
+            totalKills += getKillCounter().getKills(player.getUniqueId());
+        return totalKills;
     }
 
     @Override

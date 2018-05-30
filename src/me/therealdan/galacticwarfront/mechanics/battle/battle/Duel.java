@@ -8,6 +8,7 @@ import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
 import me.therealdan.galacticwarfront.util.PlayerHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -34,8 +35,20 @@ public class Duel implements Battle {
         add(player1);
         add(player2);
 
-        BattleStartEvent battleStartEvent = new BattleStartEvent(this, player1);
-        Bukkit.getPluginManager().callEvent(battleStartEvent);
+        BattleStartEvent event = new BattleStartEvent(this, player1);
+        event.setBattleMessage(GalacticWarFront.MAIN + "Your Duel on " + GalacticWarFront.SECOND + arena.getName() + GalacticWarFront.MAIN + " has begun.");
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getPlayerMessage() != null)
+            player1.sendMessage(event.getPlayerMessage());
+
+        if (event.getBattleMessage() != null)
+            for (Player player : getPlayers())
+                player.sendMessage(event.getBattleMessage());
+
+        if (event.getLobbyMessage() != null)
+            for (Player player : Lobby.getInstance().getPlayers())
+                player.sendMessage(event.getLobbyMessage());
 
         duels.add(this);
     }
@@ -44,8 +57,19 @@ public class Duel implements Battle {
     public void end(BattleLeaveEvent.Reason reason) {
         if (!duels.contains(this)) return;
 
-        BattleFinishEvent battleFinishEvent = new BattleFinishEvent(this);
-        Bukkit.getPluginManager().callEvent(battleFinishEvent);
+        OfflinePlayer mostKills = Bukkit.getOfflinePlayer(getKillCounter().getMostKills());
+
+        BattleFinishEvent event = new BattleFinishEvent(this);
+        event.setBattleMessage(GalacticWarFront.SECOND + mostKills.getName() + GalacticWarFront.MAIN + " got the most kills, with " + getKillCounter().getKills(mostKills.getUniqueId()) + GalacticWarFront.MAIN + " kills.");
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getBattleMessage() != null)
+            for (Player player : getPlayers())
+                player.sendMessage(event.getBattleMessage());
+
+        if (event.getLobbyMessage() != null)
+            for (Player player : Lobby.getInstance().getPlayers())
+                player.sendMessage(event.getLobbyMessage());
 
         for (Player player : getPlayers())
             remove(player, BattleLeaveEvent.Reason.BATTLE_FINISHED);
@@ -62,26 +86,52 @@ public class Duel implements Battle {
 
         this.players.add(player.getUniqueId());
 
-        BattleJoinEvent battleJoinEvent = new BattleJoinEvent(this, player);
-        Bukkit.getPluginManager().callEvent(battleJoinEvent);
+        BattleJoinEvent event = new BattleJoinEvent(this, player);
+        event.setBattleMessage(GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " has joined the " + GalacticWarFront.SECOND + getType().name());
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getBattleMessage() != null)
+            for (Player each : getPlayers())
+                each.sendMessage(event.getBattleMessage());
 
         respawn(player);
     }
 
     @Override
     public void remove(Player player, BattleLeaveEvent.Reason reason) {
-        BattleLeaveEvent battleLeaveEvent = new BattleLeaveEvent(this, player, reason, Lobby.getInstance().getSpawnpoint());
-        Bukkit.getPluginManager().callEvent(battleLeaveEvent);
+        BattleLeaveEvent event = new BattleLeaveEvent(this, player, reason, Lobby.getInstance().getSpawnpoint());
+        switch (reason) {
+            case LEAVE:
+            case LOGOUT:
+                event.setBattleMessage(GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " has left the " + GalacticWarFront.SECOND + getType().name());
+                break;
+        }
+        Bukkit.getPluginManager().callEvent(event);
 
-        player.teleport(battleLeaveEvent.getSpawn());
+        if (event.getBattleMessage() != null)
+            for (Player each : getPlayers())
+                each.sendMessage(event.getBattleMessage());
+
+        player.teleport(event.getSpawn());
 
         this.players.remove(player.getUniqueId());
     }
 
     @Override
     public void kill(Player player, Player killer) {
-        BattleDeathEvent battleDeathEvent = new BattleDeathEvent(this, player, killer);
-        Bukkit.getPluginManager().callEvent(battleDeathEvent);
+        getKillCounter().addDeath(player.getUniqueId());
+        if (killer != null) getKillCounter().addKill(killer.getUniqueId());
+
+        BattleDeathEvent event = new BattleDeathEvent(this, player, killer);
+        event.setBattleMessage(killer != null ?
+                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " was killed by " + GalacticWarFront.SECOND + killer.getName() :
+                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " killed themselves."
+        );
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getBattleMessage() != null)
+            for (Player each : getPlayers())
+                each.sendMessage(event.getBattleMessage());
 
         respawn(player);
     }
