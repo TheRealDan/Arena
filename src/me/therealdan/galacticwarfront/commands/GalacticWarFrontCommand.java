@@ -6,9 +6,7 @@ import me.therealdan.galacticwarfront.mechanics.battle.Arena;
 import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
 import me.therealdan.galacticwarfront.mechanics.lobby.BattleCreator;
 import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
-import me.therealdan.galacticwarfront.mechanics.party.Party;
 import me.therealdan.galacticwarfront.util.WXYZ;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -29,11 +27,9 @@ public class GalacticWarFrontCommand implements CommandExecutor {
             if (args[0].equalsIgnoreCase("Join")) {
                 Battle battle = Battle.get(player);
                 if (battle == null) {
-                    if (Lobby.getInstance().contains(player)) {
-                        Lobby.getInstance().open(player);
-                    } else {
+                    if (!Lobby.getInstance().contains(player))
                         Lobby.getInstance().join(player);
-                    }
+                    Lobby.getInstance().open(player);
                 } else {
                     player.sendMessage(GalacticWarFront.MAIN + "Please leave the Battle you are in first.");
                 }
@@ -53,9 +49,6 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                 }
                 battle.remove(player, BattleLeaveEvent.Reason.LEAVE);
                 Lobby.getInstance().join(player);
-            } else if (args[0].equalsIgnoreCase("Party")) {
-                party(player, args);
-                return true;
             } else if (args[0].equalsIgnoreCase("Lobby") && lobbySetup(player)) {
                 if (args.length > 1) {
                     if (args[1].equalsIgnoreCase("Spawnpoint")) {
@@ -72,81 +65,13 @@ public class GalacticWarFrontCommand implements CommandExecutor {
             }
         }
 
-        player.sendMessage(GalacticWarFront.MAIN + "/GWF Join " + GalacticWarFront.SECOND + "Join GalacticWarFront Lobby");
+        player.sendMessage(GalacticWarFront.MAIN + "/GWF Join " + GalacticWarFront.SECOND + "Join a Game");
         player.sendMessage(GalacticWarFront.MAIN + "/GWF Create " + GalacticWarFront.SECOND + "Create a game");
         player.sendMessage(GalacticWarFront.MAIN + "/GWF Leave " + GalacticWarFront.SECOND + "Leave current game");
-        player.sendMessage(GalacticWarFront.MAIN + "/GWF Party " + GalacticWarFront.SECOND + "Create or Join a Party");
         if (lobbySetup(player)) player.sendMessage(GalacticWarFront.MAIN + "/GWF Lobby " + GalacticWarFront.SECOND + "Setup GalacticWarFront Lobby");
         if (arenaSetup(player)) player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena " + GalacticWarFront.SECOND + "Setup GalacticWarFront Arenas");
 
         return true;
-    }
-
-    private void party(Player player, String[] args) {
-        Party party = Party.byPlayer(player);
-        if (args.length > 1) {
-            if (args[1].equalsIgnoreCase("Create") && party == null) {
-                new Party(player);
-                return;
-            } else if (args[1].equalsIgnoreCase("Join") && party == null) {
-                try {
-                    Player target = Bukkit.getPlayer(args[2]);
-                    party = Party.byPlayer(target);
-                    if (party == null) {
-                        player.sendMessage(GalacticWarFront.SECOND + target.getName() + GalacticWarFront.MAIN + " is not in a Party.");
-                        return;
-                    }
-                    if (party.hasInvite(player)) {
-                        party.join(player);
-                    } else {
-                        player.sendMessage(GalacticWarFront.SECOND + target.getName() + GalacticWarFront.MAIN + " hasn't invited you to their Party.");
-                    }
-                } catch (Exception e) {
-                    player.sendMessage(GalacticWarFront.MAIN + "/GWF Party Join [Player]");
-                }
-                return;
-            } else if (args[1].equalsIgnoreCase("Info") && party != null) {
-                party.info(player);
-                return;
-            } else if (args[1].equalsIgnoreCase("ChangeTeam") && party != null) {
-                party.changeTeam(player);
-                return;
-            } else if (args[1].equalsIgnoreCase("Leave") && party != null) {
-                party.leave(player);
-                return;
-            } else if (args[1].equalsIgnoreCase("Invite") && party != null) {
-                try {
-                    Player target = Bukkit.getPlayer(args[2]);
-                    if (Party.byPlayer(target) != null) {
-                        player.sendMessage(GalacticWarFront.SECOND + target.getName() + GalacticWarFront.MAIN + " already has a Party.");
-                        return;
-                    }
-                    party.invite(target, player);
-                } catch (Exception e) {
-                    player.sendMessage(GalacticWarFront.MAIN + "/GWF Invite [Player]");
-                }
-                return;
-            } else if (args[1].equalsIgnoreCase("Kick") && party != null) {
-                try {
-                    Player target = Bukkit.getPlayer(args[2]);
-                    if (!party.contains(target)) {
-                        player.sendMessage(GalacticWarFront.SECOND + target.getName() + GalacticWarFront.MAIN + " isn't in your Party.");
-                        return;
-                    }
-                    party.kick(target, player);
-                } catch (Exception e) {
-                    player.sendMessage(GalacticWarFront.MAIN + "/GWF Kick [Player]");
-                }
-                return;
-            }
-        }
-        if (party == null) player.sendMessage(GalacticWarFront.MAIN + "/GWF Party Create " + GalacticWarFront.SECOND + "Create a Party.");
-        if (party == null) player.sendMessage(GalacticWarFront.MAIN + "/GWF Party Join [Player] " + GalacticWarFront.SECOND + "Join a players Party.");
-        if (party != null) player.sendMessage(GalacticWarFront.MAIN + "/GWF Party Info " + GalacticWarFront.SECOND + "Check your Party.");
-        if (party != null) player.sendMessage(GalacticWarFront.MAIN + "/GWF Party ChangeTeam " + GalacticWarFront.SECOND + "Change Team (Only for Team Battles)");
-        if (party != null) player.sendMessage(GalacticWarFront.MAIN + "/GWF Party Leave " + GalacticWarFront.SECOND + "Leave the Party.");
-        if (party != null) player.sendMessage(GalacticWarFront.MAIN + "/GWF Party Invite [Player] " + GalacticWarFront.SECOND + "Invite someone to the Party.");
-        if (party != null) player.sendMessage(GalacticWarFront.MAIN + "/GWF Party Kick [Player] " + GalacticWarFront.SECOND + "Kick someone from the Party.");
     }
 
     private void arena(Player player, String[] args) {

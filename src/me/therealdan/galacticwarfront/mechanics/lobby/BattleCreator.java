@@ -7,8 +7,8 @@ import me.therealdan.galacticwarfront.mechanics.battle.battle.Duel;
 import me.therealdan.galacticwarfront.mechanics.battle.battle.FFA;
 import me.therealdan.galacticwarfront.mechanics.battle.battle.Team;
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
-import me.therealdan.galacticwarfront.mechanics.party.Party;
 import me.therealdan.galacticwarfront.util.Icon;
+import me.therealdan.party.Party;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -94,11 +94,11 @@ public class BattleCreator implements Listener {
                     break;
                 case Team:
                     if (party == null) return;
-                    if (party.getTeam1().size() == 0) return;
-                    if (party.getTeam2().size() == 0) return;
+                    if (party.getPlayers(1).size() == 0) return;
+                    if (party.getPlayers(2).size() == 0) return;
                     Team team = new Team(arena, player);
                     for (Player each : party.getPlayers())
-                        team.add(each, party.isTeam1(each));
+                        team.add(each, party.isTeam(each, 1));
                     battle = team;
                     break;
             }
@@ -113,7 +113,7 @@ public class BattleCreator implements Listener {
 
         for (Player each : party.getPlayers()) {
             if (getPlayerIcon(each).isSimilar(event.getCurrentItem())) {
-                party.changeTeam(each);
+                party.setTeam(each.getUniqueId(), party.isTeam(each, 1) ? 2 : 1);
                 openBattleCreator(player);
                 return;
             }
@@ -152,7 +152,7 @@ public class BattleCreator implements Listener {
         int size = 9;
         if (party != null) {
             if (battleType.hasTeams()) {
-                int largerTeam = party.getLargestTeam().size();
+                int largerTeam = party.getLargestTeamSize();
                 while (size < (largerTeam * 2) + 9) size += 9;
             } else {
                 while (size < party.getPlayers().size() + 9) size += 9;
@@ -172,7 +172,7 @@ public class BattleCreator implements Listener {
         if (battleType.hasTeams()) {
             if (getArena(player) == null || !getArena(player).hasTeamSpawnpoints())
                 canStart = false;
-            if (party == null || party.getTeam1().size() == 0 || party.getTeam2().size() == 0)
+            if (party == null || party.size(1) == 0 || party.size(2) == 0)
                 canStart = false;
         } else {
             if (getArena(player) == null || !getArena(player).hasSpawnpoints())
@@ -182,10 +182,10 @@ public class BattleCreator implements Listener {
 
         if (party != null) {
             int i = 0;
-            for (Player each : party.getTeam1())
+            for (Player each : party.getPlayers(1))
                 inventory.setItem(getSlots(true).get(i++), getPlayerIcon(each));
             i = 0;
-            for (Player each : party.getTeam2())
+            for (Player each : party.getPlayers(2))
                 inventory.setItem(getSlots(false).get(i++), getPlayerIcon(each));
         }
 
@@ -272,7 +272,7 @@ public class BattleCreator implements Listener {
 
         if (battleType.equals(Battle.Type.Team) || battleType.equals(Battle.Type.Duel)) {
             Party party = Party.byPlayer(player);
-            if (party == null || party.getTeam1().size() == 0 || party.getTeam2().size() == 0)
+            if (party == null || party.size(1) == 0 || party.size(2) == 0)
                 battleType = Battle.Type.FFA;
         }
 
@@ -382,7 +382,7 @@ public class BattleCreator implements Listener {
         Party party = Party.byPlayer(player);
         List<String> lore = new ArrayList<>();
         if (party != null)
-            lore.add(ChatColor.translateAlternateColorCodes('&', "&7Team " + (party.isTeam1(player) ? "1" : "2")));
+            lore.add(ChatColor.translateAlternateColorCodes('&', "&7Team " + party.getTeam(player)));
         lore.add(ChatColor.translateAlternateColorCodes('&', "&7KDR: &f" + KillCounter.getKDR(player.getUniqueId())));
 
         ItemStack icon = new ItemStack(Material.SKULL_ITEM);

@@ -65,11 +65,11 @@ public class Lobby implements Listener {
         if (size > 54) size = 54;
         Inventory inventory = Bukkit.createInventory(null, size, "");
 
-        inventory.setItem(size - 1, getCreateBattleIcon());
-
         for (Battle battle : Battle.values())
             if (battle.isOpen())
                 inventory.addItem(getJoinBattleIcon(battle));
+
+        inventory.setItem(size - 1, getCreateBattleIcon());
 
         player.openInventory(inventory);
         uiOpen.add(player.getUniqueId());

@@ -9,8 +9,6 @@ import me.therealdan.galacticwarfront.mechanics.battle.eventhandler.DefaultHandl
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
 import me.therealdan.galacticwarfront.mechanics.lobby.BattleCreator;
 import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
-import me.therealdan.galacticwarfront.mechanics.party.Party;
-import me.therealdan.galacticwarfront.mechanics.party.PartyHandler;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,10 +26,8 @@ public class GalacticWarFront extends JavaPlugin {
         SECOND = ChatColor.translateAlternateColorCodes('&', getConfig().getString("Color.Secondary"));
 
         Arena.load();
-        Party.load();
 
         getServer().getPluginManager().registerEvents(Lobby.getInstance(), this);
-        getServer().getPluginManager().registerEvents(PartyHandler.getInstance(), this);
         getServer().getPluginManager().registerEvents(BattleCreator.getInstance(), this);
         getServer().getPluginManager().registerEvents(BattleHandler.getInstance(), this);
 
@@ -51,7 +47,6 @@ public class GalacticWarFront extends JavaPlugin {
         Lobby.getInstance().unload();
 
         Arena.unload();
-        Party.unload();
         KillCounter.unload();
     }
 
