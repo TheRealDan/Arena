@@ -39,7 +39,7 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                 if (battle == null) {
                     BattleCreator.getInstance().openBattleCreator(player);
                 } else {
-                    player.sendMessage("Please leave the Battle you are in first.");
+                    player.sendMessage(GalacticWarFront.MAIN + "Please leave the Battle you are in first.");
                 }
                 return true;
             } else if (args[0].equalsIgnoreCase("Leave")) {
