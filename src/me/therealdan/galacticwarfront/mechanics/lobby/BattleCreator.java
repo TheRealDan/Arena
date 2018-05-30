@@ -41,12 +41,6 @@ public class BattleCreator implements Listener {
     private ItemStack duelIcon, ffaIcon, teamBattleIcon, gracePeriodIcon, battleDurationIcon, startGameIcon, noFreeArenaIcon;
     private List<Integer> team1Slots, team2Slots;
 
-    private int battleTypeSlot = 0;
-    private int arenaSlot = 1;
-    private int battleDurationSlot = 2;
-    private int gracePeriodSlot = 3;
-    private int startGameSlot = 8;
-
     private BattleCreator() {
     }
 
@@ -58,22 +52,23 @@ public class BattleCreator implements Listener {
 
         if (event.getCurrentItem() == null) return;
 
-        if (event.getSlot() == battleTypeSlot) {
+        if (getDuelIcon().isSimilar(event.getCurrentItem()) || getFFAIcon().isSimilar(event.getCurrentItem()) || getTeamBattleIcon().isSimilar(event.getCurrentItem())) {
             toggleBattleType(player, event.isLeftClick());
             openBattleCreator(player);
             return;
-        } else if (event.getSlot() == arenaSlot) {
+        } else if (getArenaIcon(player).isSimilar(event.getCurrentItem())) {
             openArenaPicker(player);
             return;
-        } else if (event.getSlot() == battleDurationSlot) {
+        } else if (getBattleDurationIcon(player).isSimilar(event.getCurrentItem())) {
             toggleBattleDuration(player, event.isLeftClick(), event.isShiftClick());
             openBattleCreator(player);
             return;
-        } else if (event.getSlot() == gracePeriodSlot) {
+        } else if (getGracePeriodIcon(player).isSimilar(event.getCurrentItem())) {
             toggleGracePeriod(player, event.isLeftClick(), event.isShiftClick());
             openBattleCreator(player);
             return;
-        } else if (event.getSlot() == startGameSlot) {
+        } else if (getStartGameIcon().isSimilar(event.getCurrentItem())) {
+            player.sendMessage("Starting " + getBattleType(player));
             if (!canStart(player)) return;
             Arena arena = getArena(player);
             if (arena.inUse()) return;
@@ -157,12 +152,12 @@ public class BattleCreator implements Listener {
 
         Inventory inventory = Bukkit.createInventory(null, size, "Battle Creator");
 
-        inventory.setItem(battleTypeSlot, battleType.equals(Battle.Type.FFA) ? getFFAIcon() : battleType.equals(Battle.Type.Team) ? getTeamBattleIcon() : getDuelIcon());
-        inventory.setItem(arenaSlot, getArenaIcon(player));
-        inventory.setItem(battleDurationSlot, getBattleDurationIcon(player));
-        inventory.setItem(gracePeriodSlot, getGracePeriodIcon(player));
+        inventory.setItem(0, battleType.equals(Battle.Type.FFA) ? getFFAIcon() : battleType.equals(Battle.Type.Team) ? getTeamBattleIcon() : getDuelIcon());
+        inventory.setItem(1, getArenaIcon(player));
+        inventory.setItem(2, getBattleDurationIcon(player));
+        inventory.setItem(3, getGracePeriodIcon(player));
 
-        if (canStart(player)) inventory.setItem(startGameSlot, getStartGameIcon());
+        if (canStart(player)) inventory.setItem(8, getStartGameIcon());
 
         if (party != null) {
             int i = 0;
