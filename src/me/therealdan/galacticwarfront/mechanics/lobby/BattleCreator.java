@@ -68,7 +68,6 @@ public class BattleCreator implements Listener {
             openBattleCreator(player);
             return;
         } else if (getStartGameIcon().isSimilar(event.getCurrentItem())) {
-            player.sendMessage("Starting " + getBattleType(player));
             if (!canStart(player)) return;
             Arena arena = getArena(player);
             if (arena.inUse()) return;
@@ -298,7 +297,16 @@ public class BattleCreator implements Listener {
                 noFreeArenaIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "No_Free_Arena.Team", false);
             return noFreeArenaIcon;
         }
-        return getArenaIcon(arena);
+
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.translateAlternateColorCodes('&', "&7Click to change Arena"));
+
+        ItemStack icon = getArenaIcon(arena);
+        ItemMeta itemMeta = icon.getItemMeta();
+        itemMeta.setLore(lore);
+        icon.setItemMeta(itemMeta);
+
+        return icon;
     }
 
     private ItemStack getArenaIcon(Arena arena) {
