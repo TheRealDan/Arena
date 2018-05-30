@@ -41,6 +41,7 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                 } else {
                     player.sendMessage("Please leave the Battle you are in first.");
                 }
+                return true;
             } else if (args[0].equalsIgnoreCase("Leave")) {
                 Battle battle = Battle.get(player);
                 if (battle == null) {
@@ -49,6 +50,7 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                 }
                 battle.remove(player, BattleLeaveEvent.Reason.LEAVE);
                 Lobby.getInstance().join(player);
+                return true;
             } else if (args[0].equalsIgnoreCase("Lobby") && lobbySetup(player)) {
                 if (args.length > 1) {
                     if (args[1].equalsIgnoreCase("Spawnpoint")) {
