@@ -38,7 +38,7 @@ public class Team implements Battle {
                 add(player, party.isTeam(player, 1));
 
         BattleStartEvent event = new BattleStartEvent(this, started);
-        event.setBattleMessage(GalacticWarFront.MAIN + "Your Team Battle on " + GalacticWarFront.SECOND + arena.getName() + GalacticWarFront.MAIN + " has begun.");
+        event.setBattleMessage(GalacticWarFront.MAIN + "Your " + GalacticWarFront.SECOND + "Team Battle" + GalacticWarFront.MAIN + " on " + GalacticWarFront.SECOND + arena.getName() + GalacticWarFront.MAIN + " has begun.");
         if (isOpen()) event.setLobbyMessage(GalacticWarFront.SECOND + started.getName() + GalacticWarFront.MAIN + " has started a Team Battle on " + GalacticWarFront.SECOND + arena.getName());
         Bukkit.getPluginManager().callEvent(event);
 

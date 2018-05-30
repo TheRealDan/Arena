@@ -36,7 +36,7 @@ public class Duel implements Battle {
         add(player2);
 
         BattleStartEvent event = new BattleStartEvent(this, player1);
-        event.setBattleMessage(GalacticWarFront.MAIN + "Your Duel on " + GalacticWarFront.SECOND + arena.getName() + GalacticWarFront.MAIN + " has begun.");
+        event.setBattleMessage(GalacticWarFront.MAIN + "Your " + GalacticWarFront.SECOND + "Duel" + GalacticWarFront.MAIN + " on " + GalacticWarFront.SECOND + arena.getName() + GalacticWarFront.MAIN + " has begun.");
         Bukkit.getPluginManager().callEvent(event);
 
         if (event.getPlayerMessage() != null)
