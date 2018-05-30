@@ -3,8 +3,6 @@ package me.therealdan.galacticwarfront.mechanics.battle;
 import me.therealdan.galacticwarfront.GalacticWarFront;
 import me.therealdan.galacticwarfront.events.BattleDamageEvent;
 import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
-import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
-import me.therealdan.galacticwarfront.mechanics.battle.battle.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;

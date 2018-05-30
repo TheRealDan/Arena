@@ -1,12 +1,11 @@
-package me.therealdan.galacticwarfront.mechanics.battle.battle;
+package me.therealdan.galacticwarfront.mechanics.battle;
 
 import me.therealdan.galacticwarfront.GalacticWarFront;
 import me.therealdan.galacticwarfront.events.*;
-import me.therealdan.galacticwarfront.mechanics.battle.Arena;
+import me.therealdan.galacticwarfront.mechanics.arena.Arena;
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
 import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
 import me.therealdan.galacticwarfront.util.PlayerHandler;
-import me.therealdan.party.Party;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -15,34 +14,33 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-public class FFA implements Battle {
+public class Duel implements Battle {
 
-    private static HashSet<FFA> ffas = new HashSet<>();
+    private static HashSet<Duel> duels = new HashSet<>();
 
     private Arena arena;
     private KillCounter killCounter;
+    private UUID player1, player2;
     private long gracePeriod = 0;
     private long battleDuration = 0;
-    private boolean open;
 
     private HashSet<UUID> players = new HashSet<>();
     private long startTime = System.currentTimeMillis();
 
-    public FFA(Arena arena, Player started, Party party) {
+    public Duel(Arena arena, Player player1, Player player2) {
         this.arena = arena;
-        this.open = party.isOpen();
+        this.player1 = player1.getUniqueId();
+        this.player2 = player2.getUniqueId();
 
-        add(started);
-        for (Player player : party.getPlayers())
-            add(player);
+        add(player1);
+        add(player2);
 
-        BattleStartEvent event = new BattleStartEvent(this, started);
-        event.setBattleMessage(GalacticWarFront.MAIN + "Your FFA on " + GalacticWarFront.SECOND + arena.getName() + GalacticWarFront.MAIN + " has begun.");
-        if (isOpen()) event.setLobbyMessage(GalacticWarFront.SECOND + started.getName() + GalacticWarFront.MAIN + " has started an FFA on " + GalacticWarFront.SECOND + arena.getName());
+        BattleStartEvent event = new BattleStartEvent(this, player1);
+        event.setBattleMessage(GalacticWarFront.MAIN + "Your Duel on " + GalacticWarFront.SECOND + arena.getName() + GalacticWarFront.MAIN + " has begun.");
         Bukkit.getPluginManager().callEvent(event);
 
         if (event.getPlayerMessage() != null)
-            started.sendMessage(event.getPlayerMessage());
+            player1.sendMessage(event.getPlayerMessage());
 
         if (event.getBattleMessage() != null)
             for (Player player : getPlayers())
@@ -52,12 +50,12 @@ public class FFA implements Battle {
             for (Player player : Lobby.getInstance().getPlayers())
                 player.sendMessage(event.getLobbyMessage());
 
-        ffas.add(this);
+        duels.add(this);
     }
 
     @Override
     public void end(BattleLeaveEvent.Reason reason) {
-        if (!ffas.contains(this)) return;
+        if (!duels.contains(this)) return;
 
         OfflinePlayer mostKills = Bukkit.getOfflinePlayer(getKillCounter().getMostKills());
 
@@ -76,7 +74,7 @@ public class FFA implements Battle {
         for (Player player : getPlayers())
             remove(player, BattleLeaveEvent.Reason.BATTLE_FINISHED);
 
-        ffas.remove(this);
+        duels.remove(this);
     }
 
     @Override
@@ -127,7 +125,7 @@ public class FFA implements Battle {
         BattleDeathEvent event = new BattleDeathEvent(this, player, killer);
         event.setBattleMessage(killer != null ?
                 GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " was killed by " + GalacticWarFront.SECOND + killer.getName() :
-                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " Killed themselves."
+                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " killed themselves."
         );
         Bukkit.getPluginManager().callEvent(event);
 
@@ -166,12 +164,12 @@ public class FFA implements Battle {
 
     @Override
     public void setOpen(boolean open) {
-        this.open = open;
+        // Duel's only support two players, and will never be open - See isOpen()
     }
 
     @Override
     public boolean isOpen() {
-        return open;
+        return false;
     }
 
     @Override
@@ -209,14 +207,22 @@ public class FFA implements Battle {
         return startTime;
     }
 
+    public Player getPlayer1() {
+        return Bukkit.getPlayer(player1);
+    }
+
+    public Player getPlayer2() {
+        return Bukkit.getPlayer(player2);
+    }
+
     @Override
     public Type getType() {
-        return Type.FFA;
+        return Type.Duel;
     }
 
     @Override
     public Location getRandomSpawnpoint(Player player) {
-        List<Location> spawnpoints = getArena().getSpawnpoints();
+        List<Location> spawnpoints = getPlayer1() == player ? getArena().getTeam1Spawnpoints() : getArena().getTeam2Spawnpoints();
 
         int checks = 0;
         Location location = null;
@@ -252,14 +258,14 @@ public class FFA implements Battle {
         return players;
     }
 
-    public static FFA get(Player player) {
-        for (FFA ffa : values())
-            if (ffa.contains(player))
-                return ffa;
+    public static Duel get(Player player) {
+        for (Duel duel : values())
+            if (duel.contains(player))
+                return duel;
         return null;
     }
 
-    public static List<FFA> values() {
-        return new ArrayList<>(ffas);
+    public static List<Duel> values() {
+        return new ArrayList<>(duels);
     }
 }

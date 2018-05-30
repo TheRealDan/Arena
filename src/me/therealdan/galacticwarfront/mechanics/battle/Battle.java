@@ -1,7 +1,7 @@
-package me.therealdan.galacticwarfront.mechanics.battle.battle;
+package me.therealdan.galacticwarfront.mechanics.battle;
 
 import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
-import me.therealdan.galacticwarfront.mechanics.battle.Arena;
+import me.therealdan.galacticwarfront.mechanics.arena.Arena;
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

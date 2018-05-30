@@ -2,8 +2,8 @@ package me.therealdan.galacticwarfront.commands;
 
 import me.therealdan.galacticwarfront.GalacticWarFront;
 import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
-import me.therealdan.galacticwarfront.mechanics.battle.Arena;
-import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
+import me.therealdan.galacticwarfront.mechanics.arena.Arena;
+import me.therealdan.galacticwarfront.mechanics.battle.Battle;
 import me.therealdan.galacticwarfront.mechanics.lobby.BattleCreator;
 import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
 import me.therealdan.galacticwarfront.util.WXYZ;

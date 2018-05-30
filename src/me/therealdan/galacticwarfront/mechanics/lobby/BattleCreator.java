@@ -1,11 +1,11 @@
 package me.therealdan.galacticwarfront.mechanics.lobby;
 
 import me.therealdan.galacticwarfront.GalacticWarFront;
-import me.therealdan.galacticwarfront.mechanics.battle.Arena;
-import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
-import me.therealdan.galacticwarfront.mechanics.battle.battle.Duel;
-import me.therealdan.galacticwarfront.mechanics.battle.battle.FFA;
-import me.therealdan.galacticwarfront.mechanics.battle.battle.Team;
+import me.therealdan.galacticwarfront.mechanics.arena.Arena;
+import me.therealdan.galacticwarfront.mechanics.battle.Battle;
+import me.therealdan.galacticwarfront.mechanics.battle.Duel;
+import me.therealdan.galacticwarfront.mechanics.battle.FFA;
+import me.therealdan.galacticwarfront.mechanics.battle.Team;
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
 import me.therealdan.galacticwarfront.util.Icon;
 import me.therealdan.party.Party;
