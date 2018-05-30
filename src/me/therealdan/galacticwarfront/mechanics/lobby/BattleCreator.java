@@ -73,33 +73,28 @@ public class BattleCreator implements Listener {
             toggleGracePeriod(player, event.isLeftClick(), event.isShiftClick());
             openBattleCreator(player);
             return;
-        } else if (getStartGameIcon().isSimilar(event.getCurrentItem())) {
+        } else if (event.getSlot() == startGameSlot) {
+            if (!canStart(player)) return;
             Arena arena = getArena(player);
             if (arena.inUse()) return;
             Battle battle = null;
             Party party = Party.byPlayer(player);
             switch (getBattleType(player)) {
                 case FFA:
-                    battle = new FFA(arena, player);
-                    if (party != null)
-                        for (Player each : party.getPlayers())
-                            battle.add(each);
+                    battle = new FFA(arena, player, party);
                     break;
                 case Duel:
                     if (party == null) return;
                     if (party.getPlayers().size() < 2) return;
-                    battle = new Duel(arena, player, party.getPlayers().get(1));
-                    for (Player each : party.getPlayers())
-                        battle.add(each);
+                    Player player2 = party.getPlayers().get(0);
+                    if (player2.equals(player)) player2 = party.getPlayers().get(1);
+                    battle = new Duel(arena, player, player2);
                     break;
                 case Team:
                     if (party == null) return;
                     if (party.getPlayers(1).size() == 0) return;
                     if (party.getPlayers(2).size() == 0) return;
-                    Team team = new Team(arena, player);
-                    for (Player each : party.getPlayers())
-                        team.add(each, party.isTeam(each, 1));
-                    battle = team;
+                    battle = new Team(arena, player, party);
                     break;
             }
             battle.setGracePeriod(getGracePeriod(player) / 1000);
@@ -167,18 +162,7 @@ public class BattleCreator implements Listener {
         inventory.setItem(battleDurationSlot, getBattleDurationIcon(player));
         inventory.setItem(gracePeriodSlot, getGracePeriodIcon(player));
 
-        boolean canStart = true;
-        if (getArena(player) == null || getArena(player).inUse()) canStart = false;
-        if (battleType.hasTeams()) {
-            if (getArena(player) == null || !getArena(player).hasTeamSpawnpoints())
-                canStart = false;
-            if (party == null || party.size(1) == 0 || party.size(2) == 0)
-                canStart = false;
-        } else {
-            if (getArena(player) == null || !getArena(player).hasSpawnpoints())
-                canStart = false;
-        }
-        if (canStart) inventory.setItem(startGameSlot, getStartGameIcon());
+        if (canStart(player)) inventory.setItem(startGameSlot, getStartGameIcon());
 
         if (party != null) {
             int i = 0;
@@ -235,6 +219,30 @@ public class BattleCreator implements Listener {
         this.battleDuration.put(player.getUniqueId(), Math.min(Math.max(battleDuration, 0L), maxDuration));
     }
 
+    private boolean canStart(Player player) {
+        Party party = Party.byPlayer(player);
+        Arena arena = getArena(player);
+        Battle.Type battleType = getBattleType(player);
+
+        if (arena == null) return false;
+        if (arena.inUse()) return false;
+
+        switch (battleType) {
+            case Duel:
+                if (party == null) return false;
+                if (party.size() != 2) return false;
+                break;
+            case FFA:
+
+                break;
+            case Team:
+
+                break;
+        }
+
+        return true;
+    }
+
     public boolean hasBattleCreatorUIOpen(Player player) {
         return battleCreatorUIOpen.contains(player.getUniqueId());
     }
@@ -254,29 +262,7 @@ public class BattleCreator implements Listener {
     }
 
     private Battle.Type getBattleType(Player player) {
-        Battle.Type battleType = this.battleType.getOrDefault(player.getUniqueId(), Battle.Type.FFA);
-
-        // TODO - Better conditions
-
-        switch (battleType) {
-            case FFA:
-
-                break;
-            case Duel:
-
-                break;
-            case Team:
-
-                break;
-        }
-
-        if (battleType.equals(Battle.Type.Team) || battleType.equals(Battle.Type.Duel)) {
-            Party party = Party.byPlayer(player);
-            if (party == null || party.size(1) == 0 || party.size(2) == 0)
-                battleType = Battle.Type.FFA;
-        }
-
-        return battleType;
+        return this.battleType.getOrDefault(player.getUniqueId(), Battle.Type.FFA);
     }
 
     private long getGracePeriod(Player player) {
