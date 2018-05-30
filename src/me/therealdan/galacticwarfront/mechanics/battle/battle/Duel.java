@@ -113,6 +113,11 @@ public class Duel implements Battle {
     }
 
     @Override
+    public void setOpen(boolean open) {
+        // Duel's only support two players, and will never be open - See isOpen()
+    }
+
+    @Override
     public boolean isOpen() {
         return false;
     }
