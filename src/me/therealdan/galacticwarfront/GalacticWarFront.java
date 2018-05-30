@@ -5,7 +5,6 @@ import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
 import me.therealdan.galacticwarfront.mechanics.battle.Arena;
 import me.therealdan.galacticwarfront.mechanics.battle.BattleHandler;
 import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
-import me.therealdan.galacticwarfront.mechanics.battle.eventhandler.DefaultHandler;
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
 import me.therealdan.galacticwarfront.mechanics.lobby.BattleCreator;
 import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
@@ -31,8 +30,6 @@ public class GalacticWarFront extends JavaPlugin {
         getServer().getPluginManager().registerEvents(BattleCreator.getInstance(), this);
         getServer().getPluginManager().registerEvents(BattleHandler.getInstance(), this);
 
-        if (getConfig().getBoolean("Default_Handler_Enabled")) getServer().getPluginManager().registerEvents(DefaultHandler.getInstance(), this);
-
         getCommand("GalacticWarFront").setExecutor(new GalacticWarFrontCommand());
         getCommand("GWF").setExecutor(new GalacticWarFrontCommand());
     }
@@ -41,8 +38,6 @@ public class GalacticWarFront extends JavaPlugin {
     public void onDisable() {
         for (Battle battle : Battle.values())
             battle.end(BattleLeaveEvent.Reason.SERVER_SHUTDOWN);
-
-        DefaultHandler.getInstance().unload();
 
         Lobby.getInstance().unload();
 
