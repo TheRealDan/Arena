@@ -15,6 +15,8 @@ public class BattleLeaveEvent extends Event {
     private Reason reason;
     private Location spawn;
 
+    private String battleMessage;
+
     public BattleLeaveEvent(Battle battle, Player player, Reason reason, Location spawn) {
         this.battle = battle;
         this.player = player;
@@ -24,6 +26,10 @@ public class BattleLeaveEvent extends Event {
 
     public void setSpawn(Location spawn) {
         this.spawn = spawn;
+    }
+
+    public void setBattleMessage(String battleMessage) {
+        this.battleMessage = battleMessage;
     }
 
     public Battle getBattle() {
@@ -40,6 +46,10 @@ public class BattleLeaveEvent extends Event {
 
     public Location getSpawn() {
         return spawn;
+    }
+
+    public String getBattleMessage() {
+        return battleMessage;
     }
 
     @Override

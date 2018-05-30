@@ -12,9 +12,15 @@ public class BattleJoinEvent extends Event {
     private Battle battle;
     private Player player;
 
+    private String battleMessage;
+
     public BattleJoinEvent(Battle battle, Player player) {
         this.battle = battle;
         this.player = player;
+    }
+
+    public void setBattleMessage(String battleMessage) {
+        this.battleMessage = battleMessage;
     }
 
     public Battle getBattle() {
@@ -23,6 +29,10 @@ public class BattleJoinEvent extends Event {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public String getBattleMessage() {
+        return battleMessage;
     }
 
     @Override

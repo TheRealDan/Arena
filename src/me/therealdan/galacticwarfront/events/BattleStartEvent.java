@@ -11,10 +11,23 @@ public class BattleStartEvent extends Event {
 
     private Battle battle;
     private Player started;
+    private String playerMessage, battleMessage, lobbyMessage;
 
     public BattleStartEvent(Battle battle, Player started) {
         this.battle = battle;
         this.started = started;
+    }
+
+    public void setPlayerMessage(String playerMessage) {
+        this.playerMessage = playerMessage;
+    }
+
+    public void setBattleMessage(String battleMessage) {
+        this.battleMessage = battleMessage;
+    }
+
+    public void setLobbyMessage(String lobbyMessage) {
+        this.lobbyMessage = lobbyMessage;
     }
 
     public Battle getBattle() {
@@ -23,6 +36,18 @@ public class BattleStartEvent extends Event {
 
     public Player getStarted() {
         return started;
+    }
+
+    public String getPlayerMessage() {
+        return playerMessage;
+    }
+
+    public String getBattleMessage() {
+        return battleMessage;
+    }
+
+    public String getLobbyMessage() {
+        return lobbyMessage;
     }
 
     @Override

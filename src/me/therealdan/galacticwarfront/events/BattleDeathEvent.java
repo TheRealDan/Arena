@@ -12,10 +12,16 @@ public class BattleDeathEvent extends Event {
     private Battle battle;
     private Player player, killer;
 
+    private String battleMessage;
+
     public BattleDeathEvent(Battle battle, Player player, Player killer) {
         this.battle = battle;
         this.player = player;
         this.killer = killer;
+    }
+
+    public void setBattleMessage(String battleMessage) {
+        this.battleMessage = battleMessage;
     }
 
     public Battle getBattle() {
@@ -28,6 +34,10 @@ public class BattleDeathEvent extends Event {
 
     public Player getKiller() {
         return killer;
+    }
+
+    public String getBattleMessage() {
+        return battleMessage;
     }
 
     @Override

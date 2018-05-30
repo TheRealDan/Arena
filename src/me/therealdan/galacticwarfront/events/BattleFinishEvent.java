@@ -9,6 +9,7 @@ public class BattleFinishEvent extends Event {
     private static HandlerList handlerList = new HandlerList();
 
     private Battle battle;
+    private String battleMessage, lobbyMessage;
 
     public BattleFinishEvent(Battle battle) {
         this.battle = battle;
@@ -16,6 +17,22 @@ public class BattleFinishEvent extends Event {
 
     public Battle getBattle() {
         return battle;
+    }
+
+    public void setBattleMessage(String battleMessage) {
+        this.battleMessage = battleMessage;
+    }
+
+    public void setLobbyMessage(String lobbyMessage) {
+        this.lobbyMessage = lobbyMessage;
+    }
+
+    public String getBattleMessage() {
+        return battleMessage;
+    }
+
+    public String getLobbyMessage() {
+        return lobbyMessage;
     }
 
     @Override

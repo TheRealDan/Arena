@@ -1,6 +1,5 @@
-package me.therealdan.galacticwarfront.mechanics.battle.eventhandler;
+package me.therealdan.galacticwarfront.events;
 
-import me.therealdan.galacticwarfront.events.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
