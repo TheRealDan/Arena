@@ -87,8 +87,6 @@ public class FFA implements Battle {
         Battle battle = Battle.get(player);
         if (battle != null) battle.remove(player, BattleLeaveEvent.Reason.LEAVE);
 
-        this.players.add(player.getUniqueId());
-
         BattleJoinEvent event = new BattleJoinEvent(this, player);
         event.setBattleMessage(GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " has joined the " + GalacticWarFront.SECOND + getType().name());
         Bukkit.getPluginManager().callEvent(event);
@@ -96,6 +94,8 @@ public class FFA implements Battle {
         if (event.getBattleMessage() != null)
             for (Player each : getPlayers())
                 each.sendMessage(event.getBattleMessage());
+
+        this.players.add(player.getUniqueId());
 
         respawn(player);
     }

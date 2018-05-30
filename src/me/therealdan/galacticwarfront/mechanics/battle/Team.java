@@ -94,12 +94,6 @@ public class Team implements Battle {
         Battle battle = Battle.get(player);
         if (battle != null) battle.remove(player, BattleLeaveEvent.Reason.LEAVE);
 
-        if (team1) {
-            this.team1.add(player.getUniqueId());
-        } else {
-            this.team2.add(player.getUniqueId());
-        }
-
         BattleJoinEvent event = new BattleJoinEvent(this, player);
         event.setBattleMessage(GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " has joined " + GalacticWarFront.SECOND + "Team " + (isTeam1(player) ? "1" : "2"));
         Bukkit.getPluginManager().callEvent(event);
@@ -107,6 +101,12 @@ public class Team implements Battle {
         if (event.getBattleMessage() != null)
             for (Player each : getPlayers())
                 each.sendMessage(event.getBattleMessage());
+
+        if (team1) {
+            this.team1.add(player.getUniqueId());
+        } else {
+            this.team2.add(player.getUniqueId());
+        }
 
         respawn(player);
     }
