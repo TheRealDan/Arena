@@ -217,6 +217,14 @@ public class Lobby implements Listener {
         return createBattleIcon;
     }
 
+    public List<Player> getPlayers() {
+        List<Player> players = new ArrayList<>();
+        for (Player player : Bukkit.getOnlinePlayers())
+            if (contains(player))
+                players.add(player);
+        return players;
+    }
+
     private static void saveData() {
         try {
             getData().save(getFile());
