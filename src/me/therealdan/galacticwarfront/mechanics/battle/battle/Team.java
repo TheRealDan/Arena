@@ -120,6 +120,11 @@ public class Team implements Battle {
     }
 
     @Override
+    public void setOpen(boolean open) {
+        this.open = open;
+    }
+
+    @Override
     public boolean isOpen() {
         return open;
     }
