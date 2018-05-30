@@ -3,7 +3,6 @@ package me.therealdan.galacticwarfront.mechanics.killcounter;
 import me.therealdan.galacticwarfront.GalacticWarFront;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.HashMap;
