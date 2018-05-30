@@ -30,11 +30,12 @@ public class Team implements Battle {
 
     public Team(Arena arena, Player started, Party party) {
         this.arena = arena;
-        this.open = party.isOpen();
+        if (party != null) this.open = party.isOpen();
 
         add(started);
-        for (Player player : party.getPlayers())
-            add(player, party.isTeam(player, 1));
+        if (party != null)
+            for (Player player : party.getPlayers())
+                add(player, party.isTeam(player, 1));
 
         BattleStartEvent event = new BattleStartEvent(this, started);
         event.setBattleMessage(GalacticWarFront.MAIN + "Your Team Battle on " + GalacticWarFront.SECOND + arena.getName() + GalacticWarFront.MAIN + " has begun.");

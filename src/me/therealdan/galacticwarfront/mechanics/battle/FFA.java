@@ -23,18 +23,19 @@ public class FFA implements Battle {
     private KillCounter killCounter;
     private long gracePeriod = 0;
     private long battleDuration = 0;
-    private boolean open;
+    private boolean open = false;
 
     private HashSet<UUID> players = new HashSet<>();
     private long startTime = System.currentTimeMillis();
 
     public FFA(Arena arena, Player started, Party party) {
         this.arena = arena;
-        this.open = party.isOpen();
+        if (party != null) this.open = party.isOpen();
 
         add(started);
-        for (Player player : party.getPlayers())
-            add(player);
+        if (party != null)
+            for (Player player : party.getPlayers())
+                add(player);
 
         BattleStartEvent event = new BattleStartEvent(this, started);
         event.setBattleMessage(GalacticWarFront.MAIN + "Your FFA on " + GalacticWarFront.SECOND + arena.getName() + GalacticWarFront.MAIN + " has begun.");
