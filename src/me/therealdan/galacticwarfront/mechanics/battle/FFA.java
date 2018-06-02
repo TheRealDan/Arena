@@ -42,6 +42,16 @@ public class FFA implements Battle {
         if (isOpen()) event.setLobbyMessage(GalacticWarFront.SECOND + started.getName() + GalacticWarFront.MAIN + " has started an " + GalacticWarFront.SECOND + "FFA" + GalacticWarFront.MAIN + " on " + GalacticWarFront.SECOND + arena.getName());
         Bukkit.getPluginManager().callEvent(event);
 
+        Bukkit.broadcastMessage("");
+        for (Player player : getPlayers()) {
+            Bukkit.broadcastMessage(GalacticWarFront.MAIN + player.getName()
+                    + GalacticWarFront.MAIN + " - KDR: " + GalacticWarFront.SECOND + getKillCounter().getKDRString(player.getUniqueId())
+                    + GalacticWarFront.MAIN + " - Kills: " + GalacticWarFront.SECOND + getKillCounter().getKills(player.getUniqueId())
+                    + GalacticWarFront.MAIN + " - Deaths: " + GalacticWarFront.SECOND + getKillCounter().getDeaths(player.getUniqueId())
+            );
+        }
+        Bukkit.broadcastMessage("");
+
         if (event.getPlayerMessage() != null)
             started.sendMessage(event.getPlayerMessage());
 
@@ -128,7 +138,7 @@ public class FFA implements Battle {
         BattleDeathEvent event = new BattleDeathEvent(this, player, killer);
         event.setBattleMessage(killer != null ?
                 GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " (" + GalacticWarFront.SECOND + getKillCounter().getDeaths(player.getUniqueId()) + GalacticWarFront.MAIN + " deaths) was killed by " + GalacticWarFront.SECOND + killer.getName() + GalacticWarFront.MAIN + " (" + GalacticWarFront.SECOND + getKillCounter().getKills(killer.getUniqueId()) + GalacticWarFront.MAIN + " kills)" :
-                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " Killed themselves. (" + GalacticWarFront.SECOND + getKillCounter().getDeaths(player.getUniqueId()) + GalacticWarFront.MAIN + " deaths)"
+                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " killed themselves. (" + GalacticWarFront.SECOND + getKillCounter().getDeaths(player.getUniqueId()) + GalacticWarFront.MAIN + " deaths)"
         );
         Bukkit.getPluginManager().callEvent(event);
 
