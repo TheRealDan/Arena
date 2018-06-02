@@ -140,7 +140,7 @@ public class Team implements Battle {
         BattleDeathEvent event = new BattleDeathEvent(this, player, killer);
         event.setBattleMessage(killer != null ?
                 GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " was killed by " + GalacticWarFront.SECOND + killer.getName() :
-                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " Killed themselves."
+                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " killed themselves."
         );
         Bukkit.getPluginManager().callEvent(event);
 
