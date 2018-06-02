@@ -5,10 +5,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.UUID;
 
 public class KillCounter {
+
+    private static DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
     private static File file;
     private static FileConfiguration data;
@@ -48,6 +51,10 @@ public class KillCounter {
         if (deaths == 0) return kills;
 
         return kills / deaths;
+    }
+
+    public String getKDRString(UUID uuid) {
+        return decimalFormat.format(getCurrentKDR(uuid));
     }
 
     public UUID getMostKills() {
