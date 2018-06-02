@@ -1,7 +1,7 @@
-package me.therealdan.galacticwarfront.mechanics.battle;
+package me.therealdan.galacticwarfront.mechanics.arena;
 
 import me.therealdan.galacticwarfront.GalacticWarFront;
-import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
+import me.therealdan.galacticwarfront.mechanics.battle.Battle;
 import me.therealdan.galacticwarfront.util.WXYZ;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

@@ -1,7 +1,7 @@
 package me.therealdan.galacticwarfront.mechanics.lobby;
 
 import me.therealdan.galacticwarfront.GalacticWarFront;
-import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
+import me.therealdan.galacticwarfront.mechanics.battle.Battle;
 import me.therealdan.galacticwarfront.util.Icon;
 import me.therealdan.galacticwarfront.util.PlayerHandler;
 import me.therealdan.galacticwarfront.util.WXYZ;

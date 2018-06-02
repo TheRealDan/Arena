@@ -2,8 +2,8 @@ package me.therealdan.galacticwarfront.commands;
 
 import me.therealdan.galacticwarfront.GalacticWarFront;
 import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
-import me.therealdan.galacticwarfront.mechanics.battle.Arena;
-import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
+import me.therealdan.galacticwarfront.mechanics.arena.Arena;
+import me.therealdan.galacticwarfront.mechanics.battle.Battle;
 import me.therealdan.galacticwarfront.mechanics.lobby.BattleCreator;
 import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
 import me.therealdan.galacticwarfront.util.WXYZ;
@@ -39,8 +39,9 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                 if (battle == null) {
                     BattleCreator.getInstance().openBattleCreator(player);
                 } else {
-                    player.sendMessage("Please leave the Battle you are in first.");
+                    player.sendMessage(GalacticWarFront.MAIN + "Please leave the Battle you are in first.");
                 }
+                return true;
             } else if (args[0].equalsIgnoreCase("Leave")) {
                 Battle battle = Battle.get(player);
                 if (battle == null) {
@@ -49,6 +50,7 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                 }
                 battle.remove(player, BattleLeaveEvent.Reason.LEAVE);
                 Lobby.getInstance().join(player);
+                return true;
             } else if (args[0].equalsIgnoreCase("Lobby") && lobbySetup(player)) {
                 if (args.length > 1) {
                     if (args[1].equalsIgnoreCase("Spawnpoint")) {

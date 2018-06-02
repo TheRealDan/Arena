@@ -2,7 +2,6 @@ package me.therealdan.galacticwarfront;
 
 import me.therealdan.galacticwarfront.commands.GalacticWarFrontCommand;
 import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
-import me.therealdan.galacticwarfront.listeners.QuitListener;
 import me.therealdan.galacticwarfront.mechanics.battle.Arena;
 import me.therealdan.galacticwarfront.mechanics.battle.BattleHandler;
 import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
@@ -30,7 +29,6 @@ public class GalacticWarFront extends JavaPlugin {
         getServer().getPluginManager().registerEvents(Lobby.getInstance(), this);
         getServer().getPluginManager().registerEvents(BattleCreator.getInstance(), this);
         getServer().getPluginManager().registerEvents(BattleHandler.getInstance(), this);
-        getServer().getPluginManager().registerEvents(new QuitListener(), this);
 
         getCommand("GalacticWarFront").setExecutor(new GalacticWarFrontCommand());
         getCommand("GWF").setExecutor(new GalacticWarFrontCommand());
