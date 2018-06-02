@@ -1,7 +1,7 @@
 package me.therealdan.galacticwarfront.listeners;
 
 import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
-import me.therealdan.galacticwarfront.mechanics.battle.battle.Battle;
+import me.therealdan.galacticwarfront.mechanics.battle.Battle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
