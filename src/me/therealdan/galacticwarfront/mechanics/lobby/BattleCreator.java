@@ -146,12 +146,8 @@ public class BattleCreator implements Listener {
 
         int size = 9;
         if (party != null) {
-            if (battleType.hasTeams()) {
-                int largerTeam = party.getLargestTeamSize();
-                while (size < (largerTeam * 2) + 9) size += 9;
-            } else {
-                while (size < party.getPlayers().size() + 9) size += 9;
-            }
+            int largerTeam = party.getLargestTeamSize();
+            while (size < (largerTeam * 2) + 9) size += 9;
         }
         if (size > 54) size = 54;
 
