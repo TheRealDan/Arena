@@ -126,8 +126,8 @@ public class FFA implements Battle {
 
         BattleDeathEvent event = new BattleDeathEvent(this, player, killer);
         event.setBattleMessage(killer != null ?
-                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " was killed by " + GalacticWarFront.SECOND + killer.getName() :
-                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " Killed themselves."
+                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " (" + GalacticWarFront.SECOND + getKillCounter().getDeaths(player.getUniqueId()) + GalacticWarFront.MAIN + " deaths) was killed by " + GalacticWarFront.SECOND + killer.getName() + GalacticWarFront.MAIN + " (" + GalacticWarFront.SECOND + getKillCounter().getKills(killer.getUniqueId()) + GalacticWarFront.MAIN + " kills)" :
+                GalacticWarFront.SECOND + player.getName() + GalacticWarFront.MAIN + " Killed themselves. (" + GalacticWarFront.SECOND + getKillCounter().getDeaths(player.getUniqueId()) + GalacticWarFront.MAIN + " deaths)"
         );
         Bukkit.getPluginManager().callEvent(event);
 
