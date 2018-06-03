@@ -9,8 +9,12 @@ import me.therealdan.galacticwarfront.util.PlayerHandler;
 import me.therealdan.party.Party;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;
 
@@ -27,6 +31,9 @@ public class Team implements Battle {
     private HashSet<UUID> team1 = new HashSet<>();
     private HashSet<UUID> team2 = new HashSet<>();
     private long startTime = System.currentTimeMillis();
+
+    private Scoreboard scoreboard;
+    private BossBar timeRemainingBar;
 
     public Team(Arena arena, Player started, Party party) {
         this.arena = arena;
@@ -108,6 +115,9 @@ public class Team implements Battle {
             this.team2.add(player.getUniqueId());
         }
 
+        player.setScoreboard(getScoreboard() != null ? getScoreboard() : Bukkit.getScoreboardManager().getNewScoreboard());
+        if (getTimeRemainingBar() != null) getTimeRemainingBar().addPlayer(player);
+
         respawn(player);
     }
 
@@ -127,9 +137,13 @@ public class Team implements Battle {
                 each.sendMessage(event.getBattleMessage());
 
         player.teleport(event.getSpawn());
+        PlayerHandler.refresh(player);
 
         this.team1.remove(player.getUniqueId());
         this.team2.remove(player.getUniqueId());
+
+        player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+        if (getTimeRemainingBar() != null) getTimeRemainingBar().removePlayer(player);
     }
 
     @Override
@@ -226,6 +240,25 @@ public class Team implements Battle {
         return startTime;
     }
 
+    @Override
+    public long getGraceDuration() {
+        return gracePeriod - getStartTime();
+    }
+
+    @Override
+    public long getBattleDuration() {
+        return battleDuration - getStartTime() - getGraceDuration();
+    }
+
+    @Override
+    public double getProgress() {
+        if (getGraceTimeRemaining() > 0) {
+            return (double) getTimePassed() / (double) getGraceDuration();
+        } else {
+            return ((double) getTimePassed() - (double) getGraceDuration()) / (double) getBattleDuration();
+        }
+    }
+
     public int getTotalKills(boolean team1) {
         int totalKills = 0;
         for (Player player : team1 ? getTeam1Players() : getTeam2Players())
@@ -267,6 +300,18 @@ public class Team implements Battle {
     @Override
     public Arena getArena() {
         return arena;
+    }
+
+    @Override
+    public Scoreboard getScoreboard() {
+        if (scoreboard == null) scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        return scoreboard;
+    }
+
+    @Override
+    public BossBar getTimeRemainingBar() {
+        if (timeRemainingBar == null) timeRemainingBar = Bukkit.createBossBar("", BarColor.WHITE, BarStyle.SOLID);
+        return timeRemainingBar;
     }
 
     public List<Player> getTeam1Players() {

@@ -9,8 +9,12 @@ import me.therealdan.galacticwarfront.util.PlayerHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;
 
@@ -26,6 +30,9 @@ public class Duel implements Battle {
 
     private HashSet<UUID> players = new HashSet<>();
     private long startTime = System.currentTimeMillis();
+
+    private Scoreboard scoreboard;
+    private BossBar timeRemainingBar;
 
     public Duel(Arena arena, Player player1, Player player2) {
         this.arena = arena;
@@ -94,6 +101,9 @@ public class Duel implements Battle {
 
         this.players.add(player.getUniqueId());
 
+        player.setScoreboard(getScoreboard() != null ? getScoreboard() : Bukkit.getScoreboardManager().getNewScoreboard());
+        if (getTimeRemainingBar() != null) getTimeRemainingBar().addPlayer(player);
+
         respawn(player);
     }
 
@@ -113,8 +123,12 @@ public class Duel implements Battle {
                 each.sendMessage(event.getBattleMessage());
 
         player.teleport(event.getSpawn());
+        PlayerHandler.refresh(player);
 
         this.players.remove(player.getUniqueId());
+
+        player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+        if (getTimeRemainingBar() != null) getTimeRemainingBar().removePlayer(player);
     }
 
     @Override
@@ -207,6 +221,25 @@ public class Duel implements Battle {
         return startTime;
     }
 
+    @Override
+    public long getGraceDuration() {
+        return gracePeriod - getStartTime();
+    }
+
+    @Override
+    public long getBattleDuration() {
+        return battleDuration - getStartTime() - getGraceDuration();
+    }
+
+    @Override
+    public double getProgress() {
+        if (getGraceTimeRemaining() > 0) {
+            return (double) getTimePassed() / (double) getGraceDuration();
+        } else {
+            return ((double) getTimePassed() - (double) getGraceDuration()) / (double) getBattleDuration();
+        }
+    }
+
     public Player getPlayer1() {
         return Bukkit.getPlayer(player1);
     }
@@ -248,6 +281,18 @@ public class Duel implements Battle {
     @Override
     public Arena getArena() {
         return arena;
+    }
+
+    @Override
+    public Scoreboard getScoreboard() {
+        if (scoreboard == null) scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        return scoreboard;
+    }
+
+    @Override
+    public BossBar getTimeRemainingBar() {
+        if (timeRemainingBar == null) timeRemainingBar = Bukkit.createBossBar("", BarColor.WHITE, BarStyle.SOLID);
+        return timeRemainingBar;
     }
 
     @Override

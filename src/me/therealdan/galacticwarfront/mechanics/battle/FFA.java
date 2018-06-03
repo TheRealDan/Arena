@@ -10,8 +10,12 @@ import me.therealdan.party.Party;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;
 
@@ -28,6 +32,9 @@ public class FFA implements Battle {
     private HashSet<UUID> players = new HashSet<>();
     private long startTime = System.currentTimeMillis();
 
+    private Scoreboard scoreboard;
+    private BossBar timeRemainingBar;
+
     public FFA(Arena arena, Player started, Party party) {
         this.arena = arena;
         if (party != null) this.open = party.isOpen();
@@ -41,16 +48,6 @@ public class FFA implements Battle {
         event.setBattleMessage(GalacticWarFront.MAIN + "Your " + GalacticWarFront.SECOND + "FFA" + GalacticWarFront.MAIN + " on " + GalacticWarFront.SECOND + arena.getName() + GalacticWarFront.MAIN + " has begun.");
         if (isOpen()) event.setLobbyMessage(GalacticWarFront.SECOND + started.getName() + GalacticWarFront.MAIN + " has started an " + GalacticWarFront.SECOND + "FFA" + GalacticWarFront.MAIN + " on " + GalacticWarFront.SECOND + arena.getName());
         Bukkit.getPluginManager().callEvent(event);
-
-        Bukkit.broadcastMessage("");
-        for (Player player : getPlayers()) {
-            Bukkit.broadcastMessage(GalacticWarFront.MAIN + player.getName()
-                    + GalacticWarFront.MAIN + " - KDR: " + GalacticWarFront.SECOND + getKillCounter().getKDRString(player.getUniqueId())
-                    + GalacticWarFront.MAIN + " - Kills: " + GalacticWarFront.SECOND + getKillCounter().getKills(player.getUniqueId())
-                    + GalacticWarFront.MAIN + " - Deaths: " + GalacticWarFront.SECOND + getKillCounter().getDeaths(player.getUniqueId())
-            );
-        }
-        Bukkit.broadcastMessage("");
 
         if (event.getPlayerMessage() != null)
             started.sendMessage(event.getPlayerMessage());
@@ -75,6 +72,16 @@ public class FFA implements Battle {
         BattleFinishEvent event = new BattleFinishEvent(this);
         if (mostKills != null) event.setBattleMessage(GalacticWarFront.SECOND + mostKills.getName() + GalacticWarFront.MAIN + " got the most kills, with " + getKillCounter().getKills(mostKills.getUniqueId()) + GalacticWarFront.MAIN + " kills.");
         Bukkit.getPluginManager().callEvent(event);
+
+        Bukkit.broadcastMessage("");
+        for (Player player : getPlayers()) {
+            Bukkit.broadcastMessage(GalacticWarFront.MAIN + player.getName()
+                    + GalacticWarFront.MAIN + " - KDR: " + GalacticWarFront.SECOND + getKillCounter().getKDRString(player.getUniqueId())
+                    + GalacticWarFront.MAIN + " - Kills: " + GalacticWarFront.SECOND + getKillCounter().getKills(player.getUniqueId())
+                    + GalacticWarFront.MAIN + " - Deaths: " + GalacticWarFront.SECOND + getKillCounter().getDeaths(player.getUniqueId())
+            );
+        }
+        Bukkit.broadcastMessage("");
 
         if (event.getBattleMessage() != null)
             for (Player player : getPlayers())
@@ -107,6 +114,9 @@ public class FFA implements Battle {
 
         this.players.add(player.getUniqueId());
 
+        player.setScoreboard(getScoreboard() != null ? getScoreboard() : Bukkit.getScoreboardManager().getNewScoreboard());
+        if (getTimeRemainingBar() != null) getTimeRemainingBar().addPlayer(player);
+
         respawn(player);
     }
 
@@ -126,8 +136,12 @@ public class FFA implements Battle {
                 each.sendMessage(event.getBattleMessage());
 
         player.teleport(event.getSpawn());
+        PlayerHandler.refresh(player);
 
         this.players.remove(player.getUniqueId());
+
+        player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+        if (getTimeRemainingBar() != null) getTimeRemainingBar().removePlayer(player);
     }
 
     @Override
@@ -158,7 +172,9 @@ public class FFA implements Battle {
 
         for (Player target : getPlayers())
             target.hidePlayer(GalacticWarFront.getInstance(), player);
+
         player.teleport(battleRespawnEvent.getRespawnLocation());
+
         for (Player target : getPlayers())
             target.showPlayer(GalacticWarFront.getInstance(), player);
 
@@ -221,6 +237,25 @@ public class FFA implements Battle {
     }
 
     @Override
+    public long getGraceDuration() {
+        return gracePeriod - getStartTime();
+    }
+
+    @Override
+    public long getBattleDuration() {
+        return battleDuration - getStartTime() - getGraceDuration();
+    }
+
+    @Override
+    public double getProgress() {
+        if (getGraceTimeRemaining() > 0) {
+            return (double) getTimePassed() / (double) getGraceDuration();
+        } else {
+            return ((double) getTimePassed() - (double) getGraceDuration()) / (double) getBattleDuration();
+        }
+    }
+
+    @Override
     public Type getType() {
         return Type.FFA;
     }
@@ -229,18 +264,20 @@ public class FFA implements Battle {
     public Location getRandomSpawnpoint(Player player) {
         List<Location> spawnpoints = getArena().getSpawnpoints();
 
+        boolean safe = false;
         int checks = 0;
         Location location = null;
         while (checks < 10) {
-            boolean safe = true;
+            safe = true;
             location = spawnpoints.get(new Random().nextInt(spawnpoints.size()));
             for (Entity entity : location.getWorld().getNearbyEntities(location, SPAWN_RANGE, SPAWN_RANGE, SPAWN_RANGE))
                 if (entity instanceof Player)
                     safe = false;
-            if (safe) return location;
+            if (safe) break;
             checks++;
         }
 
+        Bukkit.broadcastMessage(GalacticWarFront.MAIN + player.getName() + " respawned safely: " + GalacticWarFront.SECOND + safe);
         return location;
     }
 
@@ -253,6 +290,18 @@ public class FFA implements Battle {
     @Override
     public Arena getArena() {
         return arena;
+    }
+
+    @Override
+    public Scoreboard getScoreboard() {
+        if (scoreboard == null) scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        return scoreboard;
+    }
+
+    @Override
+    public BossBar getTimeRemainingBar() {
+        if (timeRemainingBar == null) timeRemainingBar = Bukkit.createBossBar("", BarColor.WHITE, BarStyle.SOLID);
+        return timeRemainingBar;
     }
 
     @Override

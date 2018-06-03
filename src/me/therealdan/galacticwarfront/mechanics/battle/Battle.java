@@ -4,7 +4,9 @@ import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
 import me.therealdan.galacticwarfront.mechanics.arena.Arena;
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
 import org.bukkit.Location;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,12 @@ public interface Battle {
 
     long getStartTime();
 
+    long getGraceDuration();
+
+    long getBattleDuration();
+
+    double getProgress();
+
     Type getType();
 
     Location getRandomSpawnpoint(Player player);
@@ -52,6 +60,10 @@ public interface Battle {
     KillCounter getKillCounter();
 
     Arena getArena();
+
+    Scoreboard getScoreboard();
+
+    BossBar getTimeRemainingBar();
 
     List<Player> getPlayers();
 
