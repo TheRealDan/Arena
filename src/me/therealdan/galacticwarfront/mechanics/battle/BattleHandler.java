@@ -4,6 +4,7 @@ import me.therealdan.galacticwarfront.GalacticWarFront;
 import me.therealdan.galacticwarfront.events.BattleDamageEvent;
 import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -18,10 +19,18 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class BattleHandler implements Listener {
 
     private static BattleHandler battleHandler;
+
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
 
     private BattleHandler() {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(GalacticWarFront.getInstance(), () -> {
@@ -37,6 +46,42 @@ public class BattleHandler implements Listener {
                     if (team.getTeam1Players().size() == 0 || team.getTeam2Players().size() == 0)
                         team.end(BattleLeaveEvent.Reason.NOT_ENOUGH_PLAYERS);
                 }
+
+                if (battle.getTimeRemainingBar() != null) {
+                    Date date = new Date();
+                    date.setTime(battle.getGraceTimeRemaining() > 0 ? battle.getGraceTimeRemaining() : battle.getTimeRemaining());
+
+                    BossBar bar = battle.getTimeRemainingBar();
+                    bar.setTitle(battle.getGraceTimeRemaining() > 0 ?
+                            GalacticWarFront.MAIN + "PvP Starts in: " + GalacticWarFront.SECOND + simpleDateFormat.format(date)
+                            : GalacticWarFront.MAIN + "Time Remaining: " + GalacticWarFront.SECOND + simpleDateFormat.format(date)
+                    );
+                    double progress = battle.getProgress();
+                    if (progress > 1.0) progress = 1.0;
+                    if (progress < 0.0) progress = 0.0;
+                    bar.setProgress(progress);
+                }
+
+                if (battle.getScoreboard() != null) {
+                    Scoreboard scoreboard = battle.getScoreboard();
+                    if (battle instanceof FFA) {
+                        Objective objective = scoreboard.registerNewObjective("dummy", "title");
+                        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+                        objective.setDisplayName(battle.getArena().getName() + GalacticWarFront.SECOND + " - " + battle.getType().name());
+
+                        int i = 0;
+                        for (Player player : battle.getPlayers())
+                            objective.getScore(
+                                    GalacticWarFront.MAIN + player.getName()
+                                            + GalacticWarFront.MAIN + " - KDR: " + GalacticWarFront.SECOND + battle.getKillCounter().getKDRString(player.getUniqueId())
+                                            + GalacticWarFront.MAIN + " - Kills: " + GalacticWarFront.SECOND + battle.getKillCounter().getKills(player.getUniqueId())
+                                            + GalacticWarFront.MAIN + " - Deaths: " + GalacticWarFront.SECOND + battle.getKillCounter().getDeaths(player.getUniqueId())
+                            ).setScore(i++);
+
+                        for (Player player : battle.getPlayers())
+                            player.setScoreboard(scoreboard);
+                    }
+                }
             }
         }, 20, 20);
     }
@@ -47,6 +92,7 @@ public class BattleHandler implements Listener {
         Battle battle = Battle.get(player);
         if (battle == null) return;
 
+        player.setNoDamageTicks(0);
         player.setFoodLevel(20);
     }
 
