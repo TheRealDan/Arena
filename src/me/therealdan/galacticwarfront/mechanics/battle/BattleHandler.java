@@ -178,7 +178,7 @@ public class BattleHandler implements Listener {
         BattleDamageEvent battleDamageEvent = new BattleDamageEvent(battle, attacker, victim, event.getDamage(), event.getCause());
         event.setDamage(0);
 
-        if (battle.sameTeam(attacker, victim) || !battle.canPvP() || !attacker.getGameMode().equals(GameMode.SURVIVAL))
+        if (battle.sameTeam(attacker, victim) || !battle.canPvP() || !attacker.getGameMode().equals(GameMode.SURVIVAL) || attacker.equals(victim))
             battleDamageEvent.setCancelled(true);
 
         Bukkit.getPluginManager().callEvent(battleDamageEvent);
