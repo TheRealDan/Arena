@@ -16,10 +16,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -153,6 +150,26 @@ public class BattleHandler implements Listener {
         if (battle == null) return;
 
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onEntityInteract(PlayerInteractEntityEvent event) {
+        Player player = event.getPlayer();
+        Battle battle = Battle.get(player);
+        if (battle == null) return;
+
+        if (player.getGameMode().equals(GameMode.SURVIVAL))
+            event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onEntity(PlayerArmorStandManipulateEvent event) {
+        Player player = event.getPlayer();
+        Battle battle = Battle.get(player);
+        if (battle == null) return;
+
+        if (player.getGameMode().equals(GameMode.SURVIVAL))
+            event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
