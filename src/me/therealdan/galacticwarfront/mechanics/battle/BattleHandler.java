@@ -4,6 +4,7 @@ import me.therealdan.galacticwarfront.GalacticWarFront;
 import me.therealdan.galacticwarfront.events.BattleDamageEvent;
 import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -159,11 +160,13 @@ public class BattleHandler implements Listener {
         if (!(event.getEntity() instanceof Player)) return;
         Player victim = (Player) event.getEntity();
 
+        boolean wasProjectile = false;
         Player attacker = null;
         if (event.getDamager() instanceof Player) attacker = (Player) event.getDamager();
         if (event.getDamager() instanceof Projectile) {
             Projectile projectile = (Projectile) event.getDamager();
             if (projectile.getShooter() instanceof Player) attacker = (Player) projectile.getShooter();
+            wasProjectile = true;
         }
 
         if (attacker == null) return;
@@ -175,7 +178,7 @@ public class BattleHandler implements Listener {
         BattleDamageEvent battleDamageEvent = new BattleDamageEvent(battle, attacker, victim, event.getDamage(), event.getCause());
         event.setDamage(0);
 
-        if (battle.sameTeam(attacker, victim) || !battle.canPvP())
+        if (battle.sameTeam(attacker, victim) || !battle.canPvP() || !attacker.getGameMode().equals(GameMode.SURVIVAL))
             battleDamageEvent.setCancelled(true);
 
         Bukkit.getPluginManager().callEvent(battleDamageEvent);
@@ -187,6 +190,9 @@ public class BattleHandler implements Listener {
             if (victim.getHealth() - battleDamageEvent.getDamage() <= 0.0) {
                 battle.kill(victim, attacker);
                 event.setCancelled(true);
+            } else if (wasProjectile) {
+                event.setCancelled(true);
+                victim.damage(battleDamageEvent.getDamage(), attacker);
             }
         }
     }

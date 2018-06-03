@@ -73,16 +73,6 @@ public class FFA implements Battle {
         if (mostKills != null) event.setBattleMessage(GalacticWarFront.SECOND + mostKills.getName() + GalacticWarFront.MAIN + " got the most kills, with " + getKillCounter().getKills(mostKills.getUniqueId()) + GalacticWarFront.MAIN + " kills.");
         Bukkit.getPluginManager().callEvent(event);
 
-        Bukkit.broadcastMessage("");
-        for (Player player : getPlayers()) {
-            Bukkit.broadcastMessage(GalacticWarFront.MAIN + player.getName()
-                    + GalacticWarFront.MAIN + " - KDR: " + GalacticWarFront.SECOND + getKillCounter().getKDRString(player.getUniqueId())
-                    + GalacticWarFront.MAIN + " - Kills: " + GalacticWarFront.SECOND + getKillCounter().getKills(player.getUniqueId())
-                    + GalacticWarFront.MAIN + " - Deaths: " + GalacticWarFront.SECOND + getKillCounter().getDeaths(player.getUniqueId())
-            );
-        }
-        Bukkit.broadcastMessage("");
-
         if (event.getBattleMessage() != null)
             for (Player player : getPlayers())
                 player.sendMessage(event.getBattleMessage());
@@ -264,7 +254,7 @@ public class FFA implements Battle {
     public Location getRandomSpawnpoint(Player player) {
         List<Location> spawnpoints = getArena().getSpawnpoints();
 
-        boolean safe = false;
+        boolean safe;
         int checks = 0;
         Location location = null;
         while (checks < 10) {
@@ -277,7 +267,6 @@ public class FFA implements Battle {
             checks++;
         }
 
-        Bukkit.broadcastMessage(GalacticWarFront.MAIN + player.getName() + " respawned safely: " + GalacticWarFront.SECOND + safe);
         return location;
     }
 
