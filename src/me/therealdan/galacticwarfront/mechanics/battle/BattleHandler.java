@@ -3,6 +3,7 @@ package me.therealdan.galacticwarfront.mechanics.battle;
 import me.therealdan.galacticwarfront.GalacticWarFront;
 import me.therealdan.galacticwarfront.events.BattleDamageEvent;
 import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
+import me.therealdan.theforcemc.mechanics.equipment.shootable.flamethrower.FlamethrowerHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.boss.BossBar;
@@ -23,6 +24,8 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class BattleHandler implements Listener {
 
@@ -222,13 +225,18 @@ public class BattleHandler implements Listener {
         Battle battle = Battle.get(victim);
         if (battle == null) return;
 
+        Player attacker = null;
         switch (event.getCause()) {
             case PROJECTILE:
             case ENTITY_ATTACK:
                 return;
+            case FIRE_TICK:
+                UUID uuid = FlamethrowerHandler.getLastFireDamage(victim.getUniqueId());
+                if (uuid != null) attacker = Bukkit.getPlayer(uuid);
+                break;
         }
 
-        BattleDamageEvent battleDamageEvent = new BattleDamageEvent(battle, null, victim, event.getDamage(), event.getCause());
+        BattleDamageEvent battleDamageEvent = new BattleDamageEvent(battle, attacker, victim, event.getDamage(), event.getCause());
         event.setDamage(0);
 
         if (!battle.canPvP())
@@ -241,7 +249,7 @@ public class BattleHandler implements Listener {
         } else {
             event.setDamage(battleDamageEvent.getDamage());
             if (victim.getHealth() - battleDamageEvent.getDamage() <= 0.0) {
-                battle.kill(victim, null);
+                battle.kill(victim, battleDamageEvent.getAttacker());
                 event.setCancelled(true);
             }
         }
