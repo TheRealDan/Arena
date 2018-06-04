@@ -18,6 +18,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -79,8 +80,10 @@ public class Lobby implements Listener {
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        if (contains(player))
+        if (contains(player)) {
             player.setFoodLevel(20);
+            player.setFireTicks(0);
+        }
     }
 
     @EventHandler
@@ -188,6 +191,18 @@ public class Lobby implements Listener {
                 event.setCancelled(true);
                 if (event.getDamager() instanceof Projectile) event.getDamager().remove();
             }
+        }
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player)) return;
+        Player player = (Player) event.getEntity();
+        if (!contains(player)) return;
+
+        switch (event.getCause()) {
+            case FIRE_TICK:
+                event.setCancelled(true);
         }
     }
 
