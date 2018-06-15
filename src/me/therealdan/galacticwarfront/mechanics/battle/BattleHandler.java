@@ -254,6 +254,9 @@ public class BattleHandler implements Listener {
         if (!battle.canPvP())
             battleDamageEvent.setCancelled(true);
 
+        if (attacker != null && battle.sameTeam(victim, attacker))
+            battleDamageEvent.setCancelled(true);
+
         Bukkit.getPluginManager().callEvent(battleDamageEvent);
 
         if (battleDamageEvent.isCancelled()) {
