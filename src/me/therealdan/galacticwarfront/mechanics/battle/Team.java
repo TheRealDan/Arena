@@ -39,7 +39,6 @@ public class Team implements Battle {
         this.arena = arena;
         if (party != null) this.open = party.isOpen();
 
-        add(started);
         if (party != null)
             for (Player player : party.getPlayers())
                 add(player, party.isTeam(player, 1));
