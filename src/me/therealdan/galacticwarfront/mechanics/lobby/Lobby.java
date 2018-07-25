@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -203,6 +204,12 @@ public class Lobby implements Listener {
         switch (event.getCause()) {
             case FIRE_TICK:
                 event.setCancelled(true);
+                return;
+        }
+
+        if (player.getHealth() - event.getDamage() <= 0.0) {
+            event.setCancelled(true);
+            join(player);
         }
     }
 
