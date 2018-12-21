@@ -1,10 +1,10 @@
-package me.therealdan.galacticwarfront.mechanics.lobby;
+package me.therealdan.battlearena.mechanics.lobby;
 
-import me.therealdan.galacticwarfront.GalacticWarFront;
-import me.therealdan.galacticwarfront.mechanics.battle.Battle;
-import me.therealdan.galacticwarfront.util.Icon;
-import me.therealdan.galacticwarfront.util.PlayerHandler;
-import me.therealdan.galacticwarfront.util.WXYZ;
+import me.therealdan.battlearena.BattleArena;
+import me.therealdan.battlearena.mechanics.battle.Battle;
+import me.therealdan.battlearena.util.Icon;
+import me.therealdan.battlearena.util.PlayerHandler;
+import me.therealdan.battlearena.util.WXYZ;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -13,7 +13,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -50,7 +49,7 @@ public class Lobby implements Listener {
     private HashSet<UUID> uiOpen = new HashSet<>();
 
     private Lobby() {
-        teleportOnJoin = GalacticWarFront.getInstance().getConfig().getBoolean("Teleport_On_Join");
+        teleportOnJoin = BattleArena.getInstance().getConfig().getBoolean("Teleport_On_Join");
 
         if (getData().contains("Lobby.Spawnpoint"))
             spawnpoint = new WXYZ(getData().getString("Lobby.Spawnpoint"));
@@ -247,7 +246,7 @@ public class Lobby implements Listener {
 
     private ItemStack getJoinBattleIcon(Battle battle) {
         List<String> lore = new ArrayList<>();
-        ItemStack icon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Join_UI.Join_Battle.Icon");
+        ItemStack icon = Icon.build(BattleArena.getInstance().getConfig(), "Join_UI.Join_Battle.Icon");
         ItemMeta itemMeta = icon.getItemMeta();
 
         String players = Integer.toString(battle.getPlayers().size());
@@ -267,7 +266,7 @@ public class Lobby implements Listener {
 
     private ItemStack getCreateBattleIcon() {
         if (createBattleIcon == null)
-            createBattleIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Join_UI.Create_Battle.Icon", true);
+            createBattleIcon = Icon.build(BattleArena.getInstance().getConfig(), "Join_UI.Create_Battle.Icon", true);
         return createBattleIcon;
     }
 
@@ -294,7 +293,7 @@ public class Lobby implements Listener {
 
     private static File getFile() {
         if (file == null) {
-            file = new File(GalacticWarFront.getInstance().getDataFolder(), path);
+            file = new File(BattleArena.getInstance().getDataFolder(), path);
         }
         return file;
     }

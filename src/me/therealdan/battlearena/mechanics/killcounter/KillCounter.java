@@ -1,6 +1,6 @@
-package me.therealdan.galacticwarfront.mechanics.killcounter;
+package me.therealdan.battlearena.mechanics.killcounter;
 
-import me.therealdan.galacticwarfront.GalacticWarFront;
+import me.therealdan.battlearena.BattleArena;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -119,7 +119,7 @@ public class KillCounter {
 
     private static File getFile() {
         if (file == null) {
-            file = new File(GalacticWarFront.getInstance().getDataFolder(), path);
+            file = new File(BattleArena.getInstance().getDataFolder(), path);
         }
         return file;
     }

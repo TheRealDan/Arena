@@ -1,4 +1,4 @@
-package me.therealdan.galacticwarfront.util;
+package me.therealdan.battlearena.util;
 
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;

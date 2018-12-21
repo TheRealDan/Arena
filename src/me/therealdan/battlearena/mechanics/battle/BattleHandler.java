@@ -1,8 +1,8 @@
-package me.therealdan.galacticwarfront.mechanics.battle;
+package me.therealdan.battlearena.mechanics.battle;
 
-import me.therealdan.galacticwarfront.GalacticWarFront;
-import me.therealdan.galacticwarfront.events.BattleDamageEvent;
-import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
+import me.therealdan.battlearena.BattleArena;
+import me.therealdan.battlearena.events.BattleDamageEvent;
+import me.therealdan.battlearena.events.BattleLeaveEvent;
 import me.therealdan.theforcemc.mechanics.equipment.shootable.flamethrower.FlamethrowerHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -31,7 +31,7 @@ public class BattleHandler implements Listener {
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
 
     private BattleHandler() {
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(GalacticWarFront.getInstance(), () -> {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(BattleArena.getInstance(), () -> {
             for (Battle battle : Battle.values()) {
                 if (battle.getTimeRemaining() <= 0) {
                     battle.end(BattleLeaveEvent.Reason.BATTLE_FINISHED);
@@ -51,8 +51,8 @@ public class BattleHandler implements Listener {
 
                     BossBar bar = battle.getTimeRemainingBar();
                     bar.setTitle(battle.getGraceTimeRemaining() > 0 ?
-                            GalacticWarFront.MAIN + "PvP Starts in: " + GalacticWarFront.SECOND + simpleDateFormat.format(date)
-                            : GalacticWarFront.MAIN + "Time Remaining: " + GalacticWarFront.SECOND + simpleDateFormat.format(date)
+                            BattleArena.MAIN + "PvP Starts in: " + BattleArena.SECOND + simpleDateFormat.format(date)
+                            : BattleArena.MAIN + "Time Remaining: " + BattleArena.SECOND + simpleDateFormat.format(date)
                     );
                     double progress = battle.getProgress();
                     if (progress > 1.0) progress = 1.0;
@@ -107,7 +107,7 @@ public class BattleHandler implements Listener {
         Battle battle = Battle.get(player);
         if (battle == null) return;
 
-        if (event.getMessage().toLowerCase().startsWith("/gwf") || event.getMessage().toLowerCase().startsWith("/galacticwarfront")) return;
+        if (event.getMessage().toLowerCase().startsWith("/gwf") || event.getMessage().toLowerCase().startsWith("/battlearena")) return;
 
         event.setCancelled(true);
     }

@@ -1,12 +1,12 @@
-package me.therealdan.galacticwarfront.commands;
+package me.therealdan.battlearena.commands;
 
-import me.therealdan.galacticwarfront.GalacticWarFront;
-import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
-import me.therealdan.galacticwarfront.mechanics.arena.Arena;
-import me.therealdan.galacticwarfront.mechanics.battle.Battle;
-import me.therealdan.galacticwarfront.mechanics.lobby.BattleCreator;
-import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
-import me.therealdan.galacticwarfront.util.WXYZ;
+import me.therealdan.battlearena.BattleArena;
+import me.therealdan.battlearena.events.BattleLeaveEvent;
+import me.therealdan.battlearena.mechanics.arena.Arena;
+import me.therealdan.battlearena.mechanics.battle.Battle;
+import me.therealdan.battlearena.mechanics.lobby.BattleCreator;
+import me.therealdan.battlearena.mechanics.lobby.Lobby;
+import me.therealdan.battlearena.util.WXYZ;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class GalacticWarFrontCommand implements CommandExecutor {
+public class BattleArenaCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String command, String[] args) {
@@ -31,7 +31,7 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                         Lobby.getInstance().join(player);
                     Lobby.getInstance().open(player);
                 } else {
-                    player.sendMessage(GalacticWarFront.MAIN + "Please leave the Battle you are in first.");
+                    player.sendMessage(BattleArena.MAIN + "Please leave the Battle you are in first.");
                 }
                 return true;
             } else if (args[0].equalsIgnoreCase("Create")) {
@@ -39,13 +39,13 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                 if (battle == null) {
                     BattleCreator.getInstance().openBattleCreator(player);
                 } else {
-                    player.sendMessage(GalacticWarFront.MAIN + "Please leave the Battle you are in first.");
+                    player.sendMessage(BattleArena.MAIN + "Please leave the Battle you are in first.");
                 }
                 return true;
             } else if (args[0].equalsIgnoreCase("Leave")) {
                 Battle battle = Battle.get(player);
                 if (battle == null) {
-                    player.sendMessage(GalacticWarFront.MAIN + "Your not in a Battle.");
+                    player.sendMessage(BattleArena.MAIN + "Your not in a Battle.");
                     return true;
                 }
                 battle.remove(player, BattleLeaveEvent.Reason.LEAVE);
@@ -55,11 +55,11 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                 if (args.length > 1) {
                     if (args[1].equalsIgnoreCase("Spawnpoint")) {
                         Lobby.getInstance().setSpawnpoint(player.getLocation());
-                        player.sendMessage(GalacticWarFront.MAIN + "Set spawnpoint for lobby to your location");
+                        player.sendMessage(BattleArena.MAIN + "Set spawnpoint for lobby to your location");
                         return true;
                     }
                 }
-                player.sendMessage(GalacticWarFront.MAIN + "/GWF Lobby SpawnPoint " + GalacticWarFront.SECOND + "Set Lobby Spawnpoint");
+                player.sendMessage(BattleArena.MAIN + "/GWF Lobby SpawnPoint " + BattleArena.SECOND + "Set Lobby Spawnpoint");
                 return true;
             } else if (args[0].equalsIgnoreCase("Arena") && arenaSetup(player)) {
                 arena(player, args);
@@ -67,11 +67,11 @@ public class GalacticWarFrontCommand implements CommandExecutor {
             }
         }
 
-        player.sendMessage(GalacticWarFront.MAIN + "/GWF Join " + GalacticWarFront.SECOND + "Join a Game");
-        player.sendMessage(GalacticWarFront.MAIN + "/GWF Create " + GalacticWarFront.SECOND + "Create a game");
-        player.sendMessage(GalacticWarFront.MAIN + "/GWF Leave " + GalacticWarFront.SECOND + "Leave current game");
-        if (lobbySetup(player)) player.sendMessage(GalacticWarFront.MAIN + "/GWF Lobby " + GalacticWarFront.SECOND + "Setup GalacticWarFront Lobby");
-        if (arenaSetup(player)) player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena " + GalacticWarFront.SECOND + "Setup GalacticWarFront Arenas");
+        player.sendMessage(BattleArena.MAIN + "/GWF Join " + BattleArena.SECOND + "Join a Game");
+        player.sendMessage(BattleArena.MAIN + "/GWF Create " + BattleArena.SECOND + "Create a game");
+        player.sendMessage(BattleArena.MAIN + "/GWF Leave " + BattleArena.SECOND + "Leave current game");
+        if (lobbySetup(player)) player.sendMessage(BattleArena.MAIN + "/GWF Lobby " + BattleArena.SECOND + "Setup BattleArena Lobby");
+        if (arenaSetup(player)) player.sendMessage(BattleArena.MAIN + "/GWF Arena " + BattleArena.SECOND + "Setup BattleArena Arenas");
 
         return true;
     }
@@ -81,21 +81,21 @@ public class GalacticWarFrontCommand implements CommandExecutor {
             String id = args.length > 2 ? args[2] : null;
             if (args[1].equalsIgnoreCase("List")) {
                 if (Arena.values().size() == 0) {
-                    player.sendMessage(GalacticWarFront.MAIN + "There are no Arenas.");
+                    player.sendMessage(BattleArena.MAIN + "There are no Arenas.");
                     return;
                 }
                 StringBuilder arenas = new StringBuilder();
                 for (Arena arena : Arena.values())
-                    arenas.append(GalacticWarFront.MAIN).append(", ").append(GalacticWarFront.SECOND).append(arena.getID());
-                player.sendMessage(GalacticWarFront.MAIN + "Arenas: " + arenas.toString().replaceFirst(", ", ""));
+                    arenas.append(BattleArena.MAIN).append(", ").append(BattleArena.SECOND).append(arena.getID());
+                player.sendMessage(BattleArena.MAIN + "Arenas: " + arenas.toString().replaceFirst(", ", ""));
                 return;
             } else if (args[1].equalsIgnoreCase("Create")) {
                 if (id == null) {
-                    player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Create [ID] [Name]");
+                    player.sendMessage(BattleArena.MAIN + "/BA Arena Create [ID] [Name]");
                     return;
                 }
                 if (Arena.get(id) != null) {
-                    player.sendMessage(GalacticWarFront.MAIN + "An Arena with that ID already exists.");
+                    player.sendMessage(BattleArena.MAIN + "An Arena with that ID already exists.");
                     return;
                 }
                 String name = id;
@@ -106,29 +106,29 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                     name = name.replaceFirst(" ", "");
                 }
                 Arena arena = new Arena(id, name);
-                player.sendMessage(GalacticWarFront.MAIN + "Created new Arena with ID: " + GalacticWarFront.SECOND + arena.getID());
+                player.sendMessage(BattleArena.MAIN + "Created new Arena with ID: " + BattleArena.SECOND + arena.getID());
                 return;
             } else if (args[1].equalsIgnoreCase("Delete")) {
                 if (id == null) {
-                    player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Delete [ID]");
+                    player.sendMessage(BattleArena.MAIN + "/BA Arena Delete [ID]");
                     return;
                 }
                 Arena arena = Arena.get(id);
                 if (arena == null) {
-                    player.sendMessage(GalacticWarFront.MAIN + "No Arena with that ID exists.");
+                    player.sendMessage(BattleArena.MAIN + "No Arena with that ID exists.");
                     return;
                 }
                 arena.delete();
-                player.sendMessage(GalacticWarFront.MAIN + "Permanently deleted Arena " + GalacticWarFront.SECOND + arena.getID());
+                player.sendMessage(BattleArena.MAIN + "Permanently deleted Arena " + BattleArena.SECOND + arena.getID());
                 return;
             } else if (args[1].equalsIgnoreCase("Edit")) {
                 if (id == null) {
-                    player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Edit [ID]");
+                    player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID]");
                     return;
                 }
                 Arena arena = Arena.get(id);
                 if (arena == null) {
-                    player.sendMessage(GalacticWarFront.MAIN + "No Arena with that ID exists.");
+                    player.sendMessage(BattleArena.MAIN + "No Arena with that ID exists.");
                     return;
                 }
                 if (args.length > 3) {
@@ -138,16 +138,16 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                             name += ", " + args[i];
                         name = name.replaceFirst(", ", "");
                         arena.setName(name);
-                        player.sendMessage(GalacticWarFront.MAIN + "Set Arena " + GalacticWarFront.SECOND + arena.getID() + GalacticWarFront.MAIN + " name to: " + GalacticWarFront.SECOND + arena.getName());
+                        player.sendMessage(BattleArena.MAIN + "Set Arena " + BattleArena.SECOND + arena.getID() + BattleArena.MAIN + " name to: " + BattleArena.SECOND + arena.getName());
                         return;
                     } else if (args[3].equalsIgnoreCase("Icon")) {
                         ItemStack itemStack = player.getItemInHand();
                         if (itemStack == null || itemStack.getType().equals(Material.AIR)) {
-                            player.sendMessage(GalacticWarFront.MAIN + "Please hold the item you want to use as an icon.");
+                            player.sendMessage(BattleArena.MAIN + "Please hold the item you want to use as an icon.");
                             return;
                         }
                         arena.setIcon(itemStack.getType(), itemStack.getDurability());
-                        player.sendMessage(GalacticWarFront.MAIN + "Set Arena " + GalacticWarFront.SECOND + arena.getID() + GalacticWarFront.MAIN + " icon to: " + GalacticWarFront.SECOND + arena.getMaterial().toString());
+                        player.sendMessage(BattleArena.MAIN + "Set Arena " + BattleArena.SECOND + arena.getID() + BattleArena.MAIN + " icon to: " + BattleArena.SECOND + arena.getMaterial().toString());
                         return;
                     } else if (args[3].equalsIgnoreCase("SpawnPoints")) {
                         if (args.length > 5) {
@@ -156,66 +156,66 @@ public class GalacticWarFrontCommand implements CommandExecutor {
                                 List<WXYZ> spawnpoints = arena.getSpawnpoints(type);
                                 if (args[4].equalsIgnoreCase("List")) {
                                     if (spawnpoints.size() == 0) {
-                                        player.sendMessage(GalacticWarFront.MAIN + "There are no Spawnpoints for " + GalacticWarFront.SECOND + type);
+                                        player.sendMessage(BattleArena.MAIN + "There are no Spawnpoints for " + BattleArena.SECOND + type);
                                         return;
                                     }
-                                    player.sendMessage(GalacticWarFront.MAIN + "SpawnPoints for " + type + ":");
+                                    player.sendMessage(BattleArena.MAIN + "SpawnPoints for " + type + ":");
                                     for (WXYZ wxyz : spawnpoints)
-                                        player.sendMessage(GalacticWarFront.SECOND + wxyz.getFormat());
+                                        player.sendMessage(BattleArena.SECOND + wxyz.getFormat());
                                     return;
                                 } else if (args[4].equalsIgnoreCase("Add")) {
                                     switch (type) {
                                         case "general":
                                             arena.addSpawnpoint(player.getLocation());
-                                            player.sendMessage(GalacticWarFront.MAIN + "Added your location to " + GalacticWarFront.SECOND + type + GalacticWarFront.MAIN + " spawnpoints.");
+                                            player.sendMessage(BattleArena.MAIN + "Added your location to " + BattleArena.SECOND + type + BattleArena.MAIN + " spawnpoints.");
                                             break;
                                         case "team1":
                                             arena.addTeam1Spawnpoint(player.getLocation());
-                                            player.sendMessage(GalacticWarFront.MAIN + "Added your location to " + GalacticWarFront.SECOND + type + GalacticWarFront.MAIN + " spawnpoints.");
+                                            player.sendMessage(BattleArena.MAIN + "Added your location to " + BattleArena.SECOND + type + BattleArena.MAIN + " spawnpoints.");
                                             break;
                                         case "team2":
                                             arena.addTeam2Spawnpoint(player.getLocation());
-                                            player.sendMessage(GalacticWarFront.MAIN + "Added your location to " + GalacticWarFront.SECOND + type + GalacticWarFront.MAIN + " spawnpoints.");
+                                            player.sendMessage(BattleArena.MAIN + "Added your location to " + BattleArena.SECOND + type + BattleArena.MAIN + " spawnpoints.");
                                             break;
                                         default:
-                                            player.sendMessage(GalacticWarFront.MAIN + "Invalid Type: " + GalacticWarFront.SECOND + type);
+                                            player.sendMessage(BattleArena.MAIN + "Invalid Type: " + BattleArena.SECOND + type);
                                             break;
                                     }
                                     return;
                                 } else if (args[4].equalsIgnoreCase("Clear")) {
                                     if (spawnpoints.size() == 0) {
-                                        player.sendMessage(GalacticWarFront.MAIN + "There are no Spawnpoints for " + GalacticWarFront.SECOND + type);
+                                        player.sendMessage(BattleArena.MAIN + "There are no Spawnpoints for " + BattleArena.SECOND + type);
                                         return;
                                     }
                                     arena.clearSpawnpoints(type);
-                                    player.sendMessage(GalacticWarFront.MAIN + "Removed all spawnpoints for " + GalacticWarFront.SECOND + type);
+                                    player.sendMessage(BattleArena.MAIN + "Removed all spawnpoints for " + BattleArena.SECOND + type);
                                     return;
                                 }
                             }
                         }
-                        player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Edit [ID] SpawnPoints List General:Team:Team2");
-                        player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Edit [ID] SpawnPoints Add General:Team1:Team2");
-                        player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Edit [ID] SpawnPoints Clear General:Team1:Team2");
+                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints List General:Team:Team2");
+                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints Add General:Team1:Team2");
+                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints Clear General:Team1:Team2");
                         return;
                     }
                 }
-                player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Edit [ID] Name [Name] " + GalacticWarFront.SECOND + "Change the Arenas name");
-                player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Edit [ID] Icon " + GalacticWarFront.SECOND + "Change the Arenas Icon");
-                player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Edit [ID] SpawnPoints " + GalacticWarFront.SECOND + "Manage Spawnpoints");
+                player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Name [Name] " + BattleArena.SECOND + "Change the Arenas name");
+                player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Icon " + BattleArena.SECOND + "Change the Arenas Icon");
+                player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints " + BattleArena.SECOND + "Manage Spawnpoints");
                 return;
             }
         }
-        player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena List " + GalacticWarFront.SECOND + "List existing Arenas");
-        player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Create [ID] [Name] " + GalacticWarFront.SECOND + "Create a new Arena");
-        player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Delete [ID] " + GalacticWarFront.SECOND + "Permanently delete an Arena");
-        player.sendMessage(GalacticWarFront.MAIN + "/GWF Arena Edit [ID] " + GalacticWarFront.SECOND + "Edit an existing Arena");
+        player.sendMessage(BattleArena.MAIN + "/BA Arena List " + BattleArena.SECOND + "List existing Arenas");
+        player.sendMessage(BattleArena.MAIN + "/BA Arena Create [ID] [Name] " + BattleArena.SECOND + "Create a new Arena");
+        player.sendMessage(BattleArena.MAIN + "/BA Arena Delete [ID] " + BattleArena.SECOND + "Permanently delete an Arena");
+        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] " + BattleArena.SECOND + "Edit an existing Arena");
     }
 
     private boolean lobbySetup(Player player) {
-        return player.hasPermission("galacticwarfront.commands.galacticwarfront.lobby");
+        return player.hasPermission("battlearena.commands.battlearena.lobby");
     }
 
     private boolean arenaSetup(Player player) {
-        return player.hasPermission("galacticwarfront.commands.galacticwarfront.arena");
+        return player.hasPermission("battlearena.commands.battlearena.arena");
     }
 }

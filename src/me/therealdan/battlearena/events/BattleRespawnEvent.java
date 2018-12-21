@@ -1,26 +1,27 @@
-package me.therealdan.galacticwarfront.events;
+package me.therealdan.battlearena.events;
 
-import me.therealdan.galacticwarfront.mechanics.battle.Battle;
+import me.therealdan.battlearena.mechanics.battle.Battle;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class BattleJoinEvent extends Event {
+public class BattleRespawnEvent extends Event {
 
     private static HandlerList handlerList = new HandlerList();
 
     private Battle battle;
     private Player player;
+    private Location respawnLocation;
 
-    private String battleMessage;
-
-    public BattleJoinEvent(Battle battle, Player player) {
+    public BattleRespawnEvent(Battle battle, Player player, Location respawnLocation) {
         this.battle = battle;
         this.player = player;
+        this.respawnLocation = respawnLocation;
     }
 
-    public void setBattleMessage(String battleMessage) {
-        this.battleMessage = battleMessage;
+    public void setRespawnLocation(Location respawnLocation) {
+        this.respawnLocation = respawnLocation;
     }
 
     public Battle getBattle() {
@@ -31,8 +32,8 @@ public class BattleJoinEvent extends Event {
         return player;
     }
 
-    public String getBattleMessage() {
-        return battleMessage;
+    public Location getRespawnLocation() {
+        return respawnLocation;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package me.therealdan.galacticwarfront.util;
+package me.therealdan.battlearena.util;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

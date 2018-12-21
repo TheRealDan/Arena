@@ -1,8 +1,8 @@
-package me.therealdan.galacticwarfront.mechanics.battle;
+package me.therealdan.battlearena.mechanics.battle;
 
-import me.therealdan.galacticwarfront.events.BattleLeaveEvent;
-import me.therealdan.galacticwarfront.mechanics.arena.Arena;
-import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
+import me.therealdan.battlearena.events.BattleLeaveEvent;
+import me.therealdan.battlearena.mechanics.arena.Arena;
+import me.therealdan.battlearena.mechanics.killcounter.KillCounter;
 import org.bukkit.Location;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;

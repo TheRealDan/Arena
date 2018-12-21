@@ -1,13 +1,13 @@
-package me.therealdan.galacticwarfront.mechanics.lobby;
+package me.therealdan.battlearena.mechanics.lobby;
 
-import me.therealdan.galacticwarfront.GalacticWarFront;
-import me.therealdan.galacticwarfront.mechanics.arena.Arena;
-import me.therealdan.galacticwarfront.mechanics.battle.Battle;
-import me.therealdan.galacticwarfront.mechanics.battle.Duel;
-import me.therealdan.galacticwarfront.mechanics.battle.FFA;
-import me.therealdan.galacticwarfront.mechanics.battle.Team;
-import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
-import me.therealdan.galacticwarfront.util.Icon;
+import me.therealdan.battlearena.BattleArena;
+import me.therealdan.battlearena.mechanics.arena.Arena;
+import me.therealdan.battlearena.mechanics.battle.Battle;
+import me.therealdan.battlearena.mechanics.battle.Duel;
+import me.therealdan.battlearena.mechanics.battle.FFA;
+import me.therealdan.battlearena.mechanics.battle.Team;
+import me.therealdan.battlearena.mechanics.killcounter.KillCounter;
+import me.therealdan.battlearena.util.Icon;
 import me.therealdan.party.Party;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -270,19 +270,19 @@ public class BattleCreator implements Listener {
 
     private ItemStack getDuelIcon() {
         if (duelIcon == null)
-            duelIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.Duel", false);
+            duelIcon = Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.Duel", false);
         return duelIcon;
     }
 
     private ItemStack getFFAIcon() {
         if (ffaIcon == null)
-            ffaIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.FFA", false);
+            ffaIcon = Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.FFA", false);
         return ffaIcon;
     }
 
     private ItemStack getTeamBattleIcon() {
         if (teamBattleIcon == null)
-            teamBattleIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.Team", false);
+            teamBattleIcon = Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.Team", false);
         return teamBattleIcon;
     }
 
@@ -290,7 +290,7 @@ public class BattleCreator implements Listener {
         Arena arena = getArena(player);
         if (arena == null) {
             if (noFreeArenaIcon == null)
-                noFreeArenaIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "No_Free_Arena.Team", false);
+                noFreeArenaIcon = Icon.build(BattleArena.getInstance().getConfig(), "No_Free_Arena.Team", false);
             return noFreeArenaIcon;
         }
 
@@ -315,7 +315,7 @@ public class BattleCreator implements Listener {
     }
 
     private ItemStack getGracePeriodIcon(Player player) {
-        if (gracePeriodIcon == null) gracePeriodIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.Grace_Period", false);
+        if (gracePeriodIcon == null) gracePeriodIcon = Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.Grace_Period", false);
 
         Date date = new Date(0);
         date.setTime(getGracePeriod(player));
@@ -336,7 +336,7 @@ public class BattleCreator implements Listener {
     }
 
     private ItemStack getBattleDurationIcon(Player player) {
-        if (battleDurationIcon == null) battleDurationIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.Battle_Duration", false);
+        if (battleDurationIcon == null) battleDurationIcon = Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.Battle_Duration", false);
 
         Date date = new Date();
         date.setHours(0);
@@ -359,7 +359,7 @@ public class BattleCreator implements Listener {
 
     private ItemStack getStartGameIcon() {
         if (startGameIcon == null)
-            startGameIcon = Icon.build(GalacticWarFront.getInstance().getConfig(), "Battle_Creator.Start_Game", false);
+            startGameIcon = Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.Start_Game", false);
         return startGameIcon;
     }
 
@@ -373,7 +373,7 @@ public class BattleCreator implements Listener {
         ItemStack icon = new ItemStack(Material.SKULL_ITEM);
         SkullMeta itemMeta = (SkullMeta) icon.getItemMeta();
         itemMeta.setOwningPlayer(player);
-        itemMeta.setDisplayName(GalacticWarFront.MAIN + player.getName());
+        itemMeta.setDisplayName(BattleArena.MAIN + player.getName());
         itemMeta.setLore(lore);
         icon.setItemMeta(itemMeta);
         icon.setDurability((short) 3);

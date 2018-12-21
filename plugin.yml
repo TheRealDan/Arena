@@ -1,7 +1,7 @@
-name: GalacticWarFront
-version: 1.1
-main: me.therealdan.galacticwarfront.GalacticWarFront
+name: BattleArena
+version: 1.2
+main: me.therealdan.battlearena.BattleArena
 author: TheRealDan
 commands:
-  GalacticWarFront:
-  GWF:
+  BattleArena:
+  BA:

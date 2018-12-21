@@ -1,31 +1,22 @@
-package me.therealdan.galacticwarfront.events;
+package me.therealdan.battlearena.events;
 
-import me.therealdan.galacticwarfront.mechanics.battle.Battle;
-import org.bukkit.Location;
+import me.therealdan.battlearena.mechanics.battle.Battle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class BattleLeaveEvent extends Event {
+public class BattleJoinEvent extends Event {
 
     private static HandlerList handlerList = new HandlerList();
 
     private Battle battle;
     private Player player;
-    private Reason reason;
-    private Location spawn;
 
     private String battleMessage;
 
-    public BattleLeaveEvent(Battle battle, Player player, Reason reason, Location spawn) {
+    public BattleJoinEvent(Battle battle, Player player) {
         this.battle = battle;
         this.player = player;
-        this.reason = reason;
-        this.spawn = spawn;
-    }
-
-    public void setSpawn(Location spawn) {
-        this.spawn = spawn;
     }
 
     public void setBattleMessage(String battleMessage) {
@@ -40,14 +31,6 @@ public class BattleLeaveEvent extends Event {
         return player;
     }
 
-    public Reason getReason() {
-        return reason;
-    }
-
-    public Location getSpawn() {
-        return spawn;
-    }
-
     public String getBattleMessage() {
         return battleMessage;
     }
@@ -55,14 +38,6 @@ public class BattleLeaveEvent extends Event {
     @Override
     public HandlerList getHandlers() {
         return handlerList;
-    }
-
-    public enum Reason {
-        BATTLE_FINISHED,
-        NOT_ENOUGH_PLAYERS,
-        LEAVE, LOGOUT,
-        SERVER_SHUTDOWN,
-        CUSTOM_PLUGIN
     }
 
     public static HandlerList getHandlerList() {

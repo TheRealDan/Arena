@@ -1,8 +1,8 @@
-package me.therealdan.galacticwarfront.mechanics.arena;
+package me.therealdan.battlearena.mechanics.arena;
 
-import me.therealdan.galacticwarfront.GalacticWarFront;
-import me.therealdan.galacticwarfront.mechanics.battle.Battle;
-import me.therealdan.galacticwarfront.util.WXYZ;
+import me.therealdan.battlearena.BattleArena;
+import me.therealdan.battlearena.mechanics.battle.Battle;
+import me.therealdan.battlearena.util.WXYZ;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -216,7 +216,7 @@ public class Arena {
                     new Arena(id);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    GalacticWarFront.getInstance().getLogger().info("Error loading arena: " + id);
+                    BattleArena.getInstance().getLogger().info("Error loading arena: " + id);
                 }
             }
         }
@@ -246,7 +246,7 @@ public class Arena {
 
     private static File getFile() {
         if (file == null) {
-            file = new File(GalacticWarFront.getInstance().getDataFolder(), path);
+            file = new File(BattleArena.getInstance().getDataFolder(), path);
         }
         return file;
     }

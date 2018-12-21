@@ -1,4 +1,4 @@
-package me.therealdan.galacticwarfront.events;
+package me.therealdan.battlearena.events;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

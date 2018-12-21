@@ -1,6 +1,6 @@
-package me.therealdan.galacticwarfront.events;
+package me.therealdan.battlearena.events;
 
-import me.therealdan.galacticwarfront.mechanics.battle.Battle;
+import me.therealdan.battlearena.mechanics.battle.Battle;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
