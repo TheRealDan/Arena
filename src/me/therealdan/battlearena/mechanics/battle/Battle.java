@@ -9,10 +9,13 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
 public interface Battle {
+
+    HashSet<Battle> open = new HashSet<>();
 
     double SPAWN_RANGE = 15;
 
@@ -30,9 +33,17 @@ public interface Battle {
 
     void setTimeRemaining(long secondsStartingNow);
 
-    void setOpen(boolean open);
+    default void setOpen(boolean open) {
+        if (open) {
+            Battle.open.add(this);
+        } else {
+            Battle.open.remove(this);
+        }
+    }
 
-    boolean isOpen();
+    default boolean isOpen() {
+        return Battle.open.contains(this);
+    }
 
     boolean contains(Player player);
 
@@ -96,7 +107,6 @@ public interface Battle {
 
     static List<Battle> values() {
         List<Battle> battles = new ArrayList<>();
-        battles.addAll(Duel.values());
         battles.addAll(Team.values());
         battles.addAll(FFA.values());
         return battles;

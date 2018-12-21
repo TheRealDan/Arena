@@ -27,7 +27,6 @@ public class FFA implements Battle {
     private KillCounter killCounter;
     private long gracePeriod = 0;
     private long battleDuration = 0;
-    private boolean open = false;
 
     private HashSet<UUID> players = new HashSet<>();
     private long startTime = System.currentTimeMillis();
@@ -36,7 +35,7 @@ public class FFA implements Battle {
 
     public FFA(Arena arena, Player started, Party party) {
         this.arena = arena;
-        if (party != null) this.open = party.isOpen();
+        if (party != null) setOpen(party.isOpen());
 
         add(started);
         if (party != null)
@@ -177,16 +176,6 @@ public class FFA implements Battle {
     @Override
     public void setTimeRemaining(long secondsStartingNow) {
         this.battleDuration = System.currentTimeMillis() + (secondsStartingNow * 1000);
-    }
-
-    @Override
-    public void setOpen(boolean open) {
-        this.open = open;
-    }
-
-    @Override
-    public boolean isOpen() {
-        return open;
     }
 
     @Override

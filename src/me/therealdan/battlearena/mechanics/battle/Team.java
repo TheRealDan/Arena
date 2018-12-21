@@ -27,7 +27,6 @@ public class Team implements Battle {
     private KillCounter killCounter;
     private long gracePeriod = 0;
     private long battleDuration = 0;
-    private boolean open;
 
     private HashSet<UUID> team1 = new HashSet<>();
     private HashSet<UUID> team2 = new HashSet<>();
@@ -37,7 +36,7 @@ public class Team implements Battle {
 
     public Team(Arena arena, Player started, Party party) {
         this.arena = arena;
-        if (party != null) this.open = party.isOpen();
+        if (party != null) setOpen(party.isOpen());
 
         if (party != null)
             for (Player player : party.getPlayers())
@@ -187,16 +186,6 @@ public class Team implements Battle {
     @Override
     public void setTimeRemaining(long secondsStartingNow) {
         this.battleDuration = System.currentTimeMillis() + (secondsStartingNow * 1000);
-    }
-
-    @Override
-    public void setOpen(boolean open) {
-        this.open = open;
-    }
-
-    @Override
-    public boolean isOpen() {
-        return open;
     }
 
     @Override
