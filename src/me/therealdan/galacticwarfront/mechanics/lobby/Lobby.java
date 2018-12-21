@@ -27,6 +27,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -84,6 +85,10 @@ public class Lobby implements Listener {
         if (contains(player)) {
             player.setFoodLevel(20);
             player.setFireTicks(0);
+            player.setHealth(player.getMaxHealth());
+
+            for (PotionEffect potionEffect : player.getActivePotionEffects())
+                player.removePotionEffect(potionEffect.getType());
         }
     }
 

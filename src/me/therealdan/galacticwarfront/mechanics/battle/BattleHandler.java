@@ -19,13 +19,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.UUID;
 
 public class BattleHandler implements Listener {
@@ -63,39 +59,8 @@ public class BattleHandler implements Listener {
                     if (progress < 0.0) progress = 0.0;
                     bar.setProgress(progress);
                 }
-
-                if (battle.getScoreboard() != null) {
-                    Scoreboard scoreboard = battle.getScoreboard();
-                    if (battle instanceof FFA) {
-                        Objective objective = scoreboard.registerNewObjective("dummy", "title");
-                        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-                        objective.setDisplayName(battle.getArena().getName() + GalacticWarFront.SECOND + " - " + battle.getType().name());
-
-                        int i = 0;
-                        for (Player player : battle.getPlayers())
-                            objective.getScore(
-                                    GalacticWarFront.MAIN + player.getName()
-                                            + GalacticWarFront.MAIN + " - KDR: " + GalacticWarFront.SECOND + battle.getKillCounter().getKDRString(player.getUniqueId())
-                                            + GalacticWarFront.MAIN + " - Kills: " + GalacticWarFront.SECOND + battle.getKillCounter().getKills(player.getUniqueId())
-                                            + GalacticWarFront.MAIN + " - Deaths: " + GalacticWarFront.SECOND + battle.getKillCounter().getDeaths(player.getUniqueId())
-                            ).setScore(i++);
-
-                        for (Player player : battle.getPlayers())
-                            player.setScoreboard(scoreboard);
-                    }
-                }
             }
         }, 20, 20);
-    }
-
-    @EventHandler
-    public void onMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        Battle battle = Battle.get(player);
-        if (battle == null) return;
-
-        player.setNoDamageTicks(0);
-        player.setFoodLevel(20);
     }
 
     @EventHandler
