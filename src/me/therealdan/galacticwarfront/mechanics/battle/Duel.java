@@ -256,6 +256,7 @@ public class Duel implements Battle {
     @Override
     public Location getRandomSpawnpoint(Player player) {
         List<Location> spawnpoints = getPlayer1() == player ? getArena().getTeam1Spawnpoints() : getArena().getTeam2Spawnpoints();
+        if (spawnpoints.size() == 0) spawnpoints = getArena().getSpawnpoints();
 
         int checks = 0;
         Location location = null;
