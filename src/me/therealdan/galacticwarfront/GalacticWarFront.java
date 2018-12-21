@@ -30,8 +30,9 @@ public class GalacticWarFront extends JavaPlugin {
         getServer().getPluginManager().registerEvents(BattleCreator.getInstance(), this);
         getServer().getPluginManager().registerEvents(BattleHandler.getInstance(), this);
 
-        getCommand("GalacticWarFront").setExecutor(new GalacticWarFrontCommand());
-        getCommand("GWF").setExecutor(new GalacticWarFrontCommand());
+        GalacticWarFrontCommand galacticWarFrontCommand = new GalacticWarFrontCommand();
+        getCommand("GalacticWarFront").setExecutor(galacticWarFrontCommand);
+        getCommand("GWF").setExecutor(galacticWarFrontCommand);
     }
 
     @Override
