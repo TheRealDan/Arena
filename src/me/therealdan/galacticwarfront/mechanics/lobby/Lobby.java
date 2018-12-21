@@ -45,7 +45,7 @@ public class Lobby implements Listener {
 
     private WXYZ spawnpoint;
     private ItemStack createBattleIcon;
-    private boolean teleportOnJoin = true;
+    private boolean teleportOnJoin;
 
     private HashSet<UUID> uiOpen = new HashSet<>();
 
