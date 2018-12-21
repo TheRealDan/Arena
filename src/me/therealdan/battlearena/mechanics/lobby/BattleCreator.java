@@ -3,7 +3,6 @@ package me.therealdan.battlearena.mechanics.lobby;
 import me.therealdan.battlearena.BattleArena;
 import me.therealdan.battlearena.mechanics.arena.Arena;
 import me.therealdan.battlearena.mechanics.battle.Battle;
-import me.therealdan.battlearena.mechanics.battle.Duel;
 import me.therealdan.battlearena.mechanics.battle.FFA;
 import me.therealdan.battlearena.mechanics.battle.Team;
 import me.therealdan.battlearena.mechanics.killcounter.KillCounter;
@@ -76,13 +75,6 @@ public class BattleCreator implements Listener {
             switch (getBattleType(player)) {
                 case FFA:
                     battle = new FFA(arena, player, party);
-                    break;
-                case Duel:
-                    if (party == null) return;
-                    if (party.getPlayers().size() < 2) return;
-                    Player player2 = party.getPlayers().get(0);
-                    if (player2.equals(player)) player2 = party.getPlayers().get(1);
-                    battle = new Duel(arena, player, player2);
                     break;
                 case Team:
                     if (party == null) return;
