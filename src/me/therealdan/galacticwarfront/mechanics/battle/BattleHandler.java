@@ -57,7 +57,7 @@ public class BattleHandler implements Listener {
                     double progress = battle.getProgress();
                     if (progress > 1.0) progress = 1.0;
                     if (progress < 0.0) progress = 0.0;
-                    bar.setProgress(progress);
+                    bar.setProgress(Math.abs(progress - 1.0));
                 }
             }
         }, 20, 20);
