@@ -8,16 +8,16 @@ import me.therealdan.galacticwarfront.mechanics.lobby.Lobby;
 import me.therealdan.galacticwarfront.util.PlayerHandler;
 import me.therealdan.party.Party;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 public class FFA implements Battle {
 
@@ -32,7 +32,6 @@ public class FFA implements Battle {
     private HashSet<UUID> players = new HashSet<>();
     private long startTime = System.currentTimeMillis();
 
-    private Scoreboard scoreboard;
     private BossBar timeRemainingBar;
 
     public FFA(Arena arena, Player started, Party party) {
@@ -104,7 +103,6 @@ public class FFA implements Battle {
 
         this.players.add(player.getUniqueId());
 
-        player.setScoreboard(getScoreboard() != null ? getScoreboard() : Bukkit.getScoreboardManager().getNewScoreboard());
         if (getTimeRemainingBar() != null) getTimeRemainingBar().addPlayer(player);
 
         respawn(player);
@@ -157,7 +155,7 @@ public class FFA implements Battle {
     public void respawn(Player player) {
         if (!contains(player)) return;
 
-        BattleRespawnEvent battleRespawnEvent = new BattleRespawnEvent(this, player, getRandomSpawnpoint(player));
+        BattleRespawnEvent battleRespawnEvent = new BattleRespawnEvent(this, player, getRandomSpawnpoint());
         Bukkit.getPluginManager().callEvent(battleRespawnEvent);
 
         for (Player target : getPlayers())
@@ -194,11 +192,6 @@ public class FFA implements Battle {
     @Override
     public boolean contains(Player player) {
         return this.players.contains(player.getUniqueId());
-    }
-
-    @Override
-    public boolean sameTeam(Player player, Player player1) {
-        return false;
     }
 
     @Override
@@ -251,26 +244,6 @@ public class FFA implements Battle {
     }
 
     @Override
-    public Location getRandomSpawnpoint(Player player) {
-        List<Location> spawnpoints = getArena().getSpawnpoints();
-
-        boolean safe;
-        int checks = 0;
-        Location location = null;
-        while (checks < 10) {
-            safe = true;
-            location = spawnpoints.get(new Random().nextInt(spawnpoints.size()));
-            for (Entity entity : location.getWorld().getNearbyEntities(location, SPAWN_RANGE, SPAWN_RANGE, SPAWN_RANGE))
-                if (entity instanceof Player)
-                    safe = false;
-            if (safe) break;
-            checks++;
-        }
-
-        return location;
-    }
-
-    @Override
     public KillCounter getKillCounter() {
         if (killCounter == null) killCounter = new KillCounter();
         return killCounter;
@@ -279,12 +252,6 @@ public class FFA implements Battle {
     @Override
     public Arena getArena() {
         return arena;
-    }
-
-    @Override
-    public Scoreboard getScoreboard() {
-        if (scoreboard == null) scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        return scoreboard;
     }
 
     @Override

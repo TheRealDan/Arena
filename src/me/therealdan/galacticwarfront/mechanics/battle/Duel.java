@@ -12,11 +12,12 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 public class Duel implements Battle {
 
@@ -31,7 +32,6 @@ public class Duel implements Battle {
     private HashSet<UUID> players = new HashSet<>();
     private long startTime = System.currentTimeMillis();
 
-    private Scoreboard scoreboard;
     private BossBar timeRemainingBar;
 
     public Duel(Arena arena, Player player1, Player player2) {
@@ -101,7 +101,6 @@ public class Duel implements Battle {
 
         this.players.add(player.getUniqueId());
 
-        player.setScoreboard(getScoreboard() != null ? getScoreboard() : Bukkit.getScoreboardManager().getNewScoreboard());
         if (getTimeRemainingBar() != null) getTimeRemainingBar().addPlayer(player);
 
         respawn(player);
@@ -192,11 +191,6 @@ public class Duel implements Battle {
     }
 
     @Override
-    public boolean sameTeam(Player player, Player player1) {
-        return false;
-    }
-
-    @Override
     public boolean canPvP() {
         return getGraceTimeRemaining() <= 0;
     }
@@ -253,24 +247,11 @@ public class Duel implements Battle {
         return Type.Duel;
     }
 
-    @Override
     public Location getRandomSpawnpoint(Player player) {
         List<Location> spawnpoints = getPlayer1() == player ? getArena().getTeam1Spawnpoints() : getArena().getTeam2Spawnpoints();
         if (spawnpoints.size() == 0) spawnpoints = getArena().getSpawnpoints();
 
-        int checks = 0;
-        Location location = null;
-        while (checks < 10) {
-            boolean safe = true;
-            location = spawnpoints.get(new Random().nextInt(spawnpoints.size()));
-            for (Entity entity : location.getWorld().getNearbyEntities(location, SPAWN_RANGE, SPAWN_RANGE, SPAWN_RANGE))
-                if (entity instanceof Player)
-                    safe = false;
-            if (safe) return location;
-            checks++;
-        }
-
-        return location;
+        return getRandomSpawnpoint(spawnpoints);
     }
 
     @Override
@@ -282,12 +263,6 @@ public class Duel implements Battle {
     @Override
     public Arena getArena() {
         return arena;
-    }
-
-    @Override
-    public Scoreboard getScoreboard() {
-        if (scoreboard == null) scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        return scoreboard;
     }
 
     @Override

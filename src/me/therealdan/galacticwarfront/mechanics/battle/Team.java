@@ -12,11 +12,12 @@ import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 public class Team implements Battle {
 
@@ -32,7 +33,6 @@ public class Team implements Battle {
     private HashSet<UUID> team2 = new HashSet<>();
     private long startTime = System.currentTimeMillis();
 
-    private Scoreboard scoreboard;
     private BossBar timeRemainingBar;
 
     public Team(Arena arena, Player started, Party party) {
@@ -114,7 +114,6 @@ public class Team implements Battle {
             this.team2.add(player.getUniqueId());
         }
 
-        player.setScoreboard(getScoreboard() != null ? getScoreboard() : Bukkit.getScoreboardManager().getNewScoreboard());
         if (getTimeRemainingBar() != null) getTimeRemainingBar().addPlayer(player);
 
         respawn(player);
@@ -270,24 +269,10 @@ public class Team implements Battle {
         return Type.Team;
     }
 
-    @Override
     public Location getRandomSpawnpoint(Player player) {
         List<Location> spawnpoints = isTeam1(player) ? getArena().getTeam1Spawnpoints() : getArena().getTeam2Spawnpoints();
 
-        int checks = 0;
-        Location location = null;
-        while (checks < 10) {
-            boolean safe = true;
-            location = spawnpoints.get(new Random().nextInt(spawnpoints.size()));
-            for (Entity entity : location.getWorld().getNearbyEntities(location, SPAWN_RANGE, SPAWN_RANGE, SPAWN_RANGE))
-                if (entity instanceof Player)
-                    if (!sameTeam(player, (Player) entity))
-                        safe = false;
-            if (safe) return location;
-            checks++;
-        }
-
-        return location;
+        return getRandomSpawnpoint(spawnpoints);
     }
 
     @Override
@@ -299,12 +284,6 @@ public class Team implements Battle {
     @Override
     public Arena getArena() {
         return arena;
-    }
-
-    @Override
-    public Scoreboard getScoreboard() {
-        if (scoreboard == null) scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        return scoreboard;
     }
 
     @Override

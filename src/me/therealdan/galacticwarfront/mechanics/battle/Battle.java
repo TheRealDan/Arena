@@ -5,11 +5,12 @@ import me.therealdan.galacticwarfront.mechanics.arena.Arena;
 import me.therealdan.galacticwarfront.mechanics.killcounter.KillCounter;
 import org.bukkit.Location;
 import org.bukkit.boss.BossBar;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public interface Battle {
 
@@ -35,7 +36,9 @@ public interface Battle {
 
     boolean contains(Player player);
 
-    boolean sameTeam(Player player, Player player1);
+    default boolean sameTeam(Player player, Player player1) {
+        return false;
+    }
 
     boolean canPvP();
 
@@ -55,13 +58,30 @@ public interface Battle {
 
     Type getType();
 
-    Location getRandomSpawnpoint(Player player);
+    default Location getRandomSpawnpoint() {
+        return getRandomSpawnpoint(getArena().getSpawnpoints());
+    }
+
+    default Location getRandomSpawnpoint(List<Location> spawnpoints) {
+        boolean safe;
+        int checks = 0;
+        Location location = null;
+        while (checks < 10) {
+            safe = true;
+            location = spawnpoints.get(new Random().nextInt(spawnpoints.size()));
+            for (Entity entity : location.getWorld().getNearbyEntities(location, SPAWN_RANGE, SPAWN_RANGE, SPAWN_RANGE))
+                if (entity instanceof Player)
+                    safe = false;
+            if (safe) break;
+            checks++;
+        }
+
+        return location;
+    }
 
     KillCounter getKillCounter();
 
     Arena getArena();
-
-    Scoreboard getScoreboard();
 
     BossBar getTimeRemainingBar();
 
