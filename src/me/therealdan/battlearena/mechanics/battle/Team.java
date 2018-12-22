@@ -84,9 +84,7 @@ public class Team implements Battle {
     }
 
     public Location getRandomSpawnpoint(Player player) {
-        List<Location> spawnpoints = isTeam1(player) ? getArena().getTeam1Spawnpoints() : getArena().getTeam2Spawnpoints();
-
-        return getRandomSpawnpoint(spawnpoints);
+        return getRandomSpawnpoint(getArena().getLocations(isTeam1(player) ? 2 : 3));
     }
 
     public List<Player> getTeam1Players() {

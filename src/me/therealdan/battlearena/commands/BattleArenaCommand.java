@@ -151,51 +151,58 @@ public class BattleArenaCommand implements CommandExecutor {
                         return;
                     } else if (args[3].equalsIgnoreCase("SpawnPoints")) {
                         if (args.length > 5) {
-                            String type = args[5].toLowerCase();
-                            if (type.equalsIgnoreCase("General") || type.equalsIgnoreCase("Team1") || type.equalsIgnoreCase("Team2")) {
-                                List<WXYZ> spawnpoints = arena.getSpawnpoints(type);
-                                if (args[4].equalsIgnoreCase("List")) {
-                                    if (spawnpoints.size() == 0) {
-                                        player.sendMessage(BattleArena.MAIN + "There are no Spawnpoints for " + BattleArena.SECOND + type);
-                                        return;
-                                    }
-                                    player.sendMessage(BattleArena.MAIN + "SpawnPoints for " + type + ":");
-                                    for (WXYZ wxyz : spawnpoints)
-                                        player.sendMessage(BattleArena.SECOND + wxyz.getFormat());
-                                    return;
-                                } else if (args[4].equalsIgnoreCase("Add")) {
-                                    switch (type) {
-                                        case "general":
-                                            arena.addSpawnpoint(player.getLocation());
-                                            player.sendMessage(BattleArena.MAIN + "Added your location to " + BattleArena.SECOND + type + BattleArena.MAIN + " spawnpoints.");
-                                            break;
-                                        case "team1":
-                                            arena.addTeam1Spawnpoint(player.getLocation());
-                                            player.sendMessage(BattleArena.MAIN + "Added your location to " + BattleArena.SECOND + type + BattleArena.MAIN + " spawnpoints.");
-                                            break;
-                                        case "team2":
-                                            arena.addTeam2Spawnpoint(player.getLocation());
-                                            player.sendMessage(BattleArena.MAIN + "Added your location to " + BattleArena.SECOND + type + BattleArena.MAIN + " spawnpoints.");
-                                            break;
-                                        default:
-                                            player.sendMessage(BattleArena.MAIN + "Invalid Type: " + BattleArena.SECOND + type);
-                                            break;
-                                    }
-                                    return;
-                                } else if (args[4].equalsIgnoreCase("Clear")) {
-                                    if (spawnpoints.size() == 0) {
-                                        player.sendMessage(BattleArena.MAIN + "There are no Spawnpoints for " + BattleArena.SECOND + type);
-                                        return;
-                                    }
-                                    arena.clearSpawnpoints(type);
-                                    player.sendMessage(BattleArena.MAIN + "Removed all spawnpoints for " + BattleArena.SECOND + type);
+                            int group;
+                            try {
+                                group = Integer.parseInt(args[5]);
+                            } catch (Exception e) {
+                                group = 0;
+                            }
+                            if (group <= 0) {
+                                player.sendMessage(BattleArena.MAIN + "Group must be a number greater than 0");
+                                return;
+                            }
+                            List<WXYZ> spawnpoints = arena.getWXYZs(group);
+                            if (args[4].equalsIgnoreCase("List")) {
+                                if (spawnpoints.size() == 0) {
+                                    player.sendMessage(BattleArena.MAIN + "There are no Spawnpoints for group " + BattleArena.SECOND + group);
                                     return;
                                 }
+                                player.sendMessage(BattleArena.MAIN + "SpawnPoints for " + group + ":");
+                                for (WXYZ wxyz : spawnpoints)
+                                    player.sendMessage(BattleArena.SECOND + wxyz.getFormat());
+                                return;
+                            } else if (args[4].equalsIgnoreCase("Add")) {
+                                switch (group) {
+                                    case 1:
+                                        arena.addLocation(1, new WXYZ(player.getLocation()));
+                                        player.sendMessage(BattleArena.MAIN + "Added your location to group " + BattleArena.SECOND + group);
+                                        break;
+                                    case 2:
+                                        arena.addLocation(2, new WXYZ(player.getLocation()));
+                                        player.sendMessage(BattleArena.MAIN + "Added your location to group " + BattleArena.SECOND + group);
+                                        break;
+                                    case 3:
+                                        arena.addLocation(3, new WXYZ(player.getLocation()));
+                                        player.sendMessage(BattleArena.MAIN + "Added your location to group " + BattleArena.SECOND + group);
+                                        break;
+                                    default:
+                                        player.sendMessage(BattleArena.MAIN + "Invalid Type: " + BattleArena.SECOND + group);
+                                        break;
+                                }
+                                return;
+                            } else if (args[4].equalsIgnoreCase("Clear")) {
+                                if (spawnpoints.size() == 0) {
+                                    player.sendMessage(BattleArena.MAIN + "There are no Spawnpoints for group " + BattleArena.SECOND + group);
+                                    return;
+                                }
+                                arena.clearSpawnpoints(group);
+                                player.sendMessage(BattleArena.MAIN + "Removed all spawnpoints for group " + BattleArena.SECOND + group);
+                                return;
                             }
                         }
-                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints List General:Team:Team2");
-                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints Add General:Team1:Team2");
-                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints Clear General:Team1:Team2");
+                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints List [Group]");
+                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints Add [Group]");
+                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints Clear [Group]");
                         return;
                     }
                 }

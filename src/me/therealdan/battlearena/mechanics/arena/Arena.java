@@ -10,10 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Arena {
 
@@ -27,9 +24,8 @@ public class Arena {
     private String name;
     private Material material = Material.BOOK;
     private short durability = 0;
-    private HashSet<WXYZ> spawnpoints = new HashSet<>();
-    private HashSet<WXYZ> team1Spawnpoints = new HashSet<>();
-    private HashSet<WXYZ> team2Spawnpoints = new HashSet<>();
+
+    private LinkedHashMap<Integer, LinkedHashSet<WXYZ>> locations;
 
     public Arena(String id, String name) {
         this.id = id;
@@ -44,15 +40,12 @@ public class Arena {
         this.material = Material.valueOf(getData().getString("Arenas." + getID() + ".Material"));
         this.durability = (short) getData().getInt("Arenas." + getID() + ".Durability");
 
-        if (getData().contains("Arenas." + getID() + ".Spawnpoints"))
-            for (String wxyz : getData().getConfigurationSection("Arenas." + getID() + ".Spawnpoints").getKeys(false))
-                spawnpoints.add(new WXYZ(wxyz));
-        if (getData().contains("Arenas." + getID() + ".Team_1_SpawnPoints"))
-            for (String wxyz : getData().getConfigurationSection("Arenas." + getID() + ".Team_1_SpawnPoints").getKeys(false))
-                team1Spawnpoints.add(new WXYZ(wxyz));
-        if (getData().contains("Arenas." + getID() + ".Team_2_SpawnPoints"))
-            for (String wxyz : getData().getConfigurationSection("Arenas." + getID() + ".Team_2_SpawnPoints").getKeys(false))
-                team2Spawnpoints.add(new WXYZ(wxyz));
+        this.locations = new LinkedHashMap<>();
+
+        if (getData().contains("Arenas." + getID() + ".Location_Groups"))
+            for (String group : getData().getConfigurationSection("Arenas." + getID() + ".Location_Groups").getKeys(false))
+                for (String wxyz : getData().getConfigurationSection("Arenas." + getID() + ".Location_Groups." + group).getKeys(false))
+                    addLocation(Integer.parseInt(group), new WXYZ(wxyz));
 
         arenas.add(this);
     }
@@ -62,30 +55,17 @@ public class Arena {
         getData().set("Arenas." + getID() + ".Material", material.toString());
         getData().set("Arenas." + getID() + ".Durability", durability);
 
-        for (WXYZ wxyz : spawnpoints)
-            getData().set("Arenas." + getID() + ".Spawnpoints." + wxyz.getWxyz(), 0);
-        for (WXYZ wxyz : team1Spawnpoints)
-            getData().set("Arenas." + getID() + ".Team_1_SpawnPoints." + wxyz.getWxyz(), 0);
-        for (WXYZ wxyz : team2Spawnpoints)
-            getData().set("Arenas." + getID() + ".Team_2_SpawnPoints." + wxyz.getWxyz(), 0);
+        for (int group : locations.keySet())
+            for (WXYZ wxyz : locations.get(group))
+                getData().set("Arenas." + getID() + ".Location_Groups." + group + "." + wxyz.getWxyz(), group);
     }
 
     public void delete() {
         arenas.remove(this);
     }
 
-    public void clearSpawnpoints(String type) {
-        switch (type.toLowerCase()) {
-            case "general":
-                spawnpoints.clear();
-                break;
-            case "team1":
-                team1Spawnpoints.clear();
-                break;
-            case "team2":
-                team2Spawnpoints.clear();
-                break;
-        }
+    public void clearSpawnpoints(int group) {
+        this.locations.get(group).clear();
     }
 
     public void setName(String name) {
@@ -105,16 +85,9 @@ public class Arena {
         this.durability = durability;
     }
 
-    public void addSpawnpoint(Location location) {
-        spawnpoints.add(new WXYZ(location));
-    }
-
-    public void addTeam1Spawnpoint(Location location) {
-        team1Spawnpoints.add(new WXYZ(location));
-    }
-
-    public void addTeam2Spawnpoint(Location location) {
-        team2Spawnpoints.add(new WXYZ(location));
+    public void addLocation(int group, WXYZ wxyz) {
+        if (!this.locations.containsKey(group)) this.locations.put(group, new LinkedHashSet<>());
+        this.locations.get(group).add(wxyz);
     }
 
     public boolean inUse() {
@@ -122,14 +95,6 @@ public class Arena {
             if (battle.getArena().getID().equalsIgnoreCase(getID()))
                 return true;
         return false;
-    }
-
-    public boolean hasSpawnpoints() {
-        return getSpawnpoints().size() > 0;
-    }
-
-    public boolean hasTeamSpawnpoints() {
-        return getTeam1Spawnpoints().size() > 0 && getTeam2Spawnpoints().size() > 0;
     }
 
     public String getID() {
@@ -148,37 +113,16 @@ public class Arena {
         return durability;
     }
 
-    public List<Location> getSpawnpoints() {
-        List<Location> spawnpoints = new ArrayList<>();
-        for (WXYZ wxyz : this.spawnpoints)
-            spawnpoints.add(wxyz.getLocation());
-        return spawnpoints;
+    public List<Location> getLocations(int group) {
+        List<Location> locations = new ArrayList<>();
+        for (WXYZ wxyz : getWXYZs(group))
+            locations.add(wxyz.getLocation());
+        return locations;
     }
 
-    public List<Location> getTeam1Spawnpoints() {
-        List<Location> spawnpoints = new ArrayList<>();
-        for (WXYZ wxyz : this.team1Spawnpoints)
-            spawnpoints.add(wxyz.getLocation());
-        return spawnpoints;
-    }
-
-    public List<Location> getTeam2Spawnpoints() {
-        List<Location> spawnpoints = new ArrayList<>();
-        for (WXYZ wxyz : this.team2Spawnpoints)
-            spawnpoints.add(wxyz.getLocation());
-        return spawnpoints;
-    }
-
-    public List<WXYZ> getSpawnpoints(String type) {
-        switch (type.toLowerCase()) {
-            case "general":
-                return new ArrayList<>(spawnpoints);
-            case "team1":
-                return new ArrayList<>(team1Spawnpoints);
-            case "team2":
-                return new ArrayList<>(team2Spawnpoints);
-        }
-        return new ArrayList<>();
+    public List<WXYZ> getWXYZs(int group) {
+        if (!this.locations.containsKey(group)) this.locations.put(group, new LinkedHashSet<>());
+        return new ArrayList<>(this.locations.get(group));
     }
 
     public static Arena getFree() {

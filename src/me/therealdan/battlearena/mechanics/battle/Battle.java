@@ -251,7 +251,7 @@ public interface Battle {
     }
 
     default Location getRandomSpawnpoint() {
-        return getRandomSpawnpoint(getArena().getSpawnpoints());
+        return getRandomSpawnpoint(getArena().getLocations(1));
     }
 
     default Location getRandomSpawnpoint(List<Location> spawnpoints) {
