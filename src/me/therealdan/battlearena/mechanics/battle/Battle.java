@@ -91,6 +91,8 @@ public interface Battle {
         for (Player player : getPlayers())
             remove(player, BattleLeaveEvent.Reason.BATTLE_FINISHED);
 
+        KillCounter.addCount(getKillCounter());
+
         Battle.battles.remove(this);
     }
 
