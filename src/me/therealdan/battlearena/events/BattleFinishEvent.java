@@ -9,14 +9,20 @@ public class BattleFinishEvent extends Event {
     private static HandlerList handlerList = new HandlerList();
 
     private Battle battle;
+    private BattleLeaveEvent.Reason reason;
     private String battleMessage, lobbyMessage;
 
-    public BattleFinishEvent(Battle battle) {
+    public BattleFinishEvent(Battle battle, BattleLeaveEvent.Reason reason) {
         this.battle = battle;
+        this.reason = reason;
     }
 
     public Battle getBattle() {
         return battle;
+    }
+
+    public BattleLeaveEvent.Reason getReason() {
+        return reason;
     }
 
     public void setBattleMessage(String battleMessage) {
