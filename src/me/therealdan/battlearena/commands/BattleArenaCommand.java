@@ -59,7 +59,7 @@ public class BattleArenaCommand implements CommandExecutor {
                         return true;
                     }
                 }
-                player.sendMessage(BattleArena.MAIN + "/GWF Lobby SpawnPoint " + BattleArena.SECOND + "Set Lobby Spawnpoint");
+                player.sendMessage(BattleArena.MAIN + "/BA Lobby SpawnPoint " + BattleArena.SECOND + "Set Lobby Spawnpoint");
                 return true;
             } else if (args[0].equalsIgnoreCase("Arena") && arenaSetup(player)) {
                 arena(player, args);
@@ -67,11 +67,11 @@ public class BattleArenaCommand implements CommandExecutor {
             }
         }
 
-        player.sendMessage(BattleArena.MAIN + "/GWF Join " + BattleArena.SECOND + "Join a Game");
-        player.sendMessage(BattleArena.MAIN + "/GWF Create " + BattleArena.SECOND + "Create a game");
-        player.sendMessage(BattleArena.MAIN + "/GWF Leave " + BattleArena.SECOND + "Leave current game");
-        if (lobbySetup(player)) player.sendMessage(BattleArena.MAIN + "/GWF Lobby " + BattleArena.SECOND + "Setup BattleArena Lobby");
-        if (arenaSetup(player)) player.sendMessage(BattleArena.MAIN + "/GWF Arena " + BattleArena.SECOND + "Setup BattleArena Arenas");
+        player.sendMessage(BattleArena.MAIN + "/BA Join " + BattleArena.SECOND + "Join a Game");
+        player.sendMessage(BattleArena.MAIN + "/BA Create " + BattleArena.SECOND + "Create a game");
+        player.sendMessage(BattleArena.MAIN + "/BA Leave " + BattleArena.SECOND + "Leave current game");
+        if (lobbySetup(player)) player.sendMessage(BattleArena.MAIN + "/BA Lobby " + BattleArena.SECOND + "Setup BattleArena Lobby");
+        if (arenaSetup(player)) player.sendMessage(BattleArena.MAIN + "/BA Arena " + BattleArena.SECOND + "Setup BattleArena Arenas");
 
         return true;
     }
