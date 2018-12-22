@@ -149,6 +149,37 @@ public class BattleArenaCommand implements CommandExecutor {
                         arena.setIcon(itemStack.getType(), itemStack.getDurability());
                         player.sendMessage(BattleArena.MAIN + "Set Arena " + BattleArena.SECOND + arena.getID() + BattleArena.MAIN + " icon to: " + BattleArena.SECOND + arena.getMaterial().toString());
                         return;
+                    } else if (args[3].equalsIgnoreCase("Bounds")) {
+                        if (args.length > 4 && args[4].equalsIgnoreCase("Pos1")) {
+                            if (!arena.hasBounds()) arena.createBounds(player.getLocation());
+                            arena.getBounds().setPos1(player.getTargetBlock(null, 10).getLocation());
+                            player.sendMessage(BattleArena.MAIN + "Set pos1 for bounds to the block your looking at.");
+                            return;
+                        } else if (args.length > 4 && args[4].equalsIgnoreCase("Pos2")) {
+                            if (!arena.hasBounds()) arena.createBounds(player.getLocation());
+                            arena.getBounds().setPos1(player.getTargetBlock(null, 10).getLocation());
+                            player.sendMessage(BattleArena.MAIN + "Set pos2 for bounds to the block your looking at.");
+                            return;
+                        } else if (args.length > 4 && args[4].equalsIgnoreCase("Consequence")) {
+                            try {
+                                Arena.Consequence consequence = Arena.Consequence.valueOf(args[5].toUpperCase());
+                                arena.setConsequence(consequence);
+                                player.sendMessage(BattleArena.MAIN + "Set consequence for leaving bounds to " + BattleArena.SECOND + consequence.getName() + BattleArena.MAIN + " for " + BattleArena.SECOND + arena.getID());
+                                return;
+                            } catch (Exception e) {
+                                //
+                            }
+                        } else if (args.length > 4 && args[4].equalsIgnoreCase("Clear")) {
+                            arena.clearBounds();
+                            player.sendMessage(BattleArena.MAIN + "Removed bounds for Arena: " + BattleArena.SECOND + arena.getID());
+                            return;
+                        }
+
+                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Bounds Pos1 " + BattleArena.SECOND + "Set pos1 for bounds");
+                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Bounds Pos2 " + BattleArena.SECOND + "Set pos2 for bounds");
+                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Bounds Consequence [Consequence] " + BattleArena.SECOND + "Set consequence for leaving bounds");
+                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Bounds Clear " + BattleArena.SECOND + "Clear bounds");
+                        return;
                     } else if (args[3].equalsIgnoreCase("SpawnPoints")) {
                         if (args.length > 5) {
                             int group;
@@ -208,6 +239,7 @@ public class BattleArenaCommand implements CommandExecutor {
                 }
                 player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Name [Name] " + BattleArena.SECOND + "Change the Arenas name");
                 player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Icon " + BattleArena.SECOND + "Change the Arenas Icon");
+                player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Bounds " + BattleArena.SECOND + "Edit the Arena Bounds");
                 player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints " + BattleArena.SECOND + "Manage Spawnpoints");
                 return;
             }

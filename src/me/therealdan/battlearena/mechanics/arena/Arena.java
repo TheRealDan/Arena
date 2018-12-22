@@ -25,6 +25,9 @@ public class Arena {
     private Material material = Material.BOOK;
     private short durability = 0;
 
+    private Bounds bounds = null;
+    private Consequence consequence = Consequence.PUSH;
+
     private LinkedHashMap<Integer, LinkedHashSet<WXYZ>> locations;
 
     public Arena(String id, String name) {
@@ -40,6 +43,15 @@ public class Arena {
         this.material = Material.valueOf(getData().getString("Arenas." + getID() + ".Material"));
         this.durability = (short) getData().getInt("Arenas." + getID() + ".Durability");
 
+        if (getData().contains("Arenas." + getID() + ".Bounds")) {
+            this.consequence = Consequence.valueOf(getData().getString("Arenas." + getID() + ".Bounds.Consequence"));
+            Location pos1 = new WXYZ(getData().getString("Arenas." + getID() + ".Bounds.Pos1")).getLocation();
+            Location pos2 = new WXYZ(getData().getString("Arenas." + getID() + ".Bounds.Pos2")).getLocation();
+            createBounds(pos1);
+            getBounds().setPos1(pos1);
+            getBounds().setPos2(pos2);
+        }
+
         this.locations = new LinkedHashMap<>();
 
         if (getData().contains("Arenas." + getID() + ".Location_Groups"))
@@ -54,6 +66,12 @@ public class Arena {
         getData().set("Arenas." + getID() + ".Name", name);
         getData().set("Arenas." + getID() + ".Material", material.toString());
         getData().set("Arenas." + getID() + ".Durability", durability);
+
+        if (hasBounds()) {
+            getData().set("Arenas." + getID() + ".Bounds.Consequence", getConsequence().toString());
+            getData().set("Arenas." + getID() + ".Bounds.Pos1", new WXYZ(getBounds().getPos1()).getWxyz());
+            getData().set("Arenas." + getID() + ".Bounds.Pos2", new WXYZ(getBounds().getPos2()).getWxyz());
+        }
 
         for (int group : locations.keySet())
             for (WXYZ wxyz : locations.get(group))
@@ -90,6 +108,18 @@ public class Arena {
         this.locations.get(group).add(wxyz);
     }
 
+    public void createBounds(Location location) {
+        this.bounds = new Bounds(location, location);
+    }
+
+    public void clearBounds() {
+        this.bounds = null;
+    }
+
+    public void setConsequence(Consequence consequence) {
+        this.consequence = consequence;
+    }
+
     public boolean inUse() {
         for (Battle battle : Battle.values())
             if (battle.getArena().getID().equalsIgnoreCase(getID()))
@@ -113,6 +143,18 @@ public class Arena {
         return durability;
     }
 
+    public boolean hasBounds() {
+        return bounds != null;
+    }
+
+    public Bounds getBounds() {
+        return bounds;
+    }
+
+    public Consequence getConsequence() {
+        return consequence;
+    }
+
     public List<Location> getLocations(int group) {
         List<Location> locations = new ArrayList<>();
         for (WXYZ wxyz : getWXYZs(group))
@@ -123,6 +165,40 @@ public class Arena {
     public List<WXYZ> getWXYZs(int group) {
         if (!this.locations.containsKey(group)) this.locations.put(group, new LinkedHashSet<>());
         return new ArrayList<>(this.locations.get(group));
+    }
+
+    public enum Consequence {
+        PUSH,
+        DAMAGE,
+        KILL,
+        RESPAWN;
+
+        public Consequence next() {
+            boolean next = false;
+            for (Consequence consequence : Consequence.values()) {
+                if (next) return consequence;
+                if (this.equals(consequence)) next = true;
+            }
+            return Consequence.values()[0];
+        }
+
+        public String getName() {
+            return this.toString().toUpperCase().substring(0, 1) + this.toString().toLowerCase().substring(1);
+        }
+
+        public String getDescription() {
+            switch (this) {
+                case PUSH:
+                    return "Push towards center of Arena.";
+                case DAMAGE:
+                    return "Constant damage while outside of Arena bounds.";
+                case KILL:
+                    return "Instant death.";
+                case RESPAWN:
+                    return "Instant respawn.";
+            }
+            return this.toString();
+        }
     }
 
     public static Arena getFree() {

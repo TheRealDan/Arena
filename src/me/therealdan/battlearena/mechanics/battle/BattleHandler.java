@@ -32,7 +32,34 @@ public class BattleHandler implements Listener {
 
     private BattleHandler() {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(BattleArena.getInstance(), () -> {
+
             for (Battle battle : Battle.values()) {
+                if (battle.getArena().hasBounds()) {
+                    for (Player player : battle.getPlayers()) {
+                        if (!battle.getArena().getBounds().contains(player.getLocation())) {
+                            switch (battle.getArena().getConsequence()) {
+                                case PUSH:
+                                    player.setVelocity(battle.getArena().getBounds().getCenter().toVector().subtract(player.getLocation().toVector()).multiply(0.025));
+                                    break;
+                                case DAMAGE:
+                                    player.damage(0.2);
+                                    break;
+                                case KILL:
+                                    battle.kill(player, null, BattleArena.SECOND + player.getName() + BattleArena.MAIN + " tried to flee the battle (" + (battle.getKillCounter().getDeaths(player.getUniqueId()) + 1) + " deaths)");
+                                    break;
+                                case RESPAWN:
+                                    battle.respawn(player);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }, 1, 1);
+
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(BattleArena.getInstance(), () -> {
+            for (Battle battle : Battle.values()) {
+
                 if (battle.getTimeRemaining() <= 0) {
                     battle.end(BattleLeaveEvent.Reason.BATTLE_FINISHED);
 
