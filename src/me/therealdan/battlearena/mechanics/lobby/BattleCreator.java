@@ -3,6 +3,7 @@ package me.therealdan.battlearena.mechanics.lobby;
 import me.therealdan.battlearena.BattleArena;
 import me.therealdan.battlearena.mechanics.arena.Arena;
 import me.therealdan.battlearena.mechanics.battle.Battle;
+import me.therealdan.battlearena.mechanics.battle.BattleType;
 import me.therealdan.battlearena.mechanics.battle.FFA;
 import me.therealdan.battlearena.mechanics.battle.Team;
 import me.therealdan.battlearena.mechanics.killcounter.KillCounter;
@@ -33,11 +34,11 @@ public class BattleCreator implements Listener {
     private HashSet<UUID> arenaPickerUIOpen = new HashSet<>();
 
     private HashMap<UUID, Arena> arena = new HashMap<>();
-    private HashMap<UUID, Battle.Type> battleType = new HashMap<>();
+    private HashMap<UUID, BattleType> battleType = new HashMap<>();
     private HashMap<UUID, Long> gracePeriod = new HashMap<>();
     private HashMap<UUID, Long> battleDuration = new HashMap<>();
 
-    private ItemStack duelIcon, ffaIcon, teamBattleIcon, gracePeriodIcon, battleDurationIcon, startGameIcon, noFreeArenaIcon;
+    private ItemStack gracePeriodIcon, battleDurationIcon, startGameIcon, noFreeArenaIcon;
     private List<Integer> team1Slots, team2Slots;
 
     private BattleCreator() {
@@ -51,7 +52,8 @@ public class BattleCreator implements Listener {
 
         if (event.getCurrentItem() == null) return;
 
-        if (getDuelIcon().isSimilar(event.getCurrentItem()) || getFFAIcon().isSimilar(event.getCurrentItem()) || getTeamBattleIcon().isSimilar(event.getCurrentItem())) {
+        BattleType battleType = getBattleType(player);
+        if (battleType.getIcon().isSimilar(event.getCurrentItem())) {
             toggleBattleType(player, event.isLeftClick());
             openBattleCreator(player);
             return;
@@ -72,11 +74,11 @@ public class BattleCreator implements Listener {
             if (arena.inUse()) return;
             Battle battle = null;
             Party party = Party.byPlayer(player);
-            switch (getBattleType(player)) {
-                case FFA:
+            switch (battleType.getName()) {
+                case "FFA":
                     battle = new FFA(arena, player, party);
                     break;
-                case Team:
+                case "Team":
                     if (party == null) return;
                     if (party.getPlayers(1).size() == 0) return;
                     if (party.getPlayers(2).size() == 0) return;
@@ -127,7 +129,7 @@ public class BattleCreator implements Listener {
     }
 
     public void openBattleCreator(Player player) {
-        Battle.Type battleType = getBattleType(player);
+        BattleType battleType = getBattleType(player);
         Party party = Party.byPlayer(player);
 
         int size = 9;
@@ -139,7 +141,7 @@ public class BattleCreator implements Listener {
 
         Inventory inventory = Bukkit.createInventory(null, size, "Battle Creator");
 
-        inventory.setItem(0, battleType.equals(Battle.Type.FFA) ? getFFAIcon() : battleType.equals(Battle.Type.Team) ? getTeamBattleIcon() : getDuelIcon());
+        inventory.setItem(0, battleType.getIcon());
         inventory.setItem(1, getArenaIcon(player));
         inventory.setItem(2, getBattleDurationIcon(player));
         inventory.setItem(3, getGracePeriodIcon(player));
@@ -177,7 +179,7 @@ public class BattleCreator implements Listener {
     }
 
     private void toggleBattleType(Player player, boolean next) {
-        Battle.Type battleType = getBattleType(player);
+        BattleType battleType = getBattleType(player);
         battleType = battleType.toggle(next);
 
         this.battleType.put(player.getUniqueId(), battleType);
@@ -202,25 +204,10 @@ public class BattleCreator implements Listener {
     }
 
     private boolean canStart(Player player) {
-        Party party = Party.byPlayer(player);
         Arena arena = getArena(player);
-        Battle.Type battleType = getBattleType(player);
 
         if (arena == null) return false;
         if (arena.inUse()) return false;
-
-        switch (battleType) {
-            case Duel:
-                if (party == null) return false;
-                if (party.size() != 2) return false;
-                break;
-            case FFA:
-
-                break;
-            case Team:
-
-                break;
-        }
 
         return true;
     }
@@ -243,8 +230,8 @@ public class BattleCreator implements Listener {
         return arena;
     }
 
-    private Battle.Type getBattleType(Player player) {
-        return this.battleType.getOrDefault(player.getUniqueId(), Battle.Type.FFA);
+    private BattleType getBattleType(Player player) {
+        return this.battleType.getOrDefault(player.getUniqueId(), BattleType.getDefault());
     }
 
     private long getGracePeriod(Player player) {
@@ -258,24 +245,6 @@ public class BattleCreator implements Listener {
 
     private long getBattleDuration(Player player) {
         return battleDuration.getOrDefault(player.getUniqueId(), 3 * 60 * 1000L);
-    }
-
-    private ItemStack getDuelIcon() {
-        if (duelIcon == null)
-            duelIcon = Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.Duel", false);
-        return duelIcon;
-    }
-
-    private ItemStack getFFAIcon() {
-        if (ffaIcon == null)
-            ffaIcon = Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.FFA", false);
-        return ffaIcon;
-    }
-
-    private ItemStack getTeamBattleIcon() {
-        if (teamBattleIcon == null)
-            teamBattleIcon = Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.Team", false);
-        return teamBattleIcon;
     }
 
     private ItemStack getArenaIcon(Player player) {

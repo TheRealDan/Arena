@@ -5,9 +5,11 @@ import me.therealdan.battlearena.events.BattleLeaveEvent;
 import me.therealdan.battlearena.mechanics.arena.Arena;
 import me.therealdan.battlearena.mechanics.battle.Battle;
 import me.therealdan.battlearena.mechanics.battle.BattleHandler;
+import me.therealdan.battlearena.mechanics.battle.BattleType;
 import me.therealdan.battlearena.mechanics.killcounter.KillCounter;
 import me.therealdan.battlearena.mechanics.lobby.BattleCreator;
 import me.therealdan.battlearena.mechanics.lobby.Lobby;
+import me.therealdan.battlearena.util.Icon;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,6 +27,9 @@ public class BattleArena extends JavaPlugin {
         SECOND = ChatColor.translateAlternateColorCodes('&', getConfig().getString("Color.Secondary"));
 
         Arena.load();
+
+        BattleType.register("FFA", Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.FFA", false));
+        BattleType.register("Team", Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.Team", false));
 
         getServer().getPluginManager().registerEvents(Lobby.getInstance(), this);
         getServer().getPluginManager().registerEvents(BattleCreator.getInstance(), this);

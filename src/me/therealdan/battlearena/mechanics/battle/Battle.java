@@ -1,37 +1,196 @@
 package me.therealdan.battlearena.mechanics.battle;
 
-import me.therealdan.battlearena.events.BattleLeaveEvent;
+import me.therealdan.battlearena.BattleArena;
+import me.therealdan.battlearena.events.*;
 import me.therealdan.battlearena.mechanics.arena.Arena;
 import me.therealdan.battlearena.mechanics.killcounter.KillCounter;
+import me.therealdan.battlearena.mechanics.lobby.Lobby;
+import me.therealdan.battlearena.util.PlayerHandler;
+import me.therealdan.party.Party;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public interface Battle {
 
+    HashSet<Battle> battles = new HashSet<>();
     HashSet<Battle> open = new HashSet<>();
+
+    HashMap<Battle, Arena> arena = new HashMap<>();
+    HashMap<Battle, BattleType> battleType = new HashMap<>();
+    HashMap<Battle, KillCounter> killCounter = new HashMap<>();
+    HashMap<Battle, Long> startTime = new HashMap<>();
+    HashMap<Battle, Long> gracePeriod = new HashMap<>();
+    HashMap<Battle, Long> battleDuration = new HashMap<>();
+    HashMap<Battle, BossBar> timeRemainingBar = new HashMap<>();
+    HashMap<Battle, LinkedHashSet<UUID>> players = new HashMap<>();
 
     double SPAWN_RANGE = 15;
 
-    void end(BattleLeaveEvent.Reason reason);
+    default void init(Arena arena, BattleType battleType, Player started, Party party) {
+        Battle.arena.put(this, arena);
+        Battle.battleType.put(this, battleType);
+        Battle.killCounter.put(this, new KillCounter());
+        Battle.startTime.put(this, System.currentTimeMillis());
+        Battle.gracePeriod.put(this, 0L);
+        Battle.battleDuration.put(this, 0L);
+        Battle.timeRemainingBar.put(this, Bukkit.createBossBar("", BarColor.WHITE, BarStyle.SOLID));
+        Battle.players.put(this, new LinkedHashSet<>());
 
-    void add(Player player);
+        BattleStartEvent event = new BattleStartEvent(this, started);
+        event.setBattleMessage(BattleArena.MAIN + "Your " + BattleArena.SECOND + getBattleType().getName() + BattleArena.MAIN + " on " + BattleArena.SECOND + arena.getName() + BattleArena.MAIN + " has begun.");
+        if (isOpen()) event.setLobbyMessage(BattleArena.SECOND + started.getName() + BattleArena.MAIN + " has started a " + BattleArena.SECOND + getBattleType().getName() + BattleArena.MAIN + " on " + BattleArena.SECOND + arena.getName());
+        Bukkit.getPluginManager().callEvent(event);
 
-    void remove(Player player, BattleLeaveEvent.Reason reason);
+        if (event.getPlayerMessage() != null)
+            started.sendMessage(event.getPlayerMessage());
 
-    void kill(Player player, Player killer);
+        if (event.getBattleMessage() != null)
+            for (Player player : getPlayers())
+                player.sendMessage(event.getBattleMessage());
 
-    void respawn(Player player);
+        if (event.getLobbyMessage() != null)
+            for (Player player : Lobby.getInstance().getPlayers())
+                player.sendMessage(event.getLobbyMessage());
 
-    void setGracePeriod(long secondsStartingNow);
+        if (party != null) setOpen(party.isOpen());
 
-    void setTimeRemaining(long secondsStartingNow);
+        Battle.battles.add(this);
+    }
+
+    default void end(BattleLeaveEvent.Reason reason) {
+        OfflinePlayer mostKills = getKillCounter().getMostKills() != null ? Bukkit.getOfflinePlayer(getKillCounter().getMostKills()) : null;
+
+        String battleMessage = null;
+        if (mostKills != null) battleMessage = BattleArena.SECOND + mostKills.getName() + BattleArena.MAIN + " got the most kills, with " + getKillCounter().getKills(mostKills.getUniqueId()) + BattleArena.MAIN + " kills.";
+        end(reason, battleMessage);
+    }
+
+    default void end(BattleLeaveEvent.Reason reason, String battleMessage) {
+        if (!Battle.battles.contains(this)) return;
+
+        BattleFinishEvent event = new BattleFinishEvent(this, reason);
+        event.setBattleMessage(battleMessage);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getBattleMessage() != null)
+            for (Player player : getPlayers())
+                player.sendMessage(event.getBattleMessage());
+
+        if (event.getLobbyMessage() != null)
+            for (Player player : Lobby.getInstance().getPlayers())
+                player.sendMessage(event.getLobbyMessage());
+
+        for (Player player : getPlayers())
+            remove(player, BattleLeaveEvent.Reason.BATTLE_FINISHED);
+
+        Battle.battles.remove(this);
+    }
+
+    default void add(Player player) {
+        add(player, BattleArena.SECOND + player.getName() + BattleArena.MAIN + " has joined the " + BattleArena.SECOND + getBattleType().getName());
+    }
+
+    default void add(Player player, String joinMessage) {
+        if (contains(player)) return;
+
+        Battle battle = Battle.get(player);
+        if (battle != null) battle.remove(player, BattleLeaveEvent.Reason.LEAVE);
+
+        BattleJoinEvent event = new BattleJoinEvent(this, player);
+        event.setBattleMessage(joinMessage.replace("%player%", player.getName()));
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getBattleMessage() != null)
+            for (Player each : getPlayers())
+                each.sendMessage(event.getBattleMessage());
+
+        if (!Battle.players.containsKey(this)) Battle.players.put(this, new LinkedHashSet<>());
+        Battle.players.get(this).add(player.getUniqueId());
+
+        getTimeRemainingBar().addPlayer(player);
+
+        respawn(player);
+    }
+
+    default void remove(Player player, BattleLeaveEvent.Reason reason) {
+        BattleLeaveEvent event = new BattleLeaveEvent(this, player, reason, Lobby.getInstance().getSpawnpoint());
+        switch (reason) {
+            case LEAVE:
+            case LOGOUT:
+                event.setBattleMessage(BattleArena.SECOND + player.getName() + BattleArena.MAIN + " has left the " + BattleArena.SECOND + getBattleType().getName());
+                break;
+        }
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getBattleMessage() != null)
+            for (Player each : getPlayers())
+                each.sendMessage(event.getBattleMessage());
+
+        player.teleport(event.getSpawn());
+        PlayerHandler.refresh(player);
+
+        Battle.players.get(this).remove(player.getUniqueId());
+
+        getTimeRemainingBar().removePlayer(player);
+    }
+
+    default void kill(Player player, Player killer) {
+        kill(player, killer, killer != null ?
+                BattleArena.SECOND + player.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + (getKillCounter().getDeaths(player.getUniqueId()) + 1) + BattleArena.MAIN + " deaths) was killed by " + BattleArena.SECOND + killer.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + (getKillCounter().getKills(killer.getUniqueId())) + BattleArena.MAIN + " kills)" :
+                BattleArena.SECOND + player.getName() + BattleArena.MAIN + " killed themselves. (" + BattleArena.SECOND + (getKillCounter().getDeaths(player.getUniqueId()) + 1) + BattleArena.MAIN + " deaths)");
+    }
+
+    default void kill(Player player, Player killer, String battleMessage) {
+        getKillCounter().addDeath(player.getUniqueId());
+        if (killer != null) getKillCounter().addKill(killer.getUniqueId());
+
+        BattleDeathEvent event = new BattleDeathEvent(this, player, killer);
+        event.setBattleMessage(battleMessage);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getBattleMessage() != null)
+            for (Player each : getPlayers())
+                each.sendMessage(event.getBattleMessage());
+
+        respawn(player);
+    }
+
+    default void respawn(Player player) {
+        respawn(player, getRandomSpawnpoint());
+    }
+
+    default void respawn(Player player, Location spawnpoint) {
+        if (!contains(player)) return;
+
+        BattleRespawnEvent battleRespawnEvent = new BattleRespawnEvent(this, player, spawnpoint);
+        Bukkit.getPluginManager().callEvent(battleRespawnEvent);
+
+        for (Player target : getPlayers())
+            target.hidePlayer(BattleArena.getInstance(), player);
+
+        player.teleport(battleRespawnEvent.getRespawnLocation());
+
+        for (Player target : getPlayers())
+            target.showPlayer(BattleArena.getInstance(), player);
+
+        PlayerHandler.refresh(player);
+    }
+
+    default void setGracePeriod(long secondsStartingNow) {
+        gracePeriod.put(this, System.currentTimeMillis() + (secondsStartingNow * 1000));
+    }
+
+    default void setTimeRemaining(long secondsStartingNow) {
+        battleDuration.put(this, System.currentTimeMillis() + (secondsStartingNow * 1000));
+    }
 
     default void setOpen(boolean open) {
         if (open) {
@@ -45,29 +204,49 @@ public interface Battle {
         return Battle.open.contains(this);
     }
 
-    boolean contains(Player player);
+    default boolean contains(Player player) {
+        return Battle.players.get(this).contains(player.getUniqueId());
+    }
 
     default boolean sameTeam(Player player, Player player1) {
         return false;
     }
 
-    boolean canPvP();
+    default boolean canPvP() {
+        return getGraceTimeRemaining() <= 0;
+    }
 
-    long getTimePassed();
+    default long getTimePassed() {
+        return System.currentTimeMillis() - getStartTime();
+    }
 
-    long getGraceTimeRemaining();
+    default long getGraceTimeRemaining() {
+        return Math.max(gracePeriod.get(this) - System.currentTimeMillis(), 0L);
+    }
 
-    long getTimeRemaining();
+    default long getTimeRemaining() {
+        return Math.max(battleDuration.get(this) - System.currentTimeMillis(), 0L);
+    }
 
-    long getStartTime();
+    default long getStartTime() {
+        return startTime.get(this);
+    }
 
-    long getGraceDuration();
+    default long getGraceDuration() {
+        return gracePeriod.get(this) - getStartTime();
+    }
 
-    long getBattleDuration();
+    default long getBattleDuration() {
+        return battleDuration.get(this) - getStartTime() - getGraceDuration();
+    }
 
-    double getProgress();
-
-    Type getType();
+    default double getProgress() {
+        if (getGraceTimeRemaining() > 0) {
+            return (double) getTimePassed() / (double) getGraceDuration();
+        } else {
+            return ((double) getTimePassed() - (double) getGraceDuration()) / (double) getBattleDuration();
+        }
+    }
 
     default Location getRandomSpawnpoint() {
         return getRandomSpawnpoint(getArena().getSpawnpoints());
@@ -90,13 +269,28 @@ public interface Battle {
         return location;
     }
 
-    KillCounter getKillCounter();
+    default Arena getArena() {
+        return arena.get(this);
+    }
 
-    Arena getArena();
+    default BattleType getBattleType() {
+        return battleType.get(this);
+    }
 
-    BossBar getTimeRemainingBar();
+    default KillCounter getKillCounter() {
+        return killCounter.get(this);
+    }
 
-    List<Player> getPlayers();
+    default BossBar getTimeRemainingBar() {
+        return timeRemainingBar.get(this);
+    }
+
+    default List<Player> getPlayers() {
+        List<Player> players = new ArrayList<>();
+        for (UUID uuid : Battle.players.get(this))
+            players.add(Bukkit.getPlayer(uuid));
+        return players;
+    }
 
     static Battle get(Player player) {
         for (Battle battle : values())
@@ -106,54 +300,10 @@ public interface Battle {
     }
 
     static List<Battle> values() {
-        List<Battle> battles = new ArrayList<>();
-        battles.addAll(Team.values());
-        battles.addAll(FFA.values());
-        return battles;
+        return new ArrayList<>(battles);
     }
 
-    enum Type {
-        FFA, Duel, Team;
-
-        public boolean hasTeams() {
-            switch (this) {
-                case FFA:
-                    return false;
-                case Duel:
-                case Team:
-                    return true;
-            }
-            return false;
-        }
-
-        public Type toggle(boolean next) {
-            return next ? next() : previous();
-        }
-
-        public Type next() {
-            switch (this) {
-                case FFA:
-                    return Duel;
-                case Duel:
-                    return Team;
-                case Team:
-                    return FFA;
-                default:
-                    return FFA;
-            }
-        }
-
-        public Type previous() {
-            switch (this) {
-                case FFA:
-                    return Team;
-                case Duel:
-                    return FFA;
-                case Team:
-                    return Duel;
-                default:
-                    return FFA;
-            }
-        }
+    static List<Battle> open() {
+        return new ArrayList<>(open);
     }
 }

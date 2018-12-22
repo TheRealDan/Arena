@@ -35,12 +35,6 @@ Battle_Creator:
     Material: BARRIER
     Durability: 0
     Lore: []
-  Duel:
-    Name: "&6Duel"
-    Material: DIAMOND_SWORD
-    Durability: 0
-    Lore:
-    - "&71v1"
   FFA:
     Name: "&6FFA"
     Material: IRON_SWORD

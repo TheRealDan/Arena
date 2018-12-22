@@ -254,7 +254,7 @@ public class Lobby implements Listener {
         for (String line : itemMeta.getLore()) {
             lore.add(line
                     .replace("%players%", players)
-                    .replace("%battle%", battle.getType().toString())
+                    .replace("%battle%", battle.getBattleType().toString())
                     .replace("%arena%", battle.getArena().getName())
             );
         }
