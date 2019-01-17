@@ -3,7 +3,6 @@ package me.therealdan.battlearena.mechanics.battle;
 import me.therealdan.battlearena.BattleArena;
 import me.therealdan.battlearena.events.BattleDamageEvent;
 import me.therealdan.battlearena.events.BattleLeaveEvent;
-import me.therealdan.theforcemc.mechanics.equipment.shootable.flamethrower.FlamethrowerHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.boss.BossBar;
@@ -22,7 +21,6 @@ import org.bukkit.event.player.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.UUID;
 
 public class BattleHandler implements Listener {
 
@@ -234,19 +232,12 @@ public class BattleHandler implements Listener {
             case PROJECTILE:
             case ENTITY_ATTACK:
                 return;
-            case FIRE_TICK:
-                UUID uuid = FlamethrowerHandler.getLastFireDamage(victim.getUniqueId());
-                if (uuid != null) attacker = Bukkit.getPlayer(uuid);
-                break;
         }
 
         BattleDamageEvent battleDamageEvent = new BattleDamageEvent(battle, attacker, victim, event.getDamage(), event.getCause());
         event.setDamage(0);
 
         if (!battle.canPvP())
-            battleDamageEvent.setCancelled(true);
-
-        if (attacker != null && battle.sameTeam(victim, attacker))
             battleDamageEvent.setCancelled(true);
 
         Bukkit.getPluginManager().callEvent(battleDamageEvent);
