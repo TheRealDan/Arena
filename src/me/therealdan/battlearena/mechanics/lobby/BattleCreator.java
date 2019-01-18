@@ -87,6 +87,7 @@ public class BattleCreator implements Listener {
             }
             battle.setGracePeriod(getGracePeriod(player) / 1000);
             battle.setTimeRemaining(getBattleDuration(player) / 1000);
+            battle.setOpen(true);
             player.closeInventory();
             return;
         }
