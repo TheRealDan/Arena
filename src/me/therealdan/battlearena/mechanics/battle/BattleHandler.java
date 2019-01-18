@@ -132,7 +132,7 @@ public class BattleHandler implements Listener {
         Battle battle = Battle.get(player);
         if (battle == null) return;
 
-        if (event.getMessage().toLowerCase().startsWith("/gwf") || event.getMessage().toLowerCase().startsWith("/battlearena")) return;
+        if (event.getMessage().toLowerCase().startsWith("/ba") || event.getMessage().toLowerCase().startsWith("/battlearena")) return;
 
         event.setCancelled(true);
     }
