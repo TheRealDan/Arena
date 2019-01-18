@@ -146,7 +146,7 @@ public interface Battle {
 
     default void kill(Player player, Player killer) {
         kill(player, killer, killer != null ?
-                BattleArena.SECOND + player.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + (getKillCounter().getDeaths(player.getUniqueId()) + 1) + BattleArena.MAIN + " deaths) was killed by " + BattleArena.SECOND + killer.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + (getKillCounter().getKills(killer.getUniqueId())) + BattleArena.MAIN + " kills)" :
+                BattleArena.SECOND + player.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + (getKillCounter().getDeaths(player.getUniqueId()) + 1) + BattleArena.MAIN + " deaths) was killed by " + BattleArena.SECOND + killer.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + (getKillCounter().getKills(killer.getUniqueId()) + 1) + BattleArena.MAIN + " kills)" :
                 BattleArena.SECOND + player.getName() + BattleArena.MAIN + " killed themselves. (" + BattleArena.SECOND + (getKillCounter().getDeaths(player.getUniqueId()) + 1) + BattleArena.MAIN + " deaths)");
     }
 
