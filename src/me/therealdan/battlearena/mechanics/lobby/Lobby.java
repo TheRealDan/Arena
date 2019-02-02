@@ -41,7 +41,7 @@ public class Lobby implements Listener {
 
     private YamlFile yamlFile;
 
-    private WXYZ spawnpoint, plaque;
+    private WXYZ spawnpoint;
     private ItemStack createBattleIcon;
     private boolean teleportOnJoin;
 
@@ -52,9 +52,6 @@ public class Lobby implements Listener {
 
         if (getYamlFile().getData().contains("Lobby.Spawnpoint"))
             spawnpoint = new WXYZ(getYamlFile().getData().getString("Lobby.Spawnpoint"));
-
-        if (getYamlFile().getData().contains("Lobby.Plaque"))
-            plaque = new WXYZ(getYamlFile().getData().getString("Lobby.Plaque"));
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(BattleArena.getInstance(), () -> tick(), 100, 1);
     }
@@ -150,14 +147,9 @@ public class Lobby implements Listener {
         if (event.getAction().equals(Action.RIGHT_CLICK_AIR)) return;
 
         Player player = event.getPlayer();
-        if (contains(player)) {
+        if (contains(player))
             if (player.getGameMode().equals(GameMode.SURVIVAL))
                 event.setCancelled(true);
-
-            if (event.getClickedBlock() != null && event.getClickedBlock().getLocation().equals(getPlaque())) {
-                Plaque.getInstance().view(player);
-            }
-        }
     }
 
     @EventHandler
@@ -217,16 +209,9 @@ public class Lobby implements Listener {
         this.spawnpoint = new WXYZ(location);
     }
 
-    public void setPlaque(Location location) {
-        this.plaque = new WXYZ(location);
-    }
-
     public void unload() {
         if (spawnpoint != null)
             getYamlFile().getData().set("Lobby.Spawnpoint", spawnpoint.getWxyz());
-
-        if (plaque != null)
-            getYamlFile().getData().set("Lobby.Plaque", plaque.getWxyz());
 
         getYamlFile().save();
     }
@@ -245,11 +230,6 @@ public class Lobby implements Listener {
     public Location getSpawnpoint() {
         if (spawnpoint == null) return null;
         return spawnpoint.getLocation();
-    }
-
-    public Location getPlaque() {
-        if (plaque == null) return null;
-        return plaque.getLocation();
     }
 
     private ItemStack getJoinBattleIcon(Battle battle) {
