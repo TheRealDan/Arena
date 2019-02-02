@@ -54,6 +54,18 @@ public class Lobby implements Listener {
 
         if (getData().contains("Lobby.Spawnpoint"))
             spawnpoint = new WXYZ(getData().getString("Lobby.Spawnpoint"));
+
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(BattleArena.getInstance(), () -> tick(), 100, 1);
+    }
+
+    private void tick() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (contains(player)) {
+                player.setFoodLevel(20);
+                player.setFireTicks(0);
+                player.setHealth(player.getMaxHealth());
+            }
+        }
     }
 
     public void join(Player player) {
@@ -76,20 +88,6 @@ public class Lobby implements Listener {
 
         player.openInventory(inventory);
         uiOpen.add(player.getUniqueId());
-    }
-
-    @EventHandler
-    public void onMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-
-        if (contains(player)) {
-            player.setFoodLevel(20);
-            player.setFireTicks(0);
-            player.setHealth(player.getMaxHealth());
-
-            for (PotionEffect potionEffect : player.getActivePotionEffects())
-                player.removePotionEffect(potionEffect.getType());
-        }
     }
 
     @EventHandler
