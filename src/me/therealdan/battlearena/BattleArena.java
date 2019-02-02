@@ -40,7 +40,6 @@ public class BattleArena extends JavaPlugin {
         getServer().getPluginManager().registerEvents(ConsequenceEditor.getInstance(), this);
         getServer().getPluginManager().registerEvents(LocationsEditor.getInstance(), this);
         getServer().getPluginManager().registerEvents(BoundsEditor.getInstance(), this);
-        getServer().getPluginManager().registerEvents(Plaque.getInstance(), this);
 
         BattleArenaCommand battleArenaCommand = new BattleArenaCommand();
         getCommand("BattleArena").setExecutor(battleArenaCommand);
