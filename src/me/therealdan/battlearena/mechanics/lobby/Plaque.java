@@ -15,7 +15,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 public class Plaque implements Listener {
@@ -48,7 +50,7 @@ public class Plaque implements Listener {
 
         Inventory inventory = Bukkit.createInventory(null, size, ChatColor.translateAlternateColorCodes('&', "&1Plaque"));
 
-        for (Player online : Bukkit.getOnlinePlayers())
+        for (Player online : getPlayers())
             inventory.addItem(getIcon(online));
 
         player.openInventory(inventory);
@@ -71,6 +73,27 @@ public class Plaque implements Listener {
         icon.setItemMeta(skullMeta);
 
         return icon;
+    }
+
+    public List<Player> getPlayers() {
+        List<Player> orderedList = new ArrayList<>();
+        List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+
+        while (players.size() > 0) {
+            Player top = null;
+            for (Player each : players) {
+                if (top == null ||
+                        KillCounter.getTotalKills(each.getUniqueId()) > KillCounter.getTotalKills(top.getUniqueId()) ||
+                        (KillCounter.getTotalKills(each.getUniqueId()) == KillCounter.getTotalKills(top.getUniqueId()) && KillCounter.getTotalDeaths(each.getUniqueId()) < KillCounter.getTotalDeaths(top.getUniqueId()))
+                ) {
+                    top = each;
+                }
+            }
+            orderedList.add(top);
+            players.remove(top);
+        }
+
+        return orderedList;
     }
 
     public static Plaque getInstance() {
