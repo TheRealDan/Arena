@@ -30,7 +30,7 @@ public class Arena {
     private Consequence sidesConsequence = Consequence.PUSH;
     private Consequence floorConsequence = Consequence.PUSH;
 
-    private LinkedHashMap<Integer, LinkedHashSet<WXYZ>> locations;
+    private LinkedHashMap<Integer, LinkedHashSet<WXYZ>> locations = new LinkedHashMap<>();
 
     public Arena(String id, String name) {
         this.id = id;
@@ -55,8 +55,6 @@ public class Arena {
             getBounds().setPos1(pos1);
             getBounds().setPos2(pos2);
         }
-
-        this.locations = new LinkedHashMap<>();
 
         if (getData().contains("Arenas." + getID() + ".Location_Groups"))
             for (String group : getData().getConfigurationSection("Arenas." + getID() + ".Location_Groups").getKeys(false))
