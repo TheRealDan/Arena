@@ -39,7 +39,7 @@ public class Bounds {
     }
 
     public boolean isBelow(Location location) {
-        return location.getY() < getLowX();
+        return location.getY() < getLowY();
     }
 
     public boolean isThroughSides(Location location) {
