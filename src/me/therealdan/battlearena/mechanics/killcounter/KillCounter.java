@@ -53,7 +53,7 @@ public class KillCounter {
         return kills / deaths;
     }
 
-    public String getKDRString(UUID uuid) {
+    public String getCurrentKDRString(UUID uuid) {
         return decimalFormat.format(getCurrentKDR(uuid));
     }
 
@@ -102,6 +102,10 @@ public class KillCounter {
         if (deaths == 0) return kills;
 
         return kills / deaths;
+    }
+
+    public static String getKDRString(UUID uuid) {
+        return decimalFormat.format(getKDR(uuid));
     }
 
     private static void saveData() {
