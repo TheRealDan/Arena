@@ -38,7 +38,11 @@ public class BoundsEditor implements Listener {
 
         Arena arena = getEditing(player);
         Location location = event.getBlock().getLocation();
-        arena.getBounds().setPos1(location);
+        if (!arena.hasBounds()) {
+            arena.createBounds(location);
+        } else {
+            arena.getBounds().setPos1(location);
+        }
         player.sendMessage(BattleArena.MAIN + "Position 1 for " + BattleArena.SECOND + arena.getID() + BattleArena.MAIN + " set");
     }
 
@@ -51,7 +55,11 @@ public class BoundsEditor implements Listener {
 
         Arena arena = getEditing(player);
         Location location = event.getClickedBlock().getLocation();
-        arena.getBounds().setPos2(location);
+        if (!arena.hasBounds()) {
+            arena.createBounds(location);
+        } else {
+            arena.getBounds().setPos2(location);
+        }
         player.sendMessage(BattleArena.MAIN + "Position 2 for " + BattleArena.SECOND + arena.getID() + BattleArena.MAIN + " set");
     }
 
