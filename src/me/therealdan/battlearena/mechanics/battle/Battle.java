@@ -255,6 +255,8 @@ public interface Battle {
     }
 
     default Location getRandomSpawnpoint(List<Location> spawnpoints) {
+        if (spawnpoints.size() == 1) return spawnpoints.get(0);
+
         boolean safe;
         int checks = 0;
         Location location = null;
