@@ -268,12 +268,7 @@ public class BattleCreator implements Listener {
     }
 
     private ItemStack getArenaIcon(Arena arena) {
-        ItemStack icon = new ItemStack(arena.getMaterial());
-        ItemMeta itemMeta = icon.getItemMeta();
-        itemMeta.setDisplayName(arena.getName());
-        icon.setItemMeta(itemMeta);
-        icon.setDurability(arena.getDurability());
-        return icon;
+        return Icon.build(arena.getMaterial(), arena.getDurability(), false, arena.getName());
     }
 
     private ItemStack getGracePeriodIcon(Player player) {
