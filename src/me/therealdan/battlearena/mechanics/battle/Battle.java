@@ -69,7 +69,7 @@ public interface Battle {
         OfflinePlayer mostKills = getKillCounter().getMostKills() != null ? Bukkit.getOfflinePlayer(getKillCounter().getMostKills()) : null;
 
         String battleMessage = null;
-        if (mostKills != null) battleMessage = BattleArena.SECOND + mostKills.getName() + BattleArena.MAIN + " got the most kills, with " + getKillCounter().getKills(mostKills.getUniqueId()) + BattleArena.MAIN + " kills.";
+        if (mostKills != null) battleMessage = BattleArena.SECOND + mostKills.getName() + BattleArena.MAIN + " got the most kills, with " + BattleArena.SECOND + getKillCounter().getKills(mostKills.getUniqueId()) + BattleArena.MAIN + " kills.";
         end(reason, battleMessage);
     }
 
@@ -146,8 +146,8 @@ public interface Battle {
 
     default void kill(Player player, Player killer) {
         kill(player, killer, killer != null ?
-                BattleArena.SECOND + player.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + (getKillCounter().getDeaths(player.getUniqueId()) + 1) + BattleArena.MAIN + " deaths) was killed by " + BattleArena.SECOND + killer.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + (getKillCounter().getKills(killer.getUniqueId()) + 1) + BattleArena.MAIN + " kills)" :
-                BattleArena.SECOND + player.getName() + BattleArena.MAIN + " killed themselves. (" + BattleArena.SECOND + (getKillCounter().getDeaths(player.getUniqueId()) + 1) + BattleArena.MAIN + " deaths)");
+                BattleArena.SECOND + player.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + "%playerdeaths%" + BattleArena.MAIN + " deaths) was killed by " + BattleArena.SECOND + killer.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + "%killerkills%" + BattleArena.MAIN + " kills)" :
+                BattleArena.SECOND + player.getName() + BattleArena.MAIN + " killed themselves. (" + BattleArena.SECOND + "%playerdeaths%" + BattleArena.MAIN + " deaths)");
     }
 
     default void kill(Player player, Player killer, String battleMessage) {
@@ -155,7 +155,12 @@ public interface Battle {
         if (killer != null) getKillCounter().addKill(killer.getUniqueId());
 
         BattleDeathEvent event = new BattleDeathEvent(this, player, killer);
-        event.setBattleMessage(battleMessage);
+        event.setBattleMessage(battleMessage
+                .replace("%playerkills%", Long.toString(getKillCounter().getKills(player.getUniqueId())))
+                .replace("%playerdeaths%", Long.toString(getKillCounter().getDeaths(player.getUniqueId())))
+                .replace("%killerkills%", killer != null ? Long.toString(getKillCounter().getKills(killer.getUniqueId())) : "0")
+                .replace("%killerdeaths%", killer != null ? Long.toString(getKillCounter().getDeaths(killer.getUniqueId())) : "0")
+        );
         Bukkit.getPluginManager().callEvent(event);
 
         if (event.getBattleMessage() != null)
