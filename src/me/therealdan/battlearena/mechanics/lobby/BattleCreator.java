@@ -325,7 +325,7 @@ public class BattleCreator implements Listener {
         List<String> lore = new ArrayList<>();
         if (party != null)
             lore.add(ChatColor.translateAlternateColorCodes('&', "&7Team " + party.getTeam(player)));
-        lore.add(ChatColor.translateAlternateColorCodes('&', "&7KDR: &f" + KillCounter.getKDR(player.getUniqueId())));
+        lore.add(ChatColor.translateAlternateColorCodes('&', "&7KDR: &f" + KillCounter.getKDRString(player.getUniqueId())));
 
         ItemStack icon = new ItemStack(Material.SKULL_ITEM);
         SkullMeta itemMeta = (SkullMeta) icon.getItemMeta();
