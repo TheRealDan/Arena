@@ -63,7 +63,7 @@ public class KillCounter {
         for (UUID uuid : kills.keySet())
             if (mostKills == null ||
                     getKills(uuid) > getKills(mostKills) ||
-                    (getKills(uuid) == getKills(mostKills) && getKDR(uuid) > getKDR(mostKills)))
+                    (getKills(uuid) == getKills(mostKills) && getDeaths(uuid) < getDeaths(mostKills)))
                 mostKills = uuid;
 
         return mostKills;
