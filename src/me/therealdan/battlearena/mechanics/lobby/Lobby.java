@@ -23,11 +23,13 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,7 +45,7 @@ public class Lobby implements Listener {
     private static FileConfiguration data;
     private static String path = "data/lobby.yml";
 
-    private WXYZ spawnpoint;
+    private WXYZ spawnpoint, plaque;
     private ItemStack createBattleIcon;
     private boolean teleportOnJoin;
 
@@ -54,6 +56,9 @@ public class Lobby implements Listener {
 
         if (getData().contains("Lobby.Spawnpoint"))
             spawnpoint = new WXYZ(getData().getString("Lobby.Spawnpoint"));
+
+        if (getData().contains("Lobby.Plaque"))
+            plaque = new WXYZ(getData().getString("Lobby.Plaque"));
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(BattleArena.getInstance(), () -> tick(), 100, 1);
     }
@@ -149,9 +154,14 @@ public class Lobby implements Listener {
         if (event.getAction().equals(Action.RIGHT_CLICK_AIR)) return;
 
         Player player = event.getPlayer();
-        if (contains(player))
+        if (contains(player)) {
             if (player.getGameMode().equals(GameMode.SURVIVAL))
                 event.setCancelled(true);
+
+            if (event.getClickedBlock() != null && event.getClickedBlock().getLocation().equals(getPlaque())) {
+                Plaque.getInstance().view(player);
+            }
+        }
     }
 
     @EventHandler
@@ -211,9 +221,16 @@ public class Lobby implements Listener {
         this.spawnpoint = new WXYZ(location);
     }
 
+    public void setPlaque(Location location) {
+        this.plaque = new WXYZ(location);
+    }
+
     public void unload() {
         if (spawnpoint != null)
             getData().set("Lobby.Spawnpoint", spawnpoint.getWxyz());
+
+        if (plaque != null)
+            getData().set("Lobby.Plaque", plaque.getWxyz());
 
         saveData();
     }
@@ -232,6 +249,11 @@ public class Lobby implements Listener {
     public Location getSpawnpoint() {
         if (spawnpoint == null) return null;
         return spawnpoint.getLocation();
+    }
+
+    public Location getPlaque() {
+        if (plaque == null) return null;
+        return plaque.getLocation();
     }
 
     private ItemStack getJoinBattleIcon(Battle battle) {

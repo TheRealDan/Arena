@@ -10,6 +10,7 @@ import me.therealdan.battlearena.mechanics.battle.Battle;
 import me.therealdan.battlearena.mechanics.lobby.BattleCreator;
 import me.therealdan.battlearena.mechanics.lobby.Lobby;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -112,9 +113,16 @@ public class BattleArenaCommand implements CommandExecutor {
                 Lobby.getInstance().setSpawnpoint(target.getLocation());
                 sender.sendMessage(BattleArena.MAIN + "Set spawnpoint for lobby to your location");
                 return;
+
+            } else if (args[1].equalsIgnoreCase("Plaque")) {
+                Lobby.getInstance().setPlaque(target.getTargetBlock(null, 10).getLocation());
+                sender.sendMessage(BattleArena.MAIN + "Set Plaque to block your looking at.");
+                return;
             }
         }
+
         sender.sendMessage(BattleArena.MAIN + "/BA Lobby SpawnPoint " + BattleArena.SECOND + "Set Lobby Spawnpoint");
+        sender.sendMessage(BattleArena.MAIN + "/BA Lobby Plaque " + BattleArena.SECOND + "Set Lobby Plaque");
     }
 
     private void arena(CommandSender sender, Player target, String[] args) {
