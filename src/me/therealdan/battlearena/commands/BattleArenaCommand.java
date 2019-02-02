@@ -220,7 +220,7 @@ public class BattleArenaCommand implements CommandExecutor {
 
         String name = "";
         for (int i = 3; i < args.length; i++)
-            name += ", " + args[i];
+            name += " " + args[i];
         name = name.replaceFirst(", ", "");
         arena.setName(name);
         sender.sendMessage(BattleArena.MAIN + "Renamed Arena " + BattleArena.SECOND + arena.getID() + BattleArena.MAIN + " to: " + BattleArena.SECOND + arena.getName());
