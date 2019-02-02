@@ -3,21 +3,16 @@ package me.therealdan.battlearena.mechanics.arena;
 import me.therealdan.battlearena.BattleArena;
 import me.therealdan.battlearena.mechanics.battle.Battle;
 import me.therealdan.battlearena.util.WXYZ;
+import me.therealdan.battlearena.util.YamlFile;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.File;
 import java.util.*;
 
 public class Arena {
 
-    private static File file;
-    private static FileConfiguration data;
-    private static String path = "data/arenas.yml";
-
+    private static YamlFile yamlFile;
     private static HashSet<Arena> arenas = new HashSet<>();
 
     private String id;
@@ -41,45 +36,45 @@ public class Arena {
 
     private Arena(String id) {
         this.id = id;
-        this.name = getData().getString("Arenas." + getID() + ".Name");
-        this.material = Material.valueOf(getData().getString("Arenas." + getID() + ".Material"));
-        this.durability = (short) getData().getInt("Arenas." + getID() + ".Durability");
+        this.name = getYamlFile().getData().getString("Arenas." + getID() + ".Name");
+        this.material = Material.valueOf(getYamlFile().getData().getString("Arenas." + getID() + ".Material"));
+        this.durability = (short) getYamlFile().getData().getInt("Arenas." + getID() + ".Durability");
 
-        if (getData().contains("Arenas." + getID() + ".Bounds")) {
-            if (getData().contains("Arenas." + getID() + ".Bounds.Top_Consequence")) this.topConsequence = Consequence.valueOf(getData().getString("Arenas." + getID() + ".Bounds.Top_Consequence"));
-            if (getData().contains("Arenas." + getID() + ".Bounds.Sides_Consequence")) this.sidesConsequence = Consequence.valueOf(getData().getString("Arenas." + getID() + ".Bounds.Sides_Consequence"));
-            if (getData().contains("Arenas." + getID() + ".Bounds.Floor_Consequence")) this.floorConsequence = Consequence.valueOf(getData().getString("Arenas." + getID() + ".Bounds.Floor_Consequence"));
-            Location pos1 = new WXYZ(getData().getString("Arenas." + getID() + ".Bounds.Pos1")).getLocation();
-            Location pos2 = new WXYZ(getData().getString("Arenas." + getID() + ".Bounds.Pos2")).getLocation();
+        if (getYamlFile().getData().contains("Arenas." + getID() + ".Bounds")) {
+            if (getYamlFile().getData().contains("Arenas." + getID() + ".Bounds.Top_Consequence")) this.topConsequence = Consequence.valueOf(getYamlFile().getData().getString("Arenas." + getID() + ".Bounds.Top_Consequence"));
+            if (getYamlFile().getData().contains("Arenas." + getID() + ".Bounds.Sides_Consequence")) this.sidesConsequence = Consequence.valueOf(getYamlFile().getData().getString("Arenas." + getID() + ".Bounds.Sides_Consequence"));
+            if (getYamlFile().getData().contains("Arenas." + getID() + ".Bounds.Floor_Consequence")) this.floorConsequence = Consequence.valueOf(getYamlFile().getData().getString("Arenas." + getID() + ".Bounds.Floor_Consequence"));
+            Location pos1 = new WXYZ(getYamlFile().getData().getString("Arenas." + getID() + ".Bounds.Pos1")).getLocation();
+            Location pos2 = new WXYZ(getYamlFile().getData().getString("Arenas." + getID() + ".Bounds.Pos2")).getLocation();
             createBounds(pos1);
             getBounds().setPos1(pos1);
             getBounds().setPos2(pos2);
         }
 
-        if (getData().contains("Arenas." + getID() + ".Location_Groups"))
-            for (String group : getData().getConfigurationSection("Arenas." + getID() + ".Location_Groups").getKeys(false))
-                for (String wxyz : getData().getConfigurationSection("Arenas." + getID() + ".Location_Groups." + group).getKeys(false))
+        if (getYamlFile().getData().contains("Arenas." + getID() + ".Location_Groups"))
+            for (String group : getYamlFile().getData().getConfigurationSection("Arenas." + getID() + ".Location_Groups").getKeys(false))
+                for (String wxyz : getYamlFile().getData().getConfigurationSection("Arenas." + getID() + ".Location_Groups." + group).getKeys(false))
                     addLocation(Integer.parseInt(group), new WXYZ(wxyz));
 
         arenas.add(this);
     }
 
     private void save() {
-        getData().set("Arenas." + getID() + ".Name", name);
-        getData().set("Arenas." + getID() + ".Material", material.toString());
-        getData().set("Arenas." + getID() + ".Durability", durability);
+        getYamlFile().getData().set("Arenas." + getID() + ".Name", name);
+        getYamlFile().getData().set("Arenas." + getID() + ".Material", material.toString());
+        getYamlFile().getData().set("Arenas." + getID() + ".Durability", durability);
 
         if (hasBounds()) {
-            getData().set("Arenas." + getID() + ".Bounds.Top_Consequence", getTopConsequence().toString());
-            getData().set("Arenas." + getID() + ".Bounds.Sides_Consequence", getSidesConsequence().toString());
-            getData().set("Arenas." + getID() + ".Bounds.Floor_Consequence", getFloorConsequence().toString());
-            getData().set("Arenas." + getID() + ".Bounds.Pos1", new WXYZ(getBounds().getPos1()).getWxyz());
-            getData().set("Arenas." + getID() + ".Bounds.Pos2", new WXYZ(getBounds().getPos2()).getWxyz());
+            getYamlFile().getData().set("Arenas." + getID() + ".Bounds.Top_Consequence", getTopConsequence().toString());
+            getYamlFile().getData().set("Arenas." + getID() + ".Bounds.Sides_Consequence", getSidesConsequence().toString());
+            getYamlFile().getData().set("Arenas." + getID() + ".Bounds.Floor_Consequence", getFloorConsequence().toString());
+            getYamlFile().getData().set("Arenas." + getID() + ".Bounds.Pos1", new WXYZ(getBounds().getPos1()).getWxyz());
+            getYamlFile().getData().set("Arenas." + getID() + ".Bounds.Pos2", new WXYZ(getBounds().getPos2()).getWxyz());
         }
 
         for (int group : locations.keySet())
             for (WXYZ wxyz : locations.get(group))
-                getData().set("Arenas." + getID() + ".Location_Groups." + group + "." + wxyz.getWxyz(), group);
+                getYamlFile().getData().set("Arenas." + getID() + ".Location_Groups." + group + "." + wxyz.getWxyz(), group);
     }
 
     public void delete() {
@@ -259,8 +254,8 @@ public class Arena {
     }
 
     public static void load() {
-        if (getData().contains("Arenas")) {
-            for (String id : getData().getConfigurationSection("Arenas").getKeys(false)) {
+        if (getYamlFile().getData().contains("Arenas")) {
+            for (String id : getYamlFile().getData().getConfigurationSection("Arenas").getKeys(false)) {
                 try {
                     new Arena(id);
                 } catch (Exception e) {
@@ -272,31 +267,16 @@ public class Arena {
     }
 
     public static void unload() {
-        getData().set("Arenas", null);
+        getYamlFile().getData().set("Arenas", null);
 
         for (Arena arena : values())
             arena.save();
 
-        saveData();
+        getYamlFile().save();
     }
 
-    private static void saveData() {
-        try {
-            getData().save(getFile());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static FileConfiguration getData() {
-        if (data == null) data = YamlConfiguration.loadConfiguration(getFile());
-        return data;
-    }
-
-    private static File getFile() {
-        if (file == null) {
-            file = new File(BattleArena.getInstance().getDataFolder(), path);
-        }
-        return file;
+    private static YamlFile getYamlFile() {
+        if (yamlFile == null) yamlFile = new YamlFile("data/arenas.yml");
+        return yamlFile;
     }
 }

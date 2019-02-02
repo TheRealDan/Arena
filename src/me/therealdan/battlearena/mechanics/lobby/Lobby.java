@@ -5,11 +5,10 @@ import me.therealdan.battlearena.mechanics.battle.Battle;
 import me.therealdan.battlearena.util.Icon;
 import me.therealdan.battlearena.util.PlayerHandler;
 import me.therealdan.battlearena.util.WXYZ;
+import me.therealdan.battlearena.util.YamlFile;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -31,7 +30,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -41,9 +39,7 @@ public class Lobby implements Listener {
 
     private static Lobby lobby;
 
-    private static File file;
-    private static FileConfiguration data;
-    private static String path = "data/lobby.yml";
+    private YamlFile yamlFile;
 
     private WXYZ spawnpoint, plaque;
     private ItemStack createBattleIcon;
@@ -54,11 +50,11 @@ public class Lobby implements Listener {
     private Lobby() {
         teleportOnJoin = BattleArena.getInstance().getConfig().getBoolean("Teleport_On_Join");
 
-        if (getData().contains("Lobby.Spawnpoint"))
-            spawnpoint = new WXYZ(getData().getString("Lobby.Spawnpoint"));
+        if (getYamlFile().getData().contains("Lobby.Spawnpoint"))
+            spawnpoint = new WXYZ(getYamlFile().getData().getString("Lobby.Spawnpoint"));
 
-        if (getData().contains("Lobby.Plaque"))
-            plaque = new WXYZ(getData().getString("Lobby.Plaque"));
+        if (getYamlFile().getData().contains("Lobby.Plaque"))
+            plaque = new WXYZ(getYamlFile().getData().getString("Lobby.Plaque"));
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(BattleArena.getInstance(), () -> tick(), 100, 1);
     }
@@ -227,12 +223,12 @@ public class Lobby implements Listener {
 
     public void unload() {
         if (spawnpoint != null)
-            getData().set("Lobby.Spawnpoint", spawnpoint.getWxyz());
+            getYamlFile().getData().set("Lobby.Spawnpoint", spawnpoint.getWxyz());
 
         if (plaque != null)
-            getData().set("Lobby.Plaque", plaque.getWxyz());
+            getYamlFile().getData().set("Lobby.Plaque", plaque.getWxyz());
 
-        saveData();
+        getYamlFile().save();
     }
 
     public boolean contains(Player player) {
@@ -290,24 +286,9 @@ public class Lobby implements Listener {
         return players;
     }
 
-    private static void saveData() {
-        try {
-            getData().save(getFile());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static FileConfiguration getData() {
-        if (data == null) data = YamlConfiguration.loadConfiguration(getFile());
-        return data;
-    }
-
-    private static File getFile() {
-        if (file == null) {
-            file = new File(BattleArena.getInstance().getDataFolder(), path);
-        }
-        return file;
+    private YamlFile getYamlFile() {
+        if (yamlFile == null) yamlFile = new YamlFile("data/lobby.yml");
+        return yamlFile;
     }
 
     public static Lobby getInstance() {

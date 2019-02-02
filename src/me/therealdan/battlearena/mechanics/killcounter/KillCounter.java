@@ -1,10 +1,7 @@
 package me.therealdan.battlearena.mechanics.killcounter;
 
-import me.therealdan.battlearena.BattleArena;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import me.therealdan.battlearena.util.YamlFile;
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.UUID;
@@ -13,9 +10,7 @@ public class KillCounter {
 
     private static DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
-    private static File file;
-    private static FileConfiguration data;
-    private static String path = "data/killcounter.yml";
+    private static YamlFile yamlFile;
 
     private static HashMap<UUID, Long> totalKills = new HashMap<>();
     private static HashMap<UUID, Long> totalDeaths = new HashMap<>();
@@ -71,12 +66,12 @@ public class KillCounter {
 
     public static void unload() {
         for (UUID uuid : totalKills.keySet())
-            getData().set("Kills." + uuid.toString(), getTotalKills(uuid));
+            getYamlFile().getData().set("Kills." + uuid.toString(), getTotalKills(uuid));
 
         for (UUID uuid : totalDeaths.keySet())
-            getData().set("Deaths." + uuid.toString(), getTotalDeaths(uuid));
+            getYamlFile().getData().set("Deaths." + uuid.toString(), getTotalDeaths(uuid));
 
-        saveData();
+        getYamlFile().save();
     }
 
     public static void addCount(KillCounter killCounter) {
@@ -88,11 +83,11 @@ public class KillCounter {
     }
 
     public static long getTotalKills(UUID uuid) {
-        return totalKills.getOrDefault(uuid, getData().getLong("Kills." + uuid.toString()));
+        return totalKills.getOrDefault(uuid, getYamlFile().getData().getLong("Kills." + uuid.toString()));
     }
 
     public static long getTotalDeaths(UUID uuid) {
-        return totalDeaths.getOrDefault(uuid, getData().getLong("Deaths." + uuid.toString()));
+        return totalDeaths.getOrDefault(uuid, getYamlFile().getData().getLong("Deaths." + uuid.toString()));
     }
 
     public static double getKDR(UUID uuid) {
@@ -108,23 +103,8 @@ public class KillCounter {
         return decimalFormat.format(getKDR(uuid));
     }
 
-    private static void saveData() {
-        try {
-            getData().save(getFile());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static FileConfiguration getData() {
-        if (data == null) data = YamlConfiguration.loadConfiguration(getFile());
-        return data;
-    }
-
-    private static File getFile() {
-        if (file == null) {
-            file = new File(BattleArena.getInstance().getDataFolder(), path);
-        }
-        return file;
+    private static YamlFile getYamlFile() {
+        if (yamlFile == null) yamlFile = new YamlFile("data/killcounter.yml");
+        return yamlFile;
     }
 }
