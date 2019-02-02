@@ -199,14 +199,20 @@ public class BattleArenaCommand implements CommandExecutor {
 
     private void arenaDelete(CommandSender sender, Arena arena) {
         if (arena == null) {
-            sender.sendMessage(BattleArena.MAIN + "No Arena with that ID exists.");
+            sender.sendMessage(BattleArena.MAIN + "There is no Arena with that ID.");
             return;
         }
+
         arena.delete();
         sender.sendMessage(BattleArena.MAIN + "Permanently deleted Arena " + BattleArena.SECOND + arena.getID());
     }
 
     private void arenaRename(CommandSender sender, String[] args, Arena arena) {
+        if (arena == null) {
+            sender.sendMessage(BattleArena.MAIN + "There is no Arena with that ID.");
+            return;
+        }
+
         String name = "";
         for (int i = 3; i < args.length; i++)
             name += ", " + args[i];
@@ -218,6 +224,11 @@ public class BattleArenaCommand implements CommandExecutor {
     private void arenaIcon(CommandSender sender, Player target, Arena arena) {
         if (target == null) {
             sender.sendMessage(BattleArena.MAIN + "Only players can use this command.");
+            return;
+        }
+
+        if (arena == null) {
+            sender.sendMessage(BattleArena.MAIN + "There is no Arena with that ID.");
             return;
         }
 
@@ -236,6 +247,11 @@ public class BattleArenaCommand implements CommandExecutor {
             return;
         }
 
+        if (arena == null) {
+            sender.sendMessage(BattleArena.MAIN + "There is no Arena with that ID.");
+            return;
+        }
+
         if (BoundsEditor.getInstance().isEditing(target)) {
             BoundsEditor.getInstance().stopEditing(target);
         } else {
@@ -249,12 +265,22 @@ public class BattleArenaCommand implements CommandExecutor {
             return;
         }
 
+        if (arena == null) {
+            sender.sendMessage(BattleArena.MAIN + "There is no Arena with that ID.");
+            return;
+        }
+
         ConsequenceEditor.getInstance().open(target, arena);
     }
 
     private void arenaLocations(CommandSender sender, Player target, Arena arena) {
         if (target == null) {
             sender.sendMessage(BattleArena.MAIN + "Only players can use this command.");
+            return;
+        }
+
+        if (arena == null) {
+            sender.sendMessage(BattleArena.MAIN + "There is no Arena with that ID.");
             return;
         }
 
