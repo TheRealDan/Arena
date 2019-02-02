@@ -48,7 +48,7 @@ public class BattleHandler implements Listener {
                                     player.damage(0.2);
                                     break;
                                 case KILL:
-                                    battle.kill(player, null, BattleArena.SECOND + player.getName() + BattleArena.MAIN + " tried to flee the battle (" + (battle.getKillCounter().getDeaths(player.getUniqueId()) + 1) + " deaths)");
+                                    battle.kill(player, null, BattleArena.SECOND + player.getName() + BattleArena.MAIN + " tried to flee the battle (" + BattleArena.SECOND + (battle.getKillCounter().getDeaths(player.getUniqueId()) + 1) + BattleArena.MAIN + " deaths)");
                                     break;
                                 case RESPAWN:
                                     battle.respawn(player);
