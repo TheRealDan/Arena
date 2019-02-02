@@ -34,6 +34,23 @@ public class Bounds {
         return true;
     }
 
+    public boolean isAbove(Location location) {
+        return location.getY() > getHighY();
+    }
+
+    public boolean isBelow(Location location) {
+        return location.getY() < getLowX();
+    }
+
+    public boolean isThroughSides(Location location) {
+        if (location.getX() > getHighX()) return true;
+        if (location.getX() < getLowX()) return true;
+        if (location.getZ() > getHighZ()) return true;
+        if (location.getZ() < getLowZ()) return true;
+
+        return false;
+    }
+
     public int getHighX() {
         return getPos1().getBlockX() > getPos2().getBlockX() ? getPos1().getBlockX() : getPos2().getBlockX();
     }

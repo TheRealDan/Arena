@@ -3,6 +3,7 @@ package me.therealdan.battlearena.mechanics.battle;
 import me.therealdan.battlearena.BattleArena;
 import me.therealdan.battlearena.events.BattleDamageEvent;
 import me.therealdan.battlearena.events.BattleLeaveEvent;
+import me.therealdan.battlearena.mechanics.arena.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.boss.BossBar;
@@ -35,7 +36,11 @@ public class BattleHandler implements Listener {
                 if (battle.getArena().hasBounds()) {
                     for (Player player : battle.getPlayers()) {
                         if (!battle.getArena().getBounds().contains(player.getLocation())) {
-                            switch (battle.getArena().getConsequence()) {
+                            Arena.Consequence consequence = Arena.Consequence.RESPAWN;
+                            if (battle.getArena().getBounds().isAbove(player.getLocation())) consequence = battle.getArena().getTopConsequence();
+                            if (battle.getArena().getBounds().isThroughSides(player.getLocation())) consequence = battle.getArena().getSidesConsequence();
+                            if (battle.getArena().getBounds().isBelow(player.getLocation())) consequence = battle.getArena().getFloorConsequence();
+                            switch (consequence) {
                                 case PUSH:
                                     player.setVelocity(battle.getArena().getBounds().getCenter().toVector().subtract(player.getLocation().toVector()).multiply(0.025));
                                     break;

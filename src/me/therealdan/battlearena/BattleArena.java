@@ -3,6 +3,9 @@ package me.therealdan.battlearena;
 import me.therealdan.battlearena.commands.BattleArenaCommand;
 import me.therealdan.battlearena.events.BattleLeaveEvent;
 import me.therealdan.battlearena.mechanics.arena.Arena;
+import me.therealdan.battlearena.mechanics.arena.editors.BoundsEditor;
+import me.therealdan.battlearena.mechanics.arena.editors.ConsequenceEditor;
+import me.therealdan.battlearena.mechanics.arena.editors.LocationsEditor;
 import me.therealdan.battlearena.mechanics.battle.Battle;
 import me.therealdan.battlearena.mechanics.battle.BattleHandler;
 import me.therealdan.battlearena.mechanics.battle.BattleType;
@@ -34,6 +37,9 @@ public class BattleArena extends JavaPlugin {
         getServer().getPluginManager().registerEvents(Lobby.getInstance(), this);
         getServer().getPluginManager().registerEvents(BattleCreator.getInstance(), this);
         getServer().getPluginManager().registerEvents(BattleHandler.getInstance(), this);
+        getServer().getPluginManager().registerEvents(ConsequenceEditor.getInstance(), this);
+        getServer().getPluginManager().registerEvents(LocationsEditor.getInstance(), this);
+        getServer().getPluginManager().registerEvents(BoundsEditor.getInstance(), this);
 
         BattleArenaCommand battleArenaCommand = new BattleArenaCommand();
         getCommand("BattleArena").setExecutor(battleArenaCommand);

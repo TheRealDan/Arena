@@ -26,7 +26,9 @@ public class Arena {
     private short durability = 0;
 
     private Bounds bounds = null;
-    private Consequence consequence = Consequence.PUSH;
+    private Consequence topConsequence = Consequence.PUSH;
+    private Consequence sidesConsequence = Consequence.PUSH;
+    private Consequence floorConsequence = Consequence.PUSH;
 
     private LinkedHashMap<Integer, LinkedHashSet<WXYZ>> locations;
 
@@ -44,7 +46,9 @@ public class Arena {
         this.durability = (short) getData().getInt("Arenas." + getID() + ".Durability");
 
         if (getData().contains("Arenas." + getID() + ".Bounds")) {
-            this.consequence = Consequence.valueOf(getData().getString("Arenas." + getID() + ".Bounds.Consequence"));
+            if (getData().contains("Arenas." + getID() + ".Bounds.Top_Consequence")) this.topConsequence = Consequence.valueOf(getData().getString("Arenas." + getID() + ".Bounds.Top_Consequence"));
+            if (getData().contains("Arenas." + getID() + ".Bounds.Sides_Consequence")) this.sidesConsequence = Consequence.valueOf(getData().getString("Arenas." + getID() + ".Bounds.Sides_Consequence"));
+            if (getData().contains("Arenas." + getID() + ".Bounds.Floor_Consequence")) this.floorConsequence = Consequence.valueOf(getData().getString("Arenas." + getID() + ".Bounds.Floor_Consequence"));
             Location pos1 = new WXYZ(getData().getString("Arenas." + getID() + ".Bounds.Pos1")).getLocation();
             Location pos2 = new WXYZ(getData().getString("Arenas." + getID() + ".Bounds.Pos2")).getLocation();
             createBounds(pos1);
@@ -68,7 +72,9 @@ public class Arena {
         getData().set("Arenas." + getID() + ".Durability", durability);
 
         if (hasBounds()) {
-            getData().set("Arenas." + getID() + ".Bounds.Consequence", getConsequence().toString());
+            getData().set("Arenas." + getID() + ".Bounds.Top_Consequence", getTopConsequence().toString());
+            getData().set("Arenas." + getID() + ".Bounds.Sides_Consequence", getSidesConsequence().toString());
+            getData().set("Arenas." + getID() + ".Bounds.Floor_Consequence", getFloorConsequence().toString());
             getData().set("Arenas." + getID() + ".Bounds.Pos1", new WXYZ(getBounds().getPos1()).getWxyz());
             getData().set("Arenas." + getID() + ".Bounds.Pos2", new WXYZ(getBounds().getPos2()).getWxyz());
         }
@@ -108,6 +114,15 @@ public class Arena {
         this.locations.get(group).add(wxyz);
     }
 
+    public void removeLocation(int group, WXYZ wxyz) {
+        for (WXYZ existing : locations.get(group)) {
+            if (existing.getWxyz().equals(wxyz.getWxyz())) {
+                locations.get(group).remove(existing);
+                return;
+            }
+        }
+    }
+
     public void createBounds(Location location) {
         this.bounds = new Bounds(location, location);
     }
@@ -116,8 +131,16 @@ public class Arena {
         this.bounds = null;
     }
 
-    public void setConsequence(Consequence consequence) {
-        this.consequence = consequence;
+    public void setTopConsequence(Consequence topConsequence) {
+        this.topConsequence = topConsequence;
+    }
+
+    public void setSidesConsequence(Consequence sidesConsequence) {
+        this.sidesConsequence = sidesConsequence;
+    }
+
+    public void setFloorConsequence(Consequence floorConsequence) {
+        this.floorConsequence = floorConsequence;
     }
 
     public boolean inUse() {
@@ -151,8 +174,16 @@ public class Arena {
         return bounds;
     }
 
-    public Consequence getConsequence() {
-        return consequence;
+    public Consequence getTopConsequence() {
+        return topConsequence;
+    }
+
+    public Consequence getSidesConsequence() {
+        return sidesConsequence;
+    }
+
+    public Consequence getFloorConsequence() {
+        return floorConsequence;
     }
 
     public List<Location> getLocations(int group) {

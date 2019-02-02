@@ -3,10 +3,13 @@ package me.therealdan.battlearena.commands;
 import me.therealdan.battlearena.BattleArena;
 import me.therealdan.battlearena.events.BattleLeaveEvent;
 import me.therealdan.battlearena.mechanics.arena.Arena;
+import me.therealdan.battlearena.mechanics.arena.editors.BoundsEditor;
+import me.therealdan.battlearena.mechanics.arena.editors.ConsequenceEditor;
+import me.therealdan.battlearena.mechanics.arena.editors.LocationsEditor;
 import me.therealdan.battlearena.mechanics.battle.Battle;
 import me.therealdan.battlearena.mechanics.lobby.BattleCreator;
 import me.therealdan.battlearena.mechanics.lobby.Lobby;
-import me.therealdan.battlearena.util.WXYZ;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,247 +17,259 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
-
 public class BattleArenaCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String command, String[] args) {
-        if (!(sender instanceof Player)) return true;
-        Player player = (Player) sender;
+        Player target = sender instanceof Player ? (Player) sender : null;
 
         if (args.length > 0) {
             if (args[0].equalsIgnoreCase("Join")) {
-                Battle battle = Battle.get(player);
-                if (battle == null) {
-                    if (!Lobby.getInstance().contains(player))
-                        Lobby.getInstance().join(player);
-                    Lobby.getInstance().open(player);
-                } else {
-                    player.sendMessage(BattleArena.MAIN + "Please leave the Battle you are in first.");
-                }
+                join(sender, target);
                 return true;
+
             } else if (args[0].equalsIgnoreCase("Create")) {
-                Battle battle = Battle.get(player);
-                if (battle == null) {
-                    BattleCreator.getInstance().openBattleCreator(player);
-                } else {
-                    player.sendMessage(BattleArena.MAIN + "Please leave the Battle you are in first.");
-                }
+                create(sender, target);
                 return true;
+
             } else if (args[0].equalsIgnoreCase("Leave")) {
-                Battle battle = Battle.get(player);
-                if (battle == null) {
-                    player.sendMessage(BattleArena.MAIN + "Your not in a Battle.");
-                    return true;
-                }
-                battle.remove(player, BattleLeaveEvent.Reason.LEAVE);
-                Lobby.getInstance().join(player);
+                leave(sender, target);
                 return true;
-            } else if (args[0].equalsIgnoreCase("Lobby") && lobbySetup(player)) {
-                if (args.length > 1) {
-                    if (args[1].equalsIgnoreCase("Spawnpoint")) {
-                        Lobby.getInstance().setSpawnpoint(player.getLocation());
-                        player.sendMessage(BattleArena.MAIN + "Set spawnpoint for lobby to your location");
-                        return true;
-                    }
-                }
-                player.sendMessage(BattleArena.MAIN + "/BA Lobby SpawnPoint " + BattleArena.SECOND + "Set Lobby Spawnpoint");
+
+            } else if (args[0].equalsIgnoreCase("Lobby") && lobbySetup(sender)) {
+                lobby(sender, target, args);
                 return true;
-            } else if (args[0].equalsIgnoreCase("Arena") && arenaSetup(player)) {
-                arena(player, args);
+
+            } else if (args[0].equalsIgnoreCase("Arena") && arenaSetup(sender)) {
+                arena(sender, target, args);
                 return true;
             }
         }
 
-        player.sendMessage(BattleArena.MAIN + "/BA Join " + BattleArena.SECOND + "Join a Game");
-        player.sendMessage(BattleArena.MAIN + "/BA Create " + BattleArena.SECOND + "Create a game");
-        player.sendMessage(BattleArena.MAIN + "/BA Leave " + BattleArena.SECOND + "Leave current game");
-        if (lobbySetup(player)) player.sendMessage(BattleArena.MAIN + "/BA Lobby " + BattleArena.SECOND + "Setup BattleArena Lobby");
-        if (arenaSetup(player)) player.sendMessage(BattleArena.MAIN + "/BA Arena " + BattleArena.SECOND + "Setup BattleArena Arenas");
+        sender.sendMessage(BattleArena.MAIN + ChatColor.STRIKETHROUGH + "-----" + BattleArena.MAIN + " BattleArena " + ChatColor.STRIKETHROUGH + "-----");
+        sender.sendMessage(BattleArena.MAIN + "/BA Join " + BattleArena.SECOND + "Join a Game");
+        sender.sendMessage(BattleArena.MAIN + "/BA Create " + BattleArena.SECOND + "Create a game");
+        sender.sendMessage(BattleArena.MAIN + "/BA Leave " + BattleArena.SECOND + "Leave current game");
+        if (lobbySetup(sender)) sender.sendMessage(BattleArena.MAIN + "/BA Lobby " + BattleArena.SECOND + "Setup BattleArena Lobby");
+        if (arenaSetup(sender)) sender.sendMessage(BattleArena.MAIN + "/BA Arena " + BattleArena.SECOND + "Setup BattleArena Arenas");
 
         return true;
     }
 
-    private void arena(Player player, String[] args) {
-        if (args.length > 1) {
-            String id = args.length > 2 ? args[2] : null;
-            if (args[1].equalsIgnoreCase("List")) {
-                if (Arena.values().size() == 0) {
-                    player.sendMessage(BattleArena.MAIN + "There are no Arenas.");
-                    return;
-                }
-                StringBuilder arenas = new StringBuilder();
-                for (Arena arena : Arena.values())
-                    arenas.append(BattleArena.MAIN).append(", ").append(BattleArena.SECOND).append(arena.getID());
-                player.sendMessage(BattleArena.MAIN + "Arenas: " + arenas.toString().replaceFirst(", ", ""));
-                return;
-            } else if (args[1].equalsIgnoreCase("Create")) {
-                if (id == null) {
-                    player.sendMessage(BattleArena.MAIN + "/BA Arena Create [ID] [Name]");
-                    return;
-                }
-                if (Arena.get(id) != null) {
-                    player.sendMessage(BattleArena.MAIN + "An Arena with that ID already exists.");
-                    return;
-                }
-                String name = id;
-                if (args.length > 3) {
-                    name = "";
-                    for (int i = 3; i < args.length; i++)
-                        name += " " + args[i];
-                    name = name.replaceFirst(" ", "");
-                }
-                Arena arena = new Arena(id, name);
-                player.sendMessage(BattleArena.MAIN + "Created new Arena with ID: " + BattleArena.SECOND + arena.getID());
-                return;
-            } else if (args[1].equalsIgnoreCase("Delete")) {
-                if (id == null) {
-                    player.sendMessage(BattleArena.MAIN + "/BA Arena Delete [ID]");
-                    return;
-                }
-                Arena arena = Arena.get(id);
-                if (arena == null) {
-                    player.sendMessage(BattleArena.MAIN + "No Arena with that ID exists.");
-                    return;
-                }
-                arena.delete();
-                player.sendMessage(BattleArena.MAIN + "Permanently deleted Arena " + BattleArena.SECOND + arena.getID());
-                return;
-            } else if (args[1].equalsIgnoreCase("Edit")) {
-                if (id == null) {
-                    player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID]");
-                    return;
-                }
-                Arena arena = Arena.get(id);
-                if (arena == null) {
-                    player.sendMessage(BattleArena.MAIN + "No Arena with that ID exists.");
-                    return;
-                }
-                if (args.length > 3) {
-                    if (args[3].equalsIgnoreCase("Name") && args.length > 4) {
-                        String name = "";
-                        for (int i = 4; i < args.length; i++)
-                            name += ", " + args[i];
-                        name = name.replaceFirst(", ", "");
-                        arena.setName(name);
-                        player.sendMessage(BattleArena.MAIN + "Set Arena " + BattleArena.SECOND + arena.getID() + BattleArena.MAIN + " name to: " + BattleArena.SECOND + arena.getName());
-                        return;
-                    } else if (args[3].equalsIgnoreCase("Icon")) {
-                        ItemStack itemStack = player.getItemInHand();
-                        if (itemStack == null || itemStack.getType().equals(Material.AIR)) {
-                            player.sendMessage(BattleArena.MAIN + "Please hold the item you want to use as an icon.");
-                            return;
-                        }
-                        arena.setIcon(itemStack.getType(), itemStack.getDurability());
-                        player.sendMessage(BattleArena.MAIN + "Set Arena " + BattleArena.SECOND + arena.getID() + BattleArena.MAIN + " icon to: " + BattleArena.SECOND + arena.getMaterial().toString());
-                        return;
-                    } else if (args[3].equalsIgnoreCase("Bounds")) {
-                        if (args.length > 4 && args[4].equalsIgnoreCase("Pos1")) {
-                            if (!arena.hasBounds()) arena.createBounds(player.getLocation());
-                            arena.getBounds().setPos1(player.getTargetBlock(null, 10).getLocation());
-                            player.sendMessage(BattleArena.MAIN + "Set pos1 for bounds to the block your looking at.");
-                            return;
-                        } else if (args.length > 4 && args[4].equalsIgnoreCase("Pos2")) {
-                            if (!arena.hasBounds()) arena.createBounds(player.getLocation());
-                            arena.getBounds().setPos1(player.getTargetBlock(null, 10).getLocation());
-                            player.sendMessage(BattleArena.MAIN + "Set pos2 for bounds to the block your looking at.");
-                            return;
-                        } else if (args.length > 4 && args[4].equalsIgnoreCase("Consequence")) {
-                            try {
-                                Arena.Consequence consequence = Arena.Consequence.valueOf(args[5].toUpperCase());
-                                arena.setConsequence(consequence);
-                                player.sendMessage(BattleArena.MAIN + "Set consequence for leaving bounds to " + BattleArena.SECOND + consequence.getName() + BattleArena.MAIN + " for " + BattleArena.SECOND + arena.getID());
-                                return;
-                            } catch (Exception e) {
-                                //
-                            }
-                        } else if (args.length > 4 && args[4].equalsIgnoreCase("Clear")) {
-                            arena.clearBounds();
-                            player.sendMessage(BattleArena.MAIN + "Removed bounds for Arena: " + BattleArena.SECOND + arena.getID());
-                            return;
-                        }
+    private void join(CommandSender sender, Player target) {
+        if (target == null) {
+            sender.sendMessage(BattleArena.MAIN + "Only players can use this command.");
+            return;
+        }
 
-                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Bounds Pos1 " + BattleArena.SECOND + "Set pos1 for bounds");
-                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Bounds Pos2 " + BattleArena.SECOND + "Set pos2 for bounds");
-                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Bounds Consequence [Consequence] " + BattleArena.SECOND + "Set consequence for leaving bounds");
-                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Bounds Clear " + BattleArena.SECOND + "Clear bounds");
-                        return;
-                    } else if (args[3].equalsIgnoreCase("SpawnPoints")) {
-                        if (args.length > 5) {
-                            int group;
-                            try {
-                                group = Integer.parseInt(args[5]);
-                            } catch (Exception e) {
-                                group = 0;
-                            }
-                            if (group <= 0) {
-                                player.sendMessage(BattleArena.MAIN + "Group must be a number greater than 0");
-                                return;
-                            }
-                            List<WXYZ> spawnpoints = arena.getWXYZs(group);
-                            if (args[4].equalsIgnoreCase("List")) {
-                                if (spawnpoints.size() == 0) {
-                                    player.sendMessage(BattleArena.MAIN + "There are no Spawnpoints for group " + BattleArena.SECOND + group);
-                                    return;
-                                }
-                                player.sendMessage(BattleArena.MAIN + "SpawnPoints for " + group + ":");
-                                for (WXYZ wxyz : spawnpoints)
-                                    player.sendMessage(BattleArena.SECOND + wxyz.getFormat());
-                                return;
-                            } else if (args[4].equalsIgnoreCase("Add")) {
-                                switch (group) {
-                                    case 1:
-                                        arena.addLocation(1, new WXYZ(player.getLocation()));
-                                        player.sendMessage(BattleArena.MAIN + "Added your location to group " + BattleArena.SECOND + group);
-                                        break;
-                                    case 2:
-                                        arena.addLocation(2, new WXYZ(player.getLocation()));
-                                        player.sendMessage(BattleArena.MAIN + "Added your location to group " + BattleArena.SECOND + group);
-                                        break;
-                                    case 3:
-                                        arena.addLocation(3, new WXYZ(player.getLocation()));
-                                        player.sendMessage(BattleArena.MAIN + "Added your location to group " + BattleArena.SECOND + group);
-                                        break;
-                                    default:
-                                        player.sendMessage(BattleArena.MAIN + "Invalid Type: " + BattleArena.SECOND + group);
-                                        break;
-                                }
-                                return;
-                            } else if (args[4].equalsIgnoreCase("Clear")) {
-                                if (spawnpoints.size() == 0) {
-                                    player.sendMessage(BattleArena.MAIN + "There are no Spawnpoints for group " + BattleArena.SECOND + group);
-                                    return;
-                                }
-                                arena.clearSpawnpoints(group);
-                                player.sendMessage(BattleArena.MAIN + "Removed all spawnpoints for group " + BattleArena.SECOND + group);
-                                return;
-                            }
-                        }
-                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints List [Group]");
-                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints Add [Group]");
-                        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints Clear [Group]");
-                        return;
-                    }
-                }
-                player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Name [Name] " + BattleArena.SECOND + "Change the Arenas name");
-                player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Icon " + BattleArena.SECOND + "Change the Arenas Icon");
-                player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] Bounds " + BattleArena.SECOND + "Edit the Arena Bounds");
-                player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] SpawnPoints " + BattleArena.SECOND + "Manage Spawnpoints");
+        Battle battle = Battle.get(target);
+        if (battle == null) {
+            if (!Lobby.getInstance().contains(target))
+                Lobby.getInstance().join(target);
+            Lobby.getInstance().open(target);
+        } else {
+            sender.sendMessage(BattleArena.MAIN + "Please leave the Battle you are in first.");
+        }
+    }
+
+    private void create(CommandSender sender, Player target) {
+        if (target == null) {
+            sender.sendMessage(BattleArena.MAIN + "Only players can use this command.");
+            return;
+        }
+
+        if (Battle.get(target) == null) {
+            BattleCreator.getInstance().openBattleCreator(target);
+        } else {
+            sender.sendMessage(BattleArena.MAIN + "Please leave the Battle you are in first.");
+        }
+    }
+
+    private void leave(CommandSender sender, Player target) {
+        if (target == null) {
+            sender.sendMessage(BattleArena.MAIN + "Only players can use this command.");
+            return;
+        }
+
+        Battle battle = Battle.get(target);
+        if (battle == null) {
+            sender.sendMessage(BattleArena.MAIN + "Your not in a Battle.");
+            return;
+        }
+
+        battle.remove(target, BattleLeaveEvent.Reason.LEAVE);
+        Lobby.getInstance().join(target);
+    }
+
+    private void lobby(CommandSender sender, Player target, String[] args) {
+        if (target == null) {
+            sender.sendMessage(BattleArena.MAIN + "Only players can use this command.");
+            return;
+        }
+
+        if (args.length > 1) {
+            if (args[1].equalsIgnoreCase("Spawnpoint")) {
+                Lobby.getInstance().setSpawnpoint(target.getLocation());
+                sender.sendMessage(BattleArena.MAIN + "Set spawnpoint for lobby to your location");
                 return;
             }
         }
-        player.sendMessage(BattleArena.MAIN + "/BA Arena List " + BattleArena.SECOND + "List existing Arenas");
-        player.sendMessage(BattleArena.MAIN + "/BA Arena Create [ID] [Name] " + BattleArena.SECOND + "Create a new Arena");
-        player.sendMessage(BattleArena.MAIN + "/BA Arena Delete [ID] " + BattleArena.SECOND + "Permanently delete an Arena");
-        player.sendMessage(BattleArena.MAIN + "/BA Arena Edit [ID] " + BattleArena.SECOND + "Edit an existing Arena");
+        sender.sendMessage(BattleArena.MAIN + "/BA Lobby SpawnPoint " + BattleArena.SECOND + "Set Lobby Spawnpoint");
     }
 
-    private boolean lobbySetup(Player player) {
+    private void arena(CommandSender sender, Player target, String[] args) {
+        if (args.length > 1) {
+            String id = args.length > 2 ? args[2] : null;
+            Arena arena = Arena.get(id);
+
+            if (args[1].equalsIgnoreCase("List")) {
+                arenaList(sender);
+                return;
+
+            } else if (args[1].equalsIgnoreCase("Create")) {
+                arenaCreate(sender, args, arena, id);
+                return;
+
+            } else if (args[1].equalsIgnoreCase("Delete")) {
+                arenaDelete(sender, arena);
+                return;
+
+            } else if (args[1].equalsIgnoreCase("Rename")) {
+                arenaRename(sender, args, arena);
+                return;
+
+            } else if (args[1].equalsIgnoreCase("Icon")) {
+                arenaIcon(sender, target, arena);
+                return;
+
+            } else if (args[1].equalsIgnoreCase("Bounds")) {
+                arenaBounds(sender, target, arena);
+                return;
+
+            } else if (args[1].equalsIgnoreCase("Consequence")) {
+                arenaConsequence(sender, target, arena);
+                return;
+
+            } else if (args[1].equalsIgnoreCase("Locations")) {
+                arenaLocations(sender, target, arena);
+                return;
+            }
+        }
+        sender.sendMessage(BattleArena.MAIN + ChatColor.STRIKETHROUGH + "-----" + BattleArena.MAIN + " BattleArena Arena " + ChatColor.STRIKETHROUGH + "-----");
+        sender.sendMessage(BattleArena.MAIN + "/BA Arena List " + BattleArena.SECOND + "List existing Arenas");
+        sender.sendMessage(BattleArena.MAIN + "/BA Arena Create [ID] [Name] " + BattleArena.SECOND + "Create a new Arena");
+        sender.sendMessage(BattleArena.MAIN + "/BA Arena Delete [ID] " + BattleArena.SECOND + "Permanently delete an Arena");
+        sender.sendMessage(BattleArena.MAIN + "/BA Arena Rename [ID] [Name] " + BattleArena.SECOND + "Rename an existing Arena");
+        sender.sendMessage(BattleArena.MAIN + "/BA Arena Icon [ID] " + BattleArena.SECOND + "Change Arena icon");
+        sender.sendMessage(BattleArena.MAIN + "/BA Arena Bounds [ID] " + BattleArena.SECOND + "Edit Arena Bounds");
+        sender.sendMessage(BattleArena.MAIN + "/BA Arena Consequence [ID] " + BattleArena.SECOND + "Edit Bounds Consequences");
+        sender.sendMessage(BattleArena.MAIN + "/BA Arena Locations [ID] " + BattleArena.SECOND + "Edit Arena Locations");
+    }
+
+    private void arenaList(CommandSender sender) {
+        if (Arena.values().size() == 0) {
+            sender.sendMessage(BattleArena.MAIN + "There are no Arenas.");
+            return;
+        }
+        StringBuilder arenas = new StringBuilder();
+        for (Arena each : Arena.values())
+            arenas.append(BattleArena.MAIN).append(", ").append(BattleArena.SECOND).append(each.getID());
+        sender.sendMessage(BattleArena.MAIN + "Arenas: " + arenas.toString().replaceFirst(", ", ""));
+    }
+
+    private void arenaCreate(CommandSender sender, String[] args, Arena arena, String id) {
+        if (id == null) {
+            sender.sendMessage(BattleArena.MAIN + "/BA Arena Create [ID] [Name]");
+            return;
+        }
+        if (arena != null) {
+            sender.sendMessage(BattleArena.MAIN + "An Arena with that ID already exists.");
+            return;
+        }
+        String name = id;
+        if (args.length > 3) {
+            name = "";
+            for (int i = 3; i < args.length; i++)
+                name += " " + args[i];
+            name = name.replaceFirst(" ", "");
+        }
+        arena = new Arena(id, name);
+        sender.sendMessage(BattleArena.MAIN + "Created new Arena with ID: " + BattleArena.SECOND + arena.getID());
+    }
+
+    private void arenaDelete(CommandSender sender, Arena arena) {
+        if (arena == null) {
+            sender.sendMessage(BattleArena.MAIN + "No Arena with that ID exists.");
+            return;
+        }
+        arena.delete();
+        sender.sendMessage(BattleArena.MAIN + "Permanently deleted Arena " + BattleArena.SECOND + arena.getID());
+    }
+
+    private void arenaRename(CommandSender sender, String[] args, Arena arena) {
+        String name = "";
+        for (int i = 3; i < args.length; i++)
+            name += ", " + args[i];
+        name = name.replaceFirst(", ", "");
+        arena.setName(name);
+        sender.sendMessage(BattleArena.MAIN + "Renamed Arena " + BattleArena.SECOND + arena.getID() + BattleArena.MAIN + " to: " + BattleArena.SECOND + arena.getName());
+    }
+
+    private void arenaIcon(CommandSender sender, Player target, Arena arena) {
+        if (target == null) {
+            sender.sendMessage(BattleArena.MAIN + "Only players can use this command.");
+            return;
+        }
+
+        ItemStack itemStack = target.getItemInHand();
+        if (itemStack == null || itemStack.getType().equals(Material.AIR)) {
+            sender.sendMessage(BattleArena.MAIN + "Please hold the item you want to use as an icon.");
+            return;
+        }
+        arena.setIcon(itemStack.getType(), itemStack.getDurability());
+        sender.sendMessage(BattleArena.MAIN + "Set Arena " + BattleArena.SECOND + arena.getID() + BattleArena.MAIN + " icon to: " + BattleArena.SECOND + arena.getMaterial().toString());
+    }
+
+    private void arenaBounds(CommandSender sender, Player target, Arena arena) {
+        if (target == null) {
+            sender.sendMessage(BattleArena.MAIN + "Only players can use this command.");
+            return;
+        }
+
+        if (BoundsEditor.getInstance().isEditing(target)) {
+            BoundsEditor.getInstance().stopEditing(target);
+        } else {
+            BoundsEditor.getInstance().edit(target, arena);
+        }
+    }
+
+    private void arenaConsequence(CommandSender sender, Player target, Arena arena) {
+        if (target == null) {
+            sender.sendMessage(BattleArena.MAIN + "Only players can use this command.");
+            return;
+        }
+
+        ConsequenceEditor.getInstance().open(target, arena);
+    }
+
+    private void arenaLocations(CommandSender sender, Player target, Arena arena) {
+        if (target == null) {
+            sender.sendMessage(BattleArena.MAIN + "Only players can use this command.");
+            return;
+        }
+
+        if (LocationsEditor.getInstance().isEditing(target)) {
+            LocationsEditor.getInstance().stopEditing(target);
+        } else {
+            LocationsEditor.getInstance().edit(target, arena);
+        }
+    }
+
+    private boolean lobbySetup(CommandSender player) {
         return player.hasPermission("battlearena.commands.battlearena.lobby");
     }
 
-    private boolean arenaSetup(Player player) {
+    private boolean arenaSetup(CommandSender player) {
         return player.hasPermission("battlearena.commands.battlearena.arena");
     }
 }

@@ -35,4 +35,23 @@ public class Icon {
 
         return icon;
     }
+
+    public static ItemStack build(Material material, int durability, boolean enchant, String name, String... description) {
+        List<String> lore = new ArrayList<>();
+        for (String line : description)
+            lore.add(ChatColor.translateAlternateColorCodes('&', line));
+
+        ItemStack icon = new ItemStack(material);
+        ItemMeta itemMeta = icon.getItemMeta();
+        itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        itemMeta.setLore(lore);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        icon.setItemMeta(itemMeta);
+        icon.setDurability((short) durability);
+        if (enchant) icon.addEnchantment(Enchantment.DURABILITY, 1);
+
+        return icon;
+    }
 }
