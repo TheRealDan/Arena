@@ -153,6 +153,10 @@ public class BattleArenaCommand implements CommandExecutor {
             } else if (args[1].equalsIgnoreCase("Locations")) {
                 arenaLocations(sender, target, arena);
                 return;
+
+            } else if (args[1].equalsIgnoreCase("Info")) {
+                arenaInfo(sender, arena);
+                return;
             }
         }
         sender.sendMessage(BattleArena.MAIN + ChatColor.STRIKETHROUGH + "-----" + BattleArena.MAIN + " BattleArena Arena " + ChatColor.STRIKETHROUGH + "-----");
@@ -164,6 +168,7 @@ public class BattleArenaCommand implements CommandExecutor {
         sender.sendMessage(BattleArena.MAIN + "/BA Arena Bounds [ID] " + BattleArena.SECOND + "Edit Arena Bounds");
         sender.sendMessage(BattleArena.MAIN + "/BA Arena Consequence [ID] " + BattleArena.SECOND + "Edit Bounds Consequences");
         sender.sendMessage(BattleArena.MAIN + "/BA Arena Locations [ID] " + BattleArena.SECOND + "Edit Arena Locations");
+        sender.sendMessage(BattleArena.MAIN + "/BA Arena Info [ID] " + BattleArena.SECOND + "Display info about Arena");
     }
 
     private void arenaList(CommandSender sender) {
@@ -289,6 +294,24 @@ public class BattleArenaCommand implements CommandExecutor {
         } else {
             LocationsEditor.getInstance().edit(target, arena);
         }
+    }
+
+    private void arenaInfo(CommandSender sender, Arena arena) {
+        if (arena == null) {
+            sender.sendMessage(BattleArena.MAIN + "There is no Arena with that ID.");
+            return;
+        }
+
+        sender.sendMessage(BattleArena.MAIN + ChatColor.STRIKETHROUGH + "-----" + BattleArena.MAIN + " Arena " + ChatColor.STRIKETHROUGH + "-----");
+        sender.sendMessage(BattleArena.MAIN + "ID: " + BattleArena.SECOND + arena.getID());
+        sender.sendMessage(BattleArena.MAIN + "Name: " + BattleArena.SECOND + arena.getName());
+        sender.sendMessage(BattleArena.MAIN + "Icon: " + BattleArena.SECOND + arena.getMaterial().toString() + ":" + arena.getDurability());
+        sender.sendMessage(BattleArena.MAIN + "Bounds: " + BattleArena.SECOND + (arena.hasBounds() ? arena.getBounds().toString() : "Not set"));
+        sender.sendMessage(BattleArena.MAIN + "Consequences: " + BattleArena.SECOND + arena.getTopConsequence().getName() + ", " + arena.getSidesConsequence().getName() + ", " + arena.getFloorConsequence().getName());
+        sender.sendMessage(BattleArena.MAIN + "General Spawnpoints: " + BattleArena.SECOND + arena.getLocations(1).size());
+        sender.sendMessage(BattleArena.MAIN + "Team 1 Spawnpoints: " + BattleArena.SECOND + arena.getLocations(2).size());
+        sender.sendMessage(BattleArena.MAIN + "Team 2 Spawnpoints: " + BattleArena.SECOND + arena.getLocations(3).size());
+        sender.sendMessage(BattleArena.MAIN + "Extra Locations: " + BattleArena.SECOND + arena.getLocations(4).size());
     }
 
     private boolean lobbySetup(CommandSender player) {

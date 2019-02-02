@@ -75,6 +75,11 @@ public class Bounds {
         return getPos1().getBlockZ() < getPos2().getBlockZ() ? getPos1().getBlockZ() : getPos2().getBlockZ();
     }
 
+    @Override
+    public String toString() {
+        return getPos1().getBlockX() + "x, " + getPos1().getBlockY() + "y, " + getPos1().getBlockZ() + "z / " + getPos2().getBlockX() + "x, " + getPos2().getBlockY() + "y, " + getPos2().getBlockZ() + "z";
+    }
+
     public Location getCenter() {
         return new Location(
                 getWorld(),
