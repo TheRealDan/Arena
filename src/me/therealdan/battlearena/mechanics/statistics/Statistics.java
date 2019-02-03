@@ -26,8 +26,6 @@ public class Statistics {
         this.deaths = getYamlFile().getData().getLong("Deaths." + getUUID().toString());
         this.gamesPlayed = getYamlFile().getData().getLong("Games_Played." + getUUID().toString());
         this.gamesWon = getYamlFile().getData().getLong("Games_Won." + getUUID().toString());
-
-        statistics.put(uuid, this);
     }
 
     public void addKill() {
@@ -98,7 +96,8 @@ public class Statistics {
     }
 
     public static Statistics byUUID(UUID uuid) {
-        return statistics.getOrDefault(uuid, new Statistics(uuid));
+        if (!statistics.containsKey(uuid)) statistics.put(uuid, new Statistics(uuid));
+        return statistics.get(uuid);
     }
 
     public static List<Statistics> values() {
