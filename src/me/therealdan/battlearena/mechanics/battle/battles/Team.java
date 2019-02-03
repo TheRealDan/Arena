@@ -1,8 +1,10 @@
-package me.therealdan.battlearena.mechanics.battle;
+package me.therealdan.battlearena.mechanics.battle.battles;
 
 import me.therealdan.battlearena.BattleArena;
 import me.therealdan.battlearena.events.BattleLeaveEvent;
 import me.therealdan.battlearena.mechanics.arena.Arena;
+import me.therealdan.battlearena.mechanics.battle.Battle;
+import me.therealdan.battlearena.mechanics.battle.BattleType;
 import me.therealdan.party.Party;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

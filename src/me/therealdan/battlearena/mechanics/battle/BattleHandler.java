@@ -4,6 +4,7 @@ import me.therealdan.battlearena.BattleArena;
 import me.therealdan.battlearena.events.BattleDamageEvent;
 import me.therealdan.battlearena.events.BattleLeaveEvent;
 import me.therealdan.battlearena.mechanics.arena.Arena;
+import me.therealdan.battlearena.mechanics.battle.battles.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.boss.BossBar;
