@@ -33,26 +33,30 @@ public class BattleHandler implements Listener {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(BattleArena.getInstance(), () -> {
 
             for (Battle battle : Battle.values()) {
-                if (battle.getArena().hasBounds()) {
-                    for (Player player : battle.getPlayers()) {
+                for (Player player : battle.getPlayers()) {
+                    if (battle.getArena().hasBounds()) {
                         if (!battle.getArena().getBounds().contains(player.getLocation())) {
-                            Arena.Consequence consequence = Arena.Consequence.RESPAWN;
-                            if (battle.getArena().getBounds().isAbove(player.getLocation())) consequence = battle.getArena().getTopConsequence();
-                            if (battle.getArena().getBounds().isThroughSides(player.getLocation())) consequence = battle.getArena().getSidesConsequence();
-                            if (battle.getArena().getBounds().isBelow(player.getLocation())) consequence = battle.getArena().getFloorConsequence();
-                            switch (consequence) {
-                                case PUSH:
-                                    player.setVelocity(battle.getArena().getBounds().getCenter().toVector().subtract(player.getLocation().toVector()).multiply(0.025));
-                                    break;
-                                case DAMAGE:
-                                    player.damage(0.2);
-                                    break;
-                                case KILL:
-                                    battle.kill(player, null, BattleArena.SECOND + player.getName() + BattleArena.MAIN + " tried to flee the battle (" + BattleArena.SECOND + (battle.getKillCounter().getDeaths(player.getUniqueId()) + 1) + BattleArena.MAIN + " deaths)");
-                                    break;
-                                case RESPAWN:
-                                    battle.respawn(player);
-                                    break;
+                            if (!battle.getArena().getBounds().getWorld().getName().equals(player.getWorld().getName())) {
+                                battle.respawn(player);
+                            } else {
+                                Arena.Consequence consequence = Arena.Consequence.RESPAWN;
+                                if (battle.getArena().getBounds().isAbove(player.getLocation())) consequence = battle.getArena().getTopConsequence();
+                                if (battle.getArena().getBounds().isThroughSides(player.getLocation())) consequence = battle.getArena().getSidesConsequence();
+                                if (battle.getArena().getBounds().isBelow(player.getLocation())) consequence = battle.getArena().getFloorConsequence();
+                                switch (consequence) {
+                                    case PUSH:
+                                        player.setVelocity(battle.getArena().getBounds().getCenter().toVector().subtract(player.getLocation().toVector()).multiply(0.025));
+                                        break;
+                                    case DAMAGE:
+                                        player.damage(0.2);
+                                        break;
+                                    case KILL:
+                                        battle.kill(player, null, BattleArena.SECOND + player.getName() + BattleArena.MAIN + " tried to flee the battle (" + BattleArena.SECOND + (battle.getKillCounter().getDeaths(player.getUniqueId()) + 1) + BattleArena.MAIN + " deaths)");
+                                        break;
+                                    case RESPAWN:
+                                        battle.respawn(player);
+                                        break;
+                                }
                             }
                         }
                     }
