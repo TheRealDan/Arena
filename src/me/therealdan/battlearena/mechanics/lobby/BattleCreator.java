@@ -6,7 +6,7 @@ import me.therealdan.battlearena.mechanics.battle.Battle;
 import me.therealdan.battlearena.mechanics.battle.BattleType;
 import me.therealdan.battlearena.mechanics.battle.FFA;
 import me.therealdan.battlearena.mechanics.battle.Team;
-import me.therealdan.battlearena.mechanics.killcounter.KillCounter;
+import me.therealdan.battlearena.mechanics.statistics.Statistics;
 import me.therealdan.battlearena.util.Icon;
 import me.therealdan.party.Party;
 import org.bukkit.Bukkit;
@@ -325,7 +325,8 @@ public class BattleCreator implements Listener {
         List<String> lore = new ArrayList<>();
         if (party != null)
             lore.add(ChatColor.translateAlternateColorCodes('&', "&7Team " + party.getTeam(player)));
-        lore.add(ChatColor.translateAlternateColorCodes('&', "&7KDR: &f" + KillCounter.getKDRString(player.getUniqueId())));
+        lore.add(ChatColor.translateAlternateColorCodes('&', "&7KDR: &f" + Statistics.byPlayer(player).getKDRString()));
+        lore.add(ChatColor.translateAlternateColorCodes('&', "&7Games Played: &f" + Statistics.byPlayer(player).getGamesPlayed()));
 
         ItemStack icon = new ItemStack(Material.SKULL_ITEM);
         SkullMeta itemMeta = (SkullMeta) icon.getItemMeta();

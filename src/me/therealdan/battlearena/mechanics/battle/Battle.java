@@ -3,7 +3,7 @@ package me.therealdan.battlearena.mechanics.battle;
 import me.therealdan.battlearena.BattleArena;
 import me.therealdan.battlearena.events.*;
 import me.therealdan.battlearena.mechanics.arena.Arena;
-import me.therealdan.battlearena.mechanics.killcounter.KillCounter;
+import me.therealdan.battlearena.mechanics.statistics.KillCounter;
 import me.therealdan.battlearena.mechanics.lobby.Lobby;
 import me.therealdan.battlearena.util.PlayerHandler;
 import me.therealdan.party.Party;
@@ -90,8 +90,6 @@ public interface Battle {
 
         for (Player player : getPlayers())
             remove(player, BattleLeaveEvent.Reason.BATTLE_FINISHED);
-
-        KillCounter.addCount(getKillCounter());
 
         Battle.battles.remove(this);
     }
