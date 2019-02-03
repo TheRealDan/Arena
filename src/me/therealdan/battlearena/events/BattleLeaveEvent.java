@@ -62,6 +62,7 @@ public class BattleLeaveEvent extends Event {
         NOT_ENOUGH_PLAYERS,
         LEAVE, LOGOUT,
         SERVER_SHUTDOWN,
+        KICK, ADMIN_END,
         CUSTOM_PLUGIN
     }
 

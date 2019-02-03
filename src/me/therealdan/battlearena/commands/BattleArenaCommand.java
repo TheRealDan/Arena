@@ -9,6 +9,7 @@ import me.therealdan.battlearena.mechanics.arena.editors.LocationsEditor;
 import me.therealdan.battlearena.mechanics.battle.Battle;
 import me.therealdan.battlearena.mechanics.lobby.BattleCreator;
 import me.therealdan.battlearena.mechanics.lobby.Lobby;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -36,6 +37,14 @@ public class BattleArenaCommand implements CommandExecutor {
                 leave(sender, target);
                 return true;
 
+            } else if (args[0].equalsIgnoreCase("Kick") && kick(sender)) {
+                kick(sender, target, args);
+                return true;
+
+            } else if (args[0].equalsIgnoreCase("End") && end(sender)) {
+                end(sender, target, args);
+                return true;
+
             } else if (args[0].equalsIgnoreCase("Lobby") && lobbySetup(sender)) {
                 lobby(sender, target, args);
                 return true;
@@ -50,6 +59,8 @@ public class BattleArenaCommand implements CommandExecutor {
         sender.sendMessage(BattleArena.MAIN + "/BA Join " + BattleArena.SECOND + "Join a Game");
         sender.sendMessage(BattleArena.MAIN + "/BA Create " + BattleArena.SECOND + "Create a game");
         sender.sendMessage(BattleArena.MAIN + "/BA Leave " + BattleArena.SECOND + "Leave current game");
+        if (kick(sender)) sender.sendMessage(BattleArena.MAIN + "/BA Kick " + BattleArena.SECOND + "Kick player from live game");
+        if (end(sender)) sender.sendMessage(BattleArena.MAIN + "/BA End " + BattleArena.SECOND + "End live game");
         if (lobbySetup(sender)) sender.sendMessage(BattleArena.MAIN + "/BA Lobby " + BattleArena.SECOND + "Setup BattleArena Lobby");
         if (arenaSetup(sender)) sender.sendMessage(BattleArena.MAIN + "/BA Arena " + BattleArena.SECOND + "Setup BattleArena Arenas");
 
@@ -68,7 +79,7 @@ public class BattleArenaCommand implements CommandExecutor {
                 Lobby.getInstance().join(target);
             Lobby.getInstance().open(target);
         } else {
-            sender.sendMessage(BattleArena.MAIN + "Please leave the Battle you are in first.");
+            sender.sendMessage(BattleArena.MAIN + "You cannot use this command while in a game.");
         }
     }
 
@@ -81,7 +92,7 @@ public class BattleArenaCommand implements CommandExecutor {
         if (Battle.get(target) == null) {
             BattleCreator.getInstance().openBattleCreator(target);
         } else {
-            sender.sendMessage(BattleArena.MAIN + "Please leave the Battle you are in first.");
+            sender.sendMessage(BattleArena.MAIN + "You cannot use this command while in a game.");
         }
     }
 
@@ -99,6 +110,50 @@ public class BattleArenaCommand implements CommandExecutor {
 
         battle.remove(target, BattleLeaveEvent.Reason.LEAVE);
         Lobby.getInstance().join(target);
+    }
+
+    private void kick(CommandSender sender, Player target, String[] args) {
+        if (target != null && Battle.get(target) != null) {
+            sender.sendMessage(BattleArena.MAIN + "You cannot use this command while in a game.");
+            return;
+        }
+
+        if (args.length < 2) {
+            sender.sendMessage(BattleArena.MAIN + "/BA Kick [Player]");
+            return;
+        }
+
+        target = Bukkit.getPlayer(args[1]);
+        Battle battle = Battle.get(target);
+        if (battle == null) {
+            sender.sendMessage(BattleArena.SECOND + target.getName() + BattleArena.MAIN + " is not in a game.");
+            return;
+        }
+
+        battle.remove(target, BattleLeaveEvent.Reason.KICK);
+        sender.sendMessage(BattleArena.MAIN + "Kicked " + BattleArena.SECOND + target.getName() + BattleArena.MAIN + " from the game they were in.");
+    }
+
+    private void end(CommandSender sender, Player target, String[] args) {
+        if (target != null && Battle.get(target) != null) {
+            sender.sendMessage(BattleArena.MAIN + "You cannot use this command while in a game.");
+            return;
+        }
+
+        if (args.length < 2) {
+            sender.sendMessage(BattleArena.MAIN + "/BA End [Player]");
+            return;
+        }
+
+        target = Bukkit.getPlayer(args[1]);
+        Battle battle = Battle.get(target);
+        if (battle == null) {
+            sender.sendMessage(BattleArena.SECOND + target.getName() + BattleArena.MAIN + " is not in a game.");
+            return;
+        }
+
+        battle.end(BattleLeaveEvent.Reason.ADMIN_END);
+        sender.sendMessage(BattleArena.MAIN + "Ended the game " + BattleArena.SECOND + target.getName() + BattleArena.MAIN + " was in.");
     }
 
     private void lobby(CommandSender sender, Player target, String[] args) {
@@ -315,11 +370,19 @@ public class BattleArenaCommand implements CommandExecutor {
         sender.sendMessage(BattleArena.MAIN + "Extra Locations: " + BattleArena.SECOND + arena.getLocations(4).size());
     }
 
-    private boolean lobbySetup(CommandSender player) {
-        return player.hasPermission("battlearena.commands.battlearena.lobby");
+    private boolean kick(CommandSender sender) {
+        return sender.hasPermission("battlearena.commands.battlearena.kick");
     }
 
-    private boolean arenaSetup(CommandSender player) {
-        return player.hasPermission("battlearena.commands.battlearena.arena");
+    private boolean end(CommandSender sender) {
+        return sender.hasPermission("battlearena.commands.battlearena.end");
+    }
+
+    private boolean lobbySetup(CommandSender sender) {
+        return sender.hasPermission("battlearena.commands.battlearena.lobby");
+    }
+
+    private boolean arenaSetup(CommandSender sender) {
+        return sender.hasPermission("battlearena.commands.battlearena.arena");
     }
 }

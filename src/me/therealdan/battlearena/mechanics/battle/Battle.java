@@ -89,7 +89,7 @@ public interface Battle {
                 player.sendMessage(event.getLobbyMessage());
 
         for (Player player : getPlayers())
-            remove(player, BattleLeaveEvent.Reason.BATTLE_FINISHED);
+            remove(player, reason);
 
         Battle.battles.remove(this);
     }
@@ -126,6 +126,12 @@ public interface Battle {
             case LEAVE:
             case LOGOUT:
                 event.setBattleMessage(BattleArena.SECOND + player.getName() + BattleArena.MAIN + " has left the " + BattleArena.SECOND + getBattleType().getName());
+                break;
+            case KICK:
+                event.setBattleMessage(BattleArena.SECOND + player.getName() + BattleArena.MAIN + " was kicked from " + BattleArena.SECOND + getBattleType().getName());
+                break;
+            case ADMIN_END:
+                event.setBattleMessage(BattleArena.MAIN + "Battle Ended by Admin");
                 break;
         }
         Bukkit.getPluginManager().callEvent(event);
