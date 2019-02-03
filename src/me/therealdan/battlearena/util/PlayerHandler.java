@@ -13,5 +13,6 @@ public class PlayerHandler {
         player.setHealth(player.getMaxHealth());
         player.setGameMode(GameMode.SURVIVAL);
         player.setFireTicks(0);
+        player.setFallDistance(0);
     }
 }
