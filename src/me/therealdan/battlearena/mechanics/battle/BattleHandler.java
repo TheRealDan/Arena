@@ -186,7 +186,7 @@ public class BattleHandler implements Listener {
             event.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onCombat(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
         Player victim = (Player) event.getEntity();
@@ -228,7 +228,7 @@ public class BattleHandler implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
         Player victim = (Player) event.getEntity();
@@ -238,9 +238,12 @@ public class BattleHandler implements Listener {
 
         Player attacker = null;
         switch (event.getCause()) {
-            case PROJECTILE:
             case ENTITY_ATTACK:
+            case PROJECTILE:
                 return;
+            case FIRE_TICK:
+                attacker = victim.getKiller();
+                break;
         }
 
         BattleDamageEvent battleDamageEvent = new BattleDamageEvent(battle, attacker, victim, event.getDamage(), event.getCause());
