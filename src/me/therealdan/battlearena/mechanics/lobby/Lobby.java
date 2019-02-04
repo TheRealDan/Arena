@@ -2,6 +2,7 @@ package me.therealdan.battlearena.mechanics.lobby;
 
 import me.therealdan.battlearena.BattleArena;
 import me.therealdan.battlearena.mechanics.battle.Battle;
+import me.therealdan.battlearena.mechanics.setup.SetupHandler;
 import me.therealdan.battlearena.util.Icon;
 import me.therealdan.battlearena.util.PlayerHandler;
 import me.therealdan.battlearena.util.WXYZ;
@@ -99,7 +100,7 @@ public class Lobby implements Listener {
         if (!event.getCurrentItem().getItemMeta().hasDisplayName()) return;
 
         if (getCreateBattleIcon().isSimilar(event.getCurrentItem())) {
-            BattleCreator.getInstance().openBattleCreator(player);
+            SetupHandler.getInstance().open(player);
         } else {
             for (Battle battle : Battle.values()) {
                 if (battle.isOpen()) {

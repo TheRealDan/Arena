@@ -9,8 +9,10 @@ import me.therealdan.battlearena.mechanics.arena.editors.LocationsEditor;
 import me.therealdan.battlearena.mechanics.battle.Battle;
 import me.therealdan.battlearena.mechanics.battle.BattleHandler;
 import me.therealdan.battlearena.mechanics.battle.BattleType;
-import me.therealdan.battlearena.mechanics.lobby.BattleCreator;
 import me.therealdan.battlearena.mechanics.lobby.Lobby;
+import me.therealdan.battlearena.mechanics.setup.SetupHandler;
+import me.therealdan.battlearena.mechanics.setup.setup.FFASetup;
+import me.therealdan.battlearena.mechanics.setup.setup.TeamSetup;
 import me.therealdan.battlearena.mechanics.statistics.Statistics;
 import me.therealdan.battlearena.util.Icon;
 import org.bukkit.ChatColor;
@@ -31,11 +33,11 @@ public class BattleArena extends JavaPlugin {
 
         Arena.load();
 
-        BattleType.register("FFA", Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.FFA", false));
-        BattleType.register("Team", Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.Team", false));
+        BattleType.register("FFA", Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.FFA", false), new FFASetup());
+        BattleType.register("Team", Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.Team", false), new TeamSetup());
 
         getServer().getPluginManager().registerEvents(Lobby.getInstance(), this);
-        getServer().getPluginManager().registerEvents(BattleCreator.getInstance(), this);
+        getServer().getPluginManager().registerEvents(SetupHandler.getInstance(), this);
         getServer().getPluginManager().registerEvents(BattleHandler.getInstance(), this);
         getServer().getPluginManager().registerEvents(Statistics.getHandler(), this);
         getServer().getPluginManager().registerEvents(ConsequenceEditor.getInstance(), this);

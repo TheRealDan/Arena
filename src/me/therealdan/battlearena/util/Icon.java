@@ -39,7 +39,8 @@ public class Icon {
     public static ItemStack build(Material material, int durability, boolean enchant, String name, String... description) {
         List<String> lore = new ArrayList<>();
         for (String line : description)
-            lore.add(ChatColor.translateAlternateColorCodes('&', line));
+            if (line != null)
+                lore.add(ChatColor.translateAlternateColorCodes('&', line));
 
         ItemStack icon = new ItemStack(material);
         ItemMeta itemMeta = icon.getItemMeta();

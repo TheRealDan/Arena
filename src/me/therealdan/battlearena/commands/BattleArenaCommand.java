@@ -7,8 +7,8 @@ import me.therealdan.battlearena.mechanics.arena.editors.BoundsEditor;
 import me.therealdan.battlearena.mechanics.arena.editors.ConsequenceEditor;
 import me.therealdan.battlearena.mechanics.arena.editors.LocationsEditor;
 import me.therealdan.battlearena.mechanics.battle.Battle;
-import me.therealdan.battlearena.mechanics.lobby.BattleCreator;
 import me.therealdan.battlearena.mechanics.lobby.Lobby;
+import me.therealdan.battlearena.mechanics.setup.SetupHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -90,7 +90,7 @@ public class BattleArenaCommand implements CommandExecutor {
         }
 
         if (Battle.get(target) == null) {
-            BattleCreator.getInstance().openBattleCreator(target);
+            SetupHandler.getInstance().open(target);
         } else {
             sender.sendMessage(BattleArena.MAIN + "You cannot use this command while in a game.");
         }

@@ -1,23 +1,23 @@
 package me.therealdan.battlearena.mechanics.battle;
 
+import me.therealdan.battlearena.mechanics.setup.Setup;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class BattleType {
 
-    private static LinkedHashSet<BattleType> battleTypes = new LinkedHashSet<>();
+    private static LinkedHashMap<String, BattleType> battleTypes = new LinkedHashMap<>();
 
     private String name;
     private ItemStack icon;
+    private Setup setup;
 
     private BattleType(String name, ItemStack icon) {
         this.name = name;
         this.icon = icon;
-
-        battleTypes.add(this);
     }
 
     public String getName() {
@@ -26,6 +26,10 @@ public class BattleType {
 
     public ItemStack getIcon() {
         return icon;
+    }
+
+    public Setup getSetup() {
+        return setup.clone();
     }
 
     public BattleType toggle(boolean next) {
@@ -53,8 +57,10 @@ public class BattleType {
         return values().get(values().size() - 1);
     }
 
-    public static void register(String name, ItemStack icon) {
-        new BattleType(name, icon);
+    public static void register(String name, ItemStack icon, Setup setup) {
+        BattleType battleType = new BattleType(name, icon);
+        battleTypes.put(name, battleType);
+        battleType.setup = setup;
     }
 
     public static BattleType getDefault() {
@@ -62,13 +68,10 @@ public class BattleType {
     }
 
     public static BattleType byName(String name) {
-        for (BattleType battleType : values())
-            if (battleType.getName().equalsIgnoreCase(name))
-                return battleType;
-        return null;
+        return battleTypes.get(name);
     }
 
     public static List<BattleType> values() {
-        return new ArrayList<>(battleTypes);
+        return new ArrayList<>(battleTypes.values());
     }
 }
