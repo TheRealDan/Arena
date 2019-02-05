@@ -189,6 +189,7 @@ public class BattleHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onCombat(EntityDamageByEntityEvent event) {
+        if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Player)) return;
         Player victim = (Player) event.getEntity();
 
