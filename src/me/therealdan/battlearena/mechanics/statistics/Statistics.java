@@ -69,6 +69,15 @@ public class Statistics {
         return kills / deaths;
     }
 
+    public boolean isHigherThan(Statistics statistics) {
+        if (getKDR() > statistics.getKDR()) return true;
+        if (getKills() > statistics.getKills()) return true;
+        if (getGamesWon() / getGamesPlayed() > statistics.getGamesWon() / statistics.getGamesPlayed()) return true;
+        if (getGamesWon() > statistics.getGamesWon()) return true;
+
+        return false;
+    }
+
     public String getKDRString() {
         return decimalFormat.format(getKDR());
     }
