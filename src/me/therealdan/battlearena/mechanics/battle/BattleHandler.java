@@ -246,6 +246,9 @@ public class BattleHandler implements Listener {
             case FIRE_TICK:
                 attacker = victim.getKiller();
                 break;
+            case FALL:
+                attacker = victim.getKiller();
+                break;
         }
 
         BattleDamageEvent battleDamageEvent = new BattleDamageEvent(battle, attacker, victim, event.getDamage(), event.getCause());
