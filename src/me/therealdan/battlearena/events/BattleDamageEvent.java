@@ -38,6 +38,10 @@ public class BattleDamageEvent extends Event implements Cancellable {
         return battle;
     }
 
+    public void setAttacker(Player attacker) {
+        this.attacker = attacker;
+    }
+
     public Player getAttacker() {
         return attacker;
     }

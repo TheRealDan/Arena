@@ -211,7 +211,10 @@ public class BattleHandler implements Listener {
         BattleDamageEvent battleDamageEvent = new BattleDamageEvent(battle, attacker, victim, event.getDamage(), event.getCause());
         event.setDamage(0);
 
-        if (battle.sameTeam(attacker, victim) || !battle.canPvP() || !attacker.getGameMode().equals(GameMode.SURVIVAL) || attacker.equals(victim))
+        if (battle.sameTeam(battleDamageEvent.getAttacker(), victim) ||
+                !battle.canPvP() ||
+                !battleDamageEvent.getAttacker().getGameMode().equals(GameMode.SURVIVAL) ||
+                battleDamageEvent.getAttacker().equals(victim))
             battleDamageEvent.setCancelled(true);
 
         Bukkit.getPluginManager().callEvent(battleDamageEvent);
@@ -221,11 +224,11 @@ public class BattleHandler implements Listener {
         } else {
             event.setDamage(battleDamageEvent.getDamage());
             if (victim.getHealth() - battleDamageEvent.getDamage() <= 0.0) {
-                battle.kill(victim, attacker);
+                battle.kill(victim, battleDamageEvent.getAttacker());
                 event.setCancelled(true);
             } else if (wasProjectile) {
                 event.setCancelled(true);
-                victim.damage(battleDamageEvent.getDamage(), attacker);
+                victim.damage(battleDamageEvent.getDamage(), battleDamageEvent.getAttacker());
             }
         }
     }
