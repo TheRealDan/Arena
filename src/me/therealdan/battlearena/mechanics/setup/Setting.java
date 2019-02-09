@@ -5,6 +5,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Setting {
 
     private String name;
@@ -62,8 +65,8 @@ public class Setting {
         return 0;
     }
 
-    public String getDescription() {
-        return null;
+    public List<String> getDescription() {
+        return new ArrayList<>();
     }
 
     public String getName() {

@@ -8,7 +8,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class GracePeriod extends Setting {
 
@@ -43,10 +45,12 @@ public class GracePeriod extends Setting {
     }
 
     @Override
-    public String getDescription() {
+    public List<String> getDescription() {
         Date date = new Date(0);
         date.setTime(getGracePeriodInSeconds() * 1000);
-        return "&7Duration: &f" + DATE_FORMAT.format(date);
+        List<String> description = new ArrayList<>();
+        description.add("&7Duration: &f" + DATE_FORMAT.format(date));
+        return description;
     }
 
     public long getGracePeriodInSeconds() {

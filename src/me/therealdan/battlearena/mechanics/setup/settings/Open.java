@@ -5,6 +5,9 @@ import me.therealdan.battlearena.mechanics.setup.Setting;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Open extends Setting {
 
     public Open(boolean open) {
@@ -33,8 +36,10 @@ public class Open extends Setting {
     }
 
     @Override
-    public String getDescription() {
-        return "&7Open: " + (isOpen() ? "&atrue" : "&cfalse");
+    public List<String> getDescription() {
+        List<String> description = new ArrayList<>();
+        description.add("&7Open: " + (isOpen() ? "&atrue" : "&cfalse"));
+        return description;
     }
 
     public boolean isOpen() {

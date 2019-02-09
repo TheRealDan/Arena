@@ -6,7 +6,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class BattleDuration extends Setting {
 
@@ -36,11 +38,13 @@ public class BattleDuration extends Setting {
     }
 
     @Override
-    public String getDescription() {
+    public List<String> getDescription() {
         Date date = new Date();
         date.setHours(0);
         date.setTime(getBattleDurationInSeconds() * 1000);
-        return "&7Time Limit: &f" + DATE_FORMAT.format(date);
+        List<String> description = new ArrayList<>();
+        description.add("&7Time Limit: &f" + DATE_FORMAT.format(date));
+        return description;
     }
 
     public long getBattleDurationInSeconds() {

@@ -70,8 +70,10 @@ public class Map extends Setting {
     }
 
     @Override
-    public String getDescription() {
-        return "&7Map: " + getArena().getName();
+    public List<String> getDescription() {
+        List<String> description = new ArrayList<>();
+        description.add("&7Map: " + getArena().getName());
+        return description;
     }
 
     public Arena getArena() {
