@@ -60,6 +60,15 @@ public class Statistics {
         return gamesWon;
     }
 
+    public double getWinRatio() {
+        double won = getGamesWon();
+        double played = getGamesPlayed();
+
+        if (played == 0) return won;
+
+        return won / played;
+    }
+
     public double getKDR() {
         double kills = getKills();
         double deaths = getDeaths();
@@ -71,9 +80,15 @@ public class Statistics {
 
     public boolean isHigherThan(Statistics statistics) {
         if (getKDR() > statistics.getKDR()) return true;
-        if (getKills() > statistics.getKills()) return true;
-        if (getGamesWon() / getGamesPlayed() > statistics.getGamesWon() / statistics.getGamesPlayed()) return true;
-        if (getGamesWon() > statistics.getGamesWon()) return true;
+        if (getKDR() == statistics.getKDR()) {
+            if (getKills() > statistics.getKills()) return true;
+            if (getKills() == statistics.getKills()) {
+                if (getWinRatio() > statistics.getWinRatio()) return true;
+                if (getWinRatio() == statistics.getWinRatio()) {
+                    if (getGamesWon() > statistics.getGamesWon()) return true;
+                }
+            }
+        }
 
         return false;
     }
