@@ -1,9 +1,11 @@
 package me.therealdan.battlearena.mechanics.setup;
 
+import me.therealdan.battlearena.BattleArena;
+import me.therealdan.battlearena.events.BattleCreateEvent;
 import me.therealdan.battlearena.mechanics.arena.Arena;
-import me.therealdan.battlearena.mechanics.battle.Battle;
+import me.therealdan.battlearena.mechanics.battle.battles.FFA;
+import me.therealdan.battlearena.mechanics.battle.battles.Team;
 import me.therealdan.battlearena.mechanics.setup.settings.Map;
-import me.therealdan.battlearena.mechanics.setup.setup.FFASetup;
 import me.therealdan.party.Party;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,6 +29,8 @@ public class SetupHandler implements Listener {
     private HashSet<UUID> uiOpen = new HashSet<>();
     private HashMap<UUID, Setup> setup = new HashMap<>();
     private HashMap<UUID, Setting> setting = new HashMap<>();
+
+    private Setup defaultSetup = null;
 
     private SetupHandler() {
 
@@ -82,8 +86,21 @@ public class SetupHandler implements Listener {
                 for (Setting each : setup.getSettings().values())
                     if (each instanceof Map)
                         arena = ((Map) each).getArena();
-                Battle battle = setup.startBattle(player, party, arena);
-                setup.getSettings().apply(battle);
+
+                BattleCreateEvent battleCreateEvent = new BattleCreateEvent(player, party, arena, setup.getBattleType(), setup.getSettings());
+                Bukkit.getPluginManager().callEvent(battleCreateEvent);
+
+                if (!battleCreateEvent.isCreated()) {
+                    switch (battleCreateEvent.getBattleType().getName()) {
+                        case "FFA":
+                            setup.getSettings().apply(new FFA(arena, player, party, setup.getSettings()));
+                            break;
+                        case "Team":
+                            setup.getSettings().apply(new Team(arena, player, party, setup.getSettings()));
+                            break;
+                    }
+                }
+
                 player.closeInventory();
                 return;
             }
@@ -101,6 +118,11 @@ public class SetupHandler implements Listener {
 
     public void open(Player player) {
         Setup setup = getSetup(player);
+        if (setup == null) {
+            player.sendMessage(BattleArena.MAIN + "There is no default battle mode!");
+            return;
+        }
+
         Party party = Party.byPlayer(player);
         int size = 9;
         if (party != null) {
@@ -126,13 +148,18 @@ public class SetupHandler implements Listener {
     }
 
     public Setup getSetup(Player player) {
-        if (!setup.containsKey(player.getUniqueId())) setup.put(player.getUniqueId(), new FFASetup());
+        if (defaultSetup == null) return null;
+        if (!setup.containsKey(player.getUniqueId())) setup.put(player.getUniqueId(), defaultSetup.clone());
         return setup.get(player.getUniqueId());
     }
 
     public Setting getSetting(Player player) {
         if (!setting.containsKey(player.getUniqueId())) return null;
         return setting.get(player.getUniqueId());
+    }
+
+    public static void setDefault(Setup setup) {
+        getInstance().defaultSetup = setup;
     }
 
     public static SetupHandler getInstance() {

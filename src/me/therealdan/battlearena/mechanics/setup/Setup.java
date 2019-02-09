@@ -1,13 +1,9 @@
 package me.therealdan.battlearena.mechanics.setup;
 
 import me.therealdan.battlearena.BattleArena;
-import me.therealdan.battlearena.mechanics.arena.Arena;
-import me.therealdan.battlearena.mechanics.battle.Battle;
 import me.therealdan.battlearena.mechanics.battle.BattleType;
 import me.therealdan.battlearena.util.Icon;
-import me.therealdan.party.Party;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class Setup {
@@ -19,13 +15,6 @@ public class Setup {
     public Setup(String battleType, Settings settings) {
         this.battleTypeString = battleType;
         this.settings = settings;
-    }
-
-    /**
-     * To be overridden by subclass
-     */
-    public Battle startBattle(Player player, Party party, Arena arena) {
-        return null;
     }
 
     public BattleType getBattleType() {

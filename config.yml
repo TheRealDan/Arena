@@ -4,6 +4,8 @@ Color:
   Secondary: "&f"
 #
 #
+Load_Default_Battles: true
+#
 Teleport_On_Join: false
 #
 # Icon options for the Join Battle UI

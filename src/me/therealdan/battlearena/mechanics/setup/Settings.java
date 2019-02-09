@@ -44,6 +44,9 @@ public class Settings {
 
     @Override
     public Settings clone() {
-        return null;
+        Settings settings = new Settings();
+        for (Setting setting : values())
+            settings.add(setting);
+        return settings;
     }
 }

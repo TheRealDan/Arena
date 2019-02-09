@@ -33,8 +33,11 @@ public class BattleArena extends JavaPlugin {
 
         Arena.load();
 
-        BattleType.register("FFA", Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.FFA", false), new FFASetup());
-        BattleType.register("Team", Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.Team", false), new TeamSetup());
+        if (getConfig().getBoolean("Load_Default_Battles")) {
+            BattleType.register("FFA", Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.FFA", false), new FFASetup());
+            BattleType.register("Team", Icon.build(BattleArena.getInstance().getConfig(), "Battle_Creator.Team", false), new TeamSetup());
+            SetupHandler.setDefault(BattleType.byName("FFA").getSetup());
+        }
 
         getServer().getPluginManager().registerEvents(Lobby.getInstance(), this);
         getServer().getPluginManager().registerEvents(SetupHandler.getInstance(), this);
