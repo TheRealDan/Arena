@@ -25,6 +25,6 @@ public class TeamSetup extends Setup {
 
     @Override
     public Battle startBattle(Player player, Party party, Arena arena) {
-        return new Team(arena, player, party);
+        return new Team(arena, player, party, getSettings());
     }
 }

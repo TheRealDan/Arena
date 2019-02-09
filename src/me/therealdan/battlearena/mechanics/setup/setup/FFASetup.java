@@ -25,6 +25,6 @@ public class FFASetup extends Setup {
 
     @Override
     public Battle startBattle(Player player, Party party, Arena arena) {
-        return new FFA(arena, player, party);
+        return new FFA(arena, player, party, getSettings());
     }
 }

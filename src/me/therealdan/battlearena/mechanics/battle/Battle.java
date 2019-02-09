@@ -3,6 +3,7 @@ package me.therealdan.battlearena.mechanics.battle;
 import me.therealdan.battlearena.BattleArena;
 import me.therealdan.battlearena.events.*;
 import me.therealdan.battlearena.mechanics.arena.Arena;
+import me.therealdan.battlearena.mechanics.setup.Settings;
 import me.therealdan.battlearena.mechanics.statistics.KillCounter;
 import me.therealdan.battlearena.mechanics.lobby.Lobby;
 import me.therealdan.battlearena.util.PlayerHandler;
@@ -25,6 +26,7 @@ public interface Battle {
 
     HashMap<Battle, Arena> arena = new HashMap<>();
     HashMap<Battle, BattleType> battleType = new HashMap<>();
+    HashMap<Battle, Settings> settings = new HashMap<>();
     HashMap<Battle, KillCounter> killCounter = new HashMap<>();
     HashMap<Battle, Long> startTime = new HashMap<>();
     HashMap<Battle, Long> gracePeriod = new HashMap<>();
@@ -34,9 +36,10 @@ public interface Battle {
 
     double SPAWN_RANGE = 15;
 
-    default void init(Arena arena, BattleType battleType, Player started, Party party) {
+    default void init(Arena arena, BattleType battleType, Player started, Party party, Settings settings) {
         Battle.arena.put(this, arena);
         Battle.battleType.put(this, battleType);
+        Battle.settings.put(this, settings);
         Battle.killCounter.put(this, new KillCounter());
         Battle.startTime.put(this, System.currentTimeMillis());
         Battle.gracePeriod.put(this, 0L);
@@ -288,6 +291,10 @@ public interface Battle {
 
     default BattleType getBattleType() {
         return battleType.get(this);
+    }
+
+    default Settings getSettings() {
+        return settings.get(this);
     }
 
     default KillCounter getKillCounter() {

@@ -5,6 +5,7 @@ import me.therealdan.battlearena.events.BattleLeaveEvent;
 import me.therealdan.battlearena.mechanics.arena.Arena;
 import me.therealdan.battlearena.mechanics.battle.Battle;
 import me.therealdan.battlearena.mechanics.battle.BattleType;
+import me.therealdan.battlearena.mechanics.setup.Settings;
 import me.therealdan.party.Party;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -19,8 +20,8 @@ public class Team implements Battle {
     private HashSet<UUID> team1 = new HashSet<>();
     private HashSet<UUID> team2 = new HashSet<>();
 
-    public Team(Arena arena, Player started, Party party) {
-        init(arena, BattleType.byName("Team"), started, party);
+    public Team(Arena arena, Player started, Party party, Settings settings) {
+        init(arena, BattleType.byName("Team"), started, party, settings);
 
         if (party != null)
             for (Player player : party.getPlayers())
