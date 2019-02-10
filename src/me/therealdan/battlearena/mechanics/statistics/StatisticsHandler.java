@@ -11,18 +11,22 @@ public class StatisticsHandler implements Listener {
 
     @EventHandler
     public void onJoin(BattleJoinEvent event) {
-        Statistics.byPlayer(event.getPlayer()).addGamePlayed();
+        if (event.getBattle().statisticsTrackingEnabled())
+            Statistics.byPlayer(event.getPlayer()).addGamePlayed();
     }
 
     @EventHandler
     public void onFinish(BattleFinishEvent event) {
         if (event.getBattle().getKillCounter().getMostKills() == null) return;
-        Statistics.byPlayer(Bukkit.getPlayer(event.getBattle().getKillCounter().getMostKills())).addGameWon();
+
+        if (event.getBattle().statisticsTrackingEnabled())
+            Statistics.byPlayer(Bukkit.getPlayer(event.getBattle().getKillCounter().getMostKills())).addGameWon();
     }
 
     @EventHandler
     public void onDeath(BattleDeathEvent event) {
         if (event.getKiller() != null) Statistics.byPlayer(event.getKiller()).addKill();
-        Statistics.byPlayer(event.getPlayer()).addDeath();
+        if (event.getBattle().statisticsTrackingEnabled())
+            Statistics.byPlayer(event.getPlayer()).addDeath();
     }
 }

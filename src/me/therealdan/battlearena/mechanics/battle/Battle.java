@@ -27,6 +27,7 @@ public interface Battle {
     HashMap<Battle, BattleType> battleType = new HashMap<>();
     HashMap<Battle, Settings> settings = new HashMap<>();
     HashMap<Battle, KillCounter> killCounter = new HashMap<>();
+    HashMap<Battle, Boolean> statisticsTracking = new HashMap<>();
     HashMap<Battle, Long> startTime = new HashMap<>();
     HashMap<Battle, Long> gracePeriod = new HashMap<>();
     HashMap<Battle, Long> battleDuration = new HashMap<>();
@@ -38,6 +39,7 @@ public interface Battle {
         Battle.battleType.put(this, battleType);
         Battle.settings.put(this, settings);
         Battle.killCounter.put(this, new KillCounter());
+        Battle.statisticsTracking.put(this, true);
         Battle.startTime.put(this, System.currentTimeMillis());
         Battle.gracePeriod.put(this, 0L);
         Battle.battleDuration.put(this, 0L);
@@ -237,6 +239,14 @@ public interface Battle {
 
     default long getTimeRemaining() {
         return Math.max(battleDuration.get(this) - System.currentTimeMillis(), 0L);
+    }
+
+    default void setStatisticsTracking(boolean enabled) {
+        statisticsTracking.put(this, enabled);
+    }
+
+    default boolean statisticsTrackingEnabled() {
+        return statisticsTracking.get(this);
     }
 
     default long getStartTime() {
