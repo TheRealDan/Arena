@@ -367,7 +367,12 @@ public class BattleArenaCommand implements CommandExecutor {
         sender.sendMessage(BattleArena.MAIN + "General Spawnpoints: " + BattleArena.SECOND + arena.getLocations(1).size());
         sender.sendMessage(BattleArena.MAIN + "Team 1 Spawnpoints: " + BattleArena.SECOND + arena.getLocations(2).size());
         sender.sendMessage(BattleArena.MAIN + "Team 2 Spawnpoints: " + BattleArena.SECOND + arena.getLocations(3).size());
-        sender.sendMessage(BattleArena.MAIN + "Extra Locations: " + BattleArena.SECOND + arena.getLocations(4).size());
+        sender.sendMessage(BattleArena.MAIN + "Extra Locations 4: " + BattleArena.SECOND + arena.getLocations(4).size());
+        sender.sendMessage(BattleArena.MAIN + "Extra Locations 5: " + BattleArena.SECOND + arena.getLocations(5).size());
+        sender.sendMessage(BattleArena.MAIN + "Extra Locations 6: " + BattleArena.SECOND + arena.getLocations(6).size());
+        sender.sendMessage(BattleArena.MAIN + "Extra Locations 7: " + BattleArena.SECOND + arena.getLocations(7).size());
+        sender.sendMessage(BattleArena.MAIN + "Extra Locations 8: " + BattleArena.SECOND + arena.getLocations(8).size());
+        sender.sendMessage(BattleArena.MAIN + "Extra Locations 9: " + BattleArena.SECOND + arena.getLocations(9).size());
     }
 
     private boolean kick(CommandSender sender) {
