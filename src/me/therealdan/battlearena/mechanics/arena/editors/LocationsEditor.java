@@ -76,7 +76,7 @@ public class LocationsEditor implements Listener {
         if (player.getEquipment().getItemInMainHand() != null && player.getEquipment().getItemInMainHand().getType().equals(Material.STAINED_GLASS))
             group = player.getEquipment().getItemInMainHand().getDurability();
 
-        if (group < 1 || group > 4) {
+        if (group < 1 || group > 9) {
             player.sendMessage(BattleArena.MAIN + "Invalid block.");
             return;
         }
@@ -97,7 +97,7 @@ public class LocationsEditor implements Listener {
         Location location = event.getBlock().getLocation();
         Arena arena = getEditing(player);
 
-        for (int group = 1; group <= 4; group++) {
+        for (int group = 1; group <= 9; group++) {
             for (Location each : arena.getLocations(group)) {
                 if (location.equals(each)) {
                     arena.removeLocation(group, new WXYZ(location));
@@ -113,7 +113,7 @@ public class LocationsEditor implements Listener {
         saveItems(player);
         clearInventory(player);
         loadSpecialBlocks(player);
-        player.sendMessage(BattleArena.MAIN + "You are now editing spawnpoints for arena " + BattleArena.SECOND + arena.getID());
+        player.sendMessage(BattleArena.MAIN + "You are now editing locations for arena " + BattleArena.SECOND + arena.getID());
     }
 
     public void stopEditing(Player player) {
@@ -121,7 +121,7 @@ public class LocationsEditor implements Listener {
             clearInventory(player);
             restoreItems(player);
             hide(player, getEditing(player));
-            player.sendMessage(BattleArena.MAIN + "You are no longer editing spawnpoints for arena ");
+            player.sendMessage(BattleArena.MAIN + "You are no longer editing locations for arenas");
         }
         editing.remove(player.getUniqueId());
     }
@@ -164,7 +164,12 @@ public class LocationsEditor implements Listener {
         player.getInventory().setItem(0, Icon.build(Material.STAINED_GLASS, 1, false, BattleArena.MAIN + "General Spawnpoints"));
         player.getInventory().setItem(1, Icon.build(Material.STAINED_GLASS, 2, false, BattleArena.MAIN + "Team 1 Spawnpoints"));
         player.getInventory().setItem(2, Icon.build(Material.STAINED_GLASS, 3, false, BattleArena.MAIN + "Team 2 Spawnpoints"));
-        player.getInventory().setItem(3, Icon.build(Material.STAINED_GLASS, 4, false, BattleArena.MAIN + "Extra"));
+        player.getInventory().setItem(3, Icon.build(Material.STAINED_GLASS, 4, false, BattleArena.MAIN + "Location 4"));
+        player.getInventory().setItem(4, Icon.build(Material.STAINED_GLASS, 5, false, BattleArena.MAIN + "Location 5"));
+        player.getInventory().setItem(5, Icon.build(Material.STAINED_GLASS, 6, false, BattleArena.MAIN + "Location 6"));
+        player.getInventory().setItem(6, Icon.build(Material.STAINED_GLASS, 7, false, BattleArena.MAIN + "Location 7"));
+        player.getInventory().setItem(7, Icon.build(Material.STAINED_GLASS, 8, false, BattleArena.MAIN + "Location 8"));
+        player.getInventory().setItem(8, Icon.build(Material.STAINED_GLASS, 9, false, BattleArena.MAIN + "Location 9"));
     }
 
     public boolean isEditing(Player player) {
