@@ -202,11 +202,11 @@ public class BattleArenaCommand implements CommandExecutor {
                 arenaBounds(sender, target, arena);
                 return;
 
-            } else if (args[1].equalsIgnoreCase("Consequence")) {
+            } else if (args[1].equalsIgnoreCase("Consequence") || args[1].equalsIgnoreCase("Con")) {
                 arenaConsequence(sender, target, arena);
                 return;
 
-            } else if (args[1].equalsIgnoreCase("Locations")) {
+            } else if (args[1].equalsIgnoreCase("Locations") || args[1].equalsIgnoreCase("Loc")) {
                 arenaLocations(sender, target, arena);
                 return;
 
