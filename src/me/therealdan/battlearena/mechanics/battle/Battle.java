@@ -33,8 +33,6 @@ public interface Battle {
     HashMap<Battle, BossBar> timeRemainingBar = new HashMap<>();
     HashMap<Battle, LinkedHashSet<UUID>> players = new HashMap<>();
 
-    double SPAWN_RANGE = 15;
-
     default void init(Arena arena, BattleType battleType, Player started, Party party, Settings settings) {
         Battle.arena.put(this, arena);
         Battle.battleType.put(this, battleType);
