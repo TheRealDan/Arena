@@ -210,6 +210,14 @@ public class BattleArenaCommand implements CommandExecutor {
                 arenaLocations(sender, target, arena);
                 return;
 
+            } else if (args[1].equalsIgnoreCase("Tp")) {
+                arenaTP(sender, arena, args);
+                return;
+
+            } else if (args[1].equalsIgnoreCase("RecommendedPlayers") || args[1].equalsIgnoreCase("RecPlayers")) {
+                arenaRecommendedPlayers(sender, arena, args);
+                return;
+
             } else if (args[1].equalsIgnoreCase("Info")) {
                 arenaInfo(sender, arena);
                 return;
@@ -224,6 +232,8 @@ public class BattleArenaCommand implements CommandExecutor {
         sender.sendMessage(BattleArena.MAIN + "/BA Arena Bounds [ID] " + BattleArena.SECOND + "Edit Arena Bounds");
         sender.sendMessage(BattleArena.MAIN + "/BA Arena Consequence [ID] " + BattleArena.SECOND + "Edit Bounds Consequences");
         sender.sendMessage(BattleArena.MAIN + "/BA Arena Locations [ID] " + BattleArena.SECOND + "Edit Arena Locations");
+        sender.sendMessage(BattleArena.MAIN + "/BA Arena Tp [ID] " + BattleArena.SECOND + "Teleport to Arena");
+        sender.sendMessage(BattleArena.MAIN + "/BA Arena RecPlayers [ID] [Description] " + BattleArena.SECOND + "Recommended amount of players");
         sender.sendMessage(BattleArena.MAIN + "/BA Arena Info [ID] " + BattleArena.SECOND + "Display info about Arena");
     }
 
@@ -373,6 +383,43 @@ public class BattleArenaCommand implements CommandExecutor {
         sender.sendMessage(BattleArena.MAIN + "Extra Locations 7: " + BattleArena.SECOND + arena.getLocations(7).size());
         sender.sendMessage(BattleArena.MAIN + "Extra Locations 8: " + BattleArena.SECOND + arena.getLocations(8).size());
         sender.sendMessage(BattleArena.MAIN + "Extra Locations 9: " + BattleArena.SECOND + arena.getLocations(9).size());
+    }
+
+    private void arenaTP(CommandSender sender, Arena arena, String[] args) {
+        Player player = sender instanceof Player ? (Player) sender : null;
+
+        if (args.length > 3) {
+            player = Bukkit.getPlayer(args[3]);
+        }
+
+        if (player == null) {
+            sender.sendMessage(BattleArena.MAIN + "Only players can use this command.");
+            return;
+        }
+
+        if (!arena.hasBounds()) {
+            sender.sendMessage(BattleArena.MAIN + "You can't tp to a map unless bounds have been set");
+            return;
+        }
+
+        player.teleport(arena.getBounds().getCenter());
+        if (sender != player) sender.sendMessage(BattleArena.MAIN + "Teleported " + BattleArena.SECOND + player.getName() + BattleArena.MAIN + " to arena " + BattleArena.SECOND + arena.getName());
+    }
+
+    private void arenaRecommendedPlayers(CommandSender sender, Arena arena, String[] args) {
+        if (args.length == 3) {
+            sender.sendMessage(BattleArena.MAIN + "Recommended Players for " + arena.getName() + BattleArena.MAIN + ": " + BattleArena.SECOND + arena.getRecommendedPlayers());
+            sender.sendMessage(BattleArena.MAIN + "/BA Arena RecPlayers [ID] [Description]");
+            return;
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 3; i < args.length; i++)
+            stringBuilder.append(" ").append(args[i]);
+        String description = stringBuilder.toString().replaceFirst(" ", "");
+
+        arena.setRecommendedPlayers(description);
+        sender.sendMessage(BattleArena.MAIN + "Set recommended players to: " + BattleArena.SECOND + description);
     }
 
     private boolean kick(CommandSender sender) {

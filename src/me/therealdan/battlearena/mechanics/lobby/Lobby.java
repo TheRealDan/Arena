@@ -245,6 +245,7 @@ public class Lobby implements Listener {
                     .replace("%players%", players)
                     .replace("%battle%", battle.getBattleType().getName())
                     .replace("%arena%", battle.getArena().getName())
+                    .replace("%recommendedplayers%", battle.getArena().getRecommendedPlayers())
             );
         }
         itemMeta.setLore(lore);

@@ -16,8 +16,9 @@ Join_UI:
       Material: IRON_SWORD
       Durability: 0
       Lore:
-      - "&7Battle: %battle%"
-      - "&7Players: %players%"
+      - "&7Battle: &f%battle%"
+      - "&7Map: &f%arena%"
+      - "&7Players: &f%players%"
   Create_Battle:
     Icon:
       Name: "&6Create Duel"

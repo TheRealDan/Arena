@@ -17,6 +17,7 @@ public class Arena {
 
     private String id;
     private String name;
+    private String recommendedPlayers = "?";
     private Material material = Material.BOOK;
     private short durability = 0;
 
@@ -37,6 +38,7 @@ public class Arena {
     private Arena(String id) {
         this.id = id;
         this.name = getYamlFile().getData().getString("Arenas." + getID() + ".Name");
+        this.recommendedPlayers = getYamlFile().getData().getString("Arenas." + getID() + ".RecommendedPlayers");
         this.material = Material.valueOf(getYamlFile().getData().getString("Arenas." + getID() + ".Material"));
         this.durability = (short) getYamlFile().getData().getInt("Arenas." + getID() + ".Durability");
 
@@ -61,6 +63,7 @@ public class Arena {
 
     private void save() {
         getYamlFile().getData().set("Arenas." + getID() + ".Name", name);
+        getYamlFile().getData().set("Arenas." + getID() + ".RecommendedPlayers", recommendedPlayers);
         getYamlFile().getData().set("Arenas." + getID() + ".Material", material.toString());
         getYamlFile().getData().set("Arenas." + getID() + ".Durability", durability);
 
@@ -87,6 +90,10 @@ public class Arena {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setRecommendedPlayers(String recommendedPlayers) {
+        this.recommendedPlayers = recommendedPlayers;
     }
 
     public void setIcon(Material material, short durability) {
@@ -149,6 +156,10 @@ public class Arena {
 
     public String getName() {
         return ChatColor.translateAlternateColorCodes('&', name);
+    }
+
+    public String getRecommendedPlayers() {
+        return recommendedPlayers;
     }
 
     public Material getMaterial() {
