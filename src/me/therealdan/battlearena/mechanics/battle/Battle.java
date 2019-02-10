@@ -3,9 +3,9 @@ package me.therealdan.battlearena.mechanics.battle;
 import me.therealdan.battlearena.BattleArena;
 import me.therealdan.battlearena.events.*;
 import me.therealdan.battlearena.mechanics.arena.Arena;
+import me.therealdan.battlearena.mechanics.lobby.Lobby;
 import me.therealdan.battlearena.mechanics.setup.Settings;
 import me.therealdan.battlearena.mechanics.statistics.KillCounter;
-import me.therealdan.battlearena.mechanics.lobby.Lobby;
 import me.therealdan.battlearena.util.PlayerHandler;
 import me.therealdan.party.Party;
 import org.bukkit.Bukkit;
@@ -14,7 +14,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -269,17 +268,24 @@ public interface Battle {
     default Location getRandomSpawnpoint(List<Location> spawnpoints) {
         if (spawnpoints.size() == 1) return spawnpoints.get(0);
 
-        boolean safe;
-        int checks = 0;
         Location location = null;
-        while (checks < 10) {
-            safe = true;
-            location = spawnpoints.get(new Random().nextInt(spawnpoints.size()));
-            for (Entity entity : location.getWorld().getNearbyEntities(location, SPAWN_RANGE, SPAWN_RANGE, SPAWN_RANGE))
-                if (entity instanceof Player)
-                    safe = false;
-            if (safe) break;
-            checks++;
+        double lastDistance = -1;
+        for (Location each : spawnpoints) {
+            if (location == null) {
+                location = each;
+            } else {
+                double playerDistance = Double.MAX_VALUE;
+                for (Player player : getPlayers()) {
+                    double distance = player.getLocation().distance(each);
+                    if (distance < playerDistance)
+                        playerDistance = distance;
+                }
+
+                if (playerDistance > lastDistance) {
+                    location = each;
+                    lastDistance = playerDistance;
+                }
+            }
         }
 
         return location;
