@@ -46,6 +46,8 @@ public interface Battle {
         Battle.timeRemainingBar.put(this, Bukkit.createBossBar("", BarColor.WHITE, BarStyle.SOLID));
         Battle.players.put(this, new LinkedHashSet<>());
 
+        settings.apply(this);
+
         BattleStartEvent event = new BattleStartEvent(this, started);
         event.setBattleMessage(BattleArena.MAIN + "Your " + BattleArena.SECOND + getBattleType().getName() + BattleArena.MAIN + " on " + BattleArena.SECOND + arena.getName() + BattleArena.MAIN + " has begun.");
         if (isOpen()) event.setLobbyMessage(BattleArena.SECOND + started.getName() + BattleArena.MAIN + " has started a " + BattleArena.SECOND + getBattleType().getName() + BattleArena.MAIN + " on " + BattleArena.SECOND + arena.getName());

@@ -25,7 +25,8 @@ public class StatisticsHandler implements Listener {
 
     @EventHandler
     public void onDeath(BattleDeathEvent event) {
-        if (event.getKiller() != null) Statistics.byPlayer(event.getKiller()).addKill();
+        if (event.getBattle().statisticsTrackingEnabled())
+            if (event.getKiller() != null) Statistics.byPlayer(event.getKiller()).addKill();
         if (event.getBattle().statisticsTrackingEnabled())
             Statistics.byPlayer(event.getPlayer()).addDeath();
     }

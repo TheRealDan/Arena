@@ -93,10 +93,10 @@ public class SetupHandler implements Listener {
                 if (!battleCreateEvent.isCreated()) {
                     switch (battleCreateEvent.getBattleType().getName()) {
                         case "FFA":
-                            setup.getSettings().apply(new FFA(arena, player, party, setup.getSettings()));
+                            new FFA(arena, player, party, setup.getSettings());
                             break;
                         case "Team":
-                            setup.getSettings().apply(new Team(arena, player, party, setup.getSettings()));
+                            new Team(arena, player, party, setup.getSettings());
                             break;
                     }
                 }
