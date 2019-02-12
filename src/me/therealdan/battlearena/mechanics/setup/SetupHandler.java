@@ -52,6 +52,7 @@ public class SetupHandler implements Listener {
         Setting setting = getSetting(player);
         if (setting != null) {
             if (setting.click(player, icon, shift, left)) {
+                this.setting.put(player.getUniqueId(), setting);
                 uiOpen.add(player.getUniqueId());
             } else {
                 this.setting.remove(player.getUniqueId());
