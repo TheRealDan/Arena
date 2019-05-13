@@ -42,6 +42,8 @@ public class Arena {
         this.material = Material.valueOf(getYamlFile().getData().getString("Arenas." + getID() + ".Material"));
         this.durability = (short) getYamlFile().getData().getInt("Arenas." + getID() + ".Durability");
 
+        if (this.recommendedPlayers == null) this.recommendedPlayers = "?";
+
         if (getYamlFile().getData().contains("Arenas." + getID() + ".Bounds")) {
             if (getYamlFile().getData().contains("Arenas." + getID() + ".Bounds.Top_Consequence")) this.topConsequence = Consequence.valueOf(getYamlFile().getData().getString("Arenas." + getID() + ".Bounds.Top_Consequence"));
             if (getYamlFile().getData().contains("Arenas." + getID() + ".Bounds.Sides_Consequence")) this.sidesConsequence = Consequence.valueOf(getYamlFile().getData().getString("Arenas." + getID() + ".Bounds.Sides_Consequence"));
