@@ -286,6 +286,7 @@ public interface Battle {
             } else {
                 double playerDistance = Double.MAX_VALUE;
                 for (Player player : getPlayers()) {
+                    if (!player.getWorld().getName().equals(each.getWorld().getName())) continue;
                     double distance = player.getLocation().distance(each);
                     if (distance < playerDistance)
                         playerDistance = distance;
