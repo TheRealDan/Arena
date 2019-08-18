@@ -34,6 +34,7 @@ public class BattleHandler implements Listener {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(BattleArena.getInstance(), () -> {
 
             for (Battle battle : Battle.values()) {
+                battle.tick();
                 for (Player player : battle.getPlayers()) {
                     if (battle.getArena().hasBounds()) {
                         if (!battle.getArena().getBounds().contains(player.getLocation())) {
@@ -67,6 +68,7 @@ public class BattleHandler implements Listener {
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(BattleArena.getInstance(), () -> {
             for (Battle battle : Battle.values()) {
+                battle.second();
 
                 if (battle.getTimeRemaining() <= 0) {
                     battle.end(BattleLeaveEvent.Reason.BATTLE_FINISHED);

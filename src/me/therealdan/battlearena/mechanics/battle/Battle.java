@@ -224,6 +224,14 @@ public interface Battle {
         PlayerHandler.refresh(player);
     }
 
+    default void tick() {
+
+    }
+
+    default void second() {
+
+    }
+
     default void setGracePeriod(long secondsStartingNow) {
         gracePeriod.put(this, System.currentTimeMillis() + (secondsStartingNow * 1000));
     }
