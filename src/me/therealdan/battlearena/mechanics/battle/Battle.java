@@ -146,6 +146,9 @@ public interface Battle {
             case KICK:
                 event.setBattleMessage(BattleArena.SECOND + player.getName() + BattleArena.MAIN + " was kicked from " + BattleArena.SECOND + getBattleType().getName());
                 break;
+            case NO_RESPAWN_LOCATION:
+                event.setBattleMessage(BattleArena.SECOND + player.getName() + BattleArena.MAIN + " left because there was no where to respawn!");
+                break;
             case ADMIN_END:
                 event.setBattleMessage(BattleArena.MAIN + "Battle Ended by Admin");
                 break;
@@ -204,6 +207,11 @@ public interface Battle {
 
         BattleRespawnEvent battleRespawnEvent = new BattleRespawnEvent(this, player, spawnpoint);
         Bukkit.getPluginManager().callEvent(battleRespawnEvent);
+
+        if (battleRespawnEvent.getRespawnLocation() == null) {
+            remove(player, BattleLeaveEvent.Reason.NO_RESPAWN_LOCATION);
+            return;
+        }
 
         for (Player target : getPlayers())
             target.hidePlayer(BattleArena.getInstance(), player);

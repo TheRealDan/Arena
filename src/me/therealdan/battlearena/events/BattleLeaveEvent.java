@@ -63,6 +63,7 @@ public class BattleLeaveEvent extends Event {
         LEAVE, LOGOUT,
         SERVER_SHUTDOWN,
         KICK, ADMIN_END,
+        NO_RESPAWN_LOCATION,
         CUSTOM_PLUGIN
     }
 
