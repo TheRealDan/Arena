@@ -23,11 +23,13 @@ public interface Battle {
     HashSet<Battle> battles = new HashSet<>();
     HashSet<Battle> open = new HashSet<>();
 
+    HashMap<Battle, UUID> battleID = new HashMap<>();
     HashMap<Battle, Arena> arena = new HashMap<>();
     HashMap<Battle, BattleType> battleType = new HashMap<>();
     HashMap<Battle, Settings> settings = new HashMap<>();
     HashMap<Battle, KillCounter> killCounter = new HashMap<>();
     HashMap<Battle, Boolean> statisticsTracking = new HashMap<>();
+    HashMap<Battle, Boolean> saveRestoreInventory = new HashMap<>();
     HashMap<Battle, Long> startTime = new HashMap<>();
     HashMap<Battle, Long> gracePeriod = new HashMap<>();
     HashMap<Battle, Long> battleDuration = new HashMap<>();
@@ -35,11 +37,13 @@ public interface Battle {
     HashMap<Battle, LinkedHashSet<UUID>> players = new HashMap<>();
 
     default void init(Arena arena, BattleType battleType, Player started, Party party, Settings settings) {
+        Battle.battleID.put(this, UUID.randomUUID());
         Battle.arena.put(this, arena);
         Battle.battleType.put(this, battleType);
         Battle.settings.put(this, settings);
         Battle.killCounter.put(this, new KillCounter());
         Battle.statisticsTracking.put(this, true);
+        Battle.saveRestoreInventory.put(this, false);
         Battle.startTime.put(this, System.currentTimeMillis());
         Battle.gracePeriod.put(this, 0L);
         Battle.battleDuration.put(this, 0L);
@@ -50,7 +54,8 @@ public interface Battle {
 
         BattleStartEvent event = new BattleStartEvent(this, started);
         event.setBattleMessage(BattleArena.MAIN + "Your " + BattleArena.SECOND + getBattleType().getName() + BattleArena.MAIN + " on " + BattleArena.SECOND + arena.getName() + BattleArena.MAIN + " has begun.");
-        if (isOpen()) event.setLobbyMessage(BattleArena.SECOND + started.getName() + BattleArena.MAIN + " has started a " + BattleArena.SECOND + getBattleType().getName() + BattleArena.MAIN + " on " + BattleArena.SECOND + arena.getName());
+        if (isOpen())
+            event.setLobbyMessage(BattleArena.SECOND + started.getName() + BattleArena.MAIN + " has started a " + BattleArena.SECOND + getBattleType().getName() + BattleArena.MAIN + " on " + BattleArena.SECOND + arena.getName());
         Bukkit.getPluginManager().callEvent(event);
 
         if (event.getPlayerMessage() != null)
@@ -73,7 +78,8 @@ public interface Battle {
         OfflinePlayer mostKills = getKillCounter().getMostKills() != null ? Bukkit.getOfflinePlayer(getKillCounter().getMostKills()) : null;
 
         String battleMessage = null;
-        if (mostKills != null) battleMessage = BattleArena.SECOND + mostKills.getName() + BattleArena.MAIN + " got the most kills, with " + BattleArena.SECOND + getKillCounter().getKills(mostKills.getUniqueId()) + BattleArena.MAIN + " kills.";
+        if (mostKills != null)
+            battleMessage = BattleArena.SECOND + mostKills.getName() + BattleArena.MAIN + " got the most kills, with " + BattleArena.SECOND + getKillCounter().getKills(mostKills.getUniqueId()) + BattleArena.MAIN + " kills.";
         end(reason, battleMessage);
     }
 
@@ -119,6 +125,11 @@ public interface Battle {
         if (!Battle.players.containsKey(this)) Battle.players.put(this, new LinkedHashSet<>());
         Battle.players.get(this).add(player.getUniqueId());
 
+        if (isSaveRestoreInventoryEnabled()) {
+            PlayerHandler.saveInventory(player, getBattleID() + "_" + player.getUniqueId().toString());
+            PlayerHandler.clearInventory(player);
+        }
+
         getTimeRemainingBar().addPlayer(player);
 
         respawn(player);
@@ -146,6 +157,11 @@ public interface Battle {
 
         player.teleport(event.getSpawn());
         PlayerHandler.refresh(player);
+
+        if (isSaveRestoreInventoryEnabled()) {
+            PlayerHandler.clearInventory(player);
+            PlayerHandler.restoreInventory(player, getBattleID() + "_" + player.getUniqueId().toString());
+        }
 
         Battle.players.get(this).remove(player.getUniqueId());
 
@@ -229,6 +245,14 @@ public interface Battle {
 
     default boolean canPvP() {
         return getGraceTimeRemaining() <= 0;
+    }
+
+    default void setSaveRestoreInventory(boolean enabled) {
+        saveRestoreInventory.put(this, enabled);
+    }
+
+    default boolean isSaveRestoreInventoryEnabled() {
+        return saveRestoreInventory.get(this);
     }
 
     default long getTimePassed() {
@@ -327,6 +351,10 @@ public interface Battle {
         for (UUID uuid : Battle.players.get(this))
             players.add(Bukkit.getPlayer(uuid));
         return players;
+    }
+
+    default UUID getBattleID() {
+        return battleID.get(this);
     }
 
     static Battle get(Player player) {
