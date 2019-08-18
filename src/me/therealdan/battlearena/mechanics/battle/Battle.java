@@ -116,6 +116,12 @@ public interface Battle {
 
         BattleJoinEvent event = new BattleJoinEvent(this, player);
         event.setBattleMessage(joinMessage.replace("%player%", player.getName()));
+
+        if (isSaveRestoreInventoryEnabled()) {
+            PlayerHandler.saveInventory(player, getBattleID() + "_" + player.getUniqueId().toString());
+            PlayerHandler.clearInventory(player);
+        }
+
         Bukkit.getPluginManager().callEvent(event);
 
         if (event.getBattleMessage() != null)
@@ -124,11 +130,6 @@ public interface Battle {
 
         if (!Battle.players.containsKey(this)) Battle.players.put(this, new LinkedHashSet<>());
         Battle.players.get(this).add(player.getUniqueId());
-
-        if (isSaveRestoreInventoryEnabled()) {
-            PlayerHandler.saveInventory(player, getBattleID() + "_" + player.getUniqueId().toString());
-            PlayerHandler.clearInventory(player);
-        }
 
         getTimeRemainingBar().addPlayer(player);
 
