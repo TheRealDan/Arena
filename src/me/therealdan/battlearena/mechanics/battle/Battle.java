@@ -261,7 +261,8 @@ public interface Battle {
     }
 
     default boolean canPvP() {
-        return getGraceTimeRemaining() <= 0;
+        if (isGracePeriodActive()) return false;
+        return true;
     }
 
     default boolean isGracePeriodActive() {
