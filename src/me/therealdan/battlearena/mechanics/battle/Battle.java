@@ -264,6 +264,10 @@ public interface Battle {
         return getGraceTimeRemaining() <= 0;
     }
 
+    default boolean isGracePeriodActive() {
+        return getGraceTimeRemaining() > 0;
+    }
+
     default void setSaveRestoreInventory(boolean enabled) {
         saveRestoreInventory.put(this, enabled);
     }
