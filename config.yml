@@ -8,6 +8,8 @@ Load_Default_Battles: true
 #
 Teleport_On_Join: false
 #
+Allowed_Commands: []
+#
 # Icon options for the Join Battle UI
 Join_UI:
   Join_Battle:

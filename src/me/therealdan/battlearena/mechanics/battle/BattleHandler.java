@@ -1,6 +1,7 @@
 package me.therealdan.battlearena.mechanics.battle;
 
 import me.therealdan.battlearena.BattleArena;
+import me.therealdan.battlearena.events.BattleCommandEvent;
 import me.therealdan.battlearena.events.BattleDamageEvent;
 import me.therealdan.battlearena.events.BattleLeaveEvent;
 import me.therealdan.battlearena.mechanics.arena.Arena;
@@ -23,12 +24,15 @@ import org.bukkit.event.player.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class BattleHandler implements Listener {
 
     private static BattleHandler battleHandler;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+
+    private List<String> allowedCommands;
 
     private BattleHandler() {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(BattleArena.getInstance(), () -> {
@@ -42,9 +46,12 @@ public class BattleHandler implements Listener {
                                 battle.respawn(player);
                             } else {
                                 Arena.Consequence consequence = Arena.Consequence.RESPAWN;
-                                if (battle.getArena().getBounds().isAbove(player.getLocation())) consequence = battle.getArena().getTopConsequence();
-                                if (battle.getArena().getBounds().isThroughSides(player.getLocation())) consequence = battle.getArena().getSidesConsequence();
-                                if (battle.getArena().getBounds().isBelow(player.getLocation())) consequence = battle.getArena().getFloorConsequence();
+                                if (battle.getArena().getBounds().isAbove(player.getLocation()))
+                                    consequence = battle.getArena().getTopConsequence();
+                                if (battle.getArena().getBounds().isThroughSides(player.getLocation()))
+                                    consequence = battle.getArena().getSidesConsequence();
+                                if (battle.getArena().getBounds().isBelow(player.getLocation()))
+                                    consequence = battle.getArena().getFloorConsequence();
                                 switch (consequence) {
                                     case PUSH:
                                         player.setVelocity(battle.getArena().getBounds().getCenter().toVector().subtract(player.getLocation().toVector()).multiply(0.025));
@@ -98,6 +105,10 @@ public class BattleHandler implements Listener {
                 }
             }
         }, 20, 20);
+
+        allowedCommands = BattleArena.getInstance().getConfig().getStringList("Allowed_Commands");
+        allowedCommands.add("ba");
+        allowedCommands.add("battlearena");
     }
 
     @EventHandler
@@ -144,9 +155,16 @@ public class BattleHandler implements Listener {
         Battle battle = Battle.get(player);
         if (battle == null) return;
 
-        if (event.getMessage().toLowerCase().startsWith("/ba") || event.getMessage().toLowerCase().startsWith("/battlearena")) return;
+        BattleCommandEvent battleCommandEvent = new BattleCommandEvent(battle, player, event.getMessage());
+        battleCommandEvent.setCancelled(true);
 
-        event.setCancelled(true);
+        for (String command : allowedCommands)
+            if (command.equalsIgnoreCase(battleCommandEvent.getCommand()))
+                battleCommandEvent.setCancelled(false);
+
+        Bukkit.getPluginManager().callEvent(battleCommandEvent);
+
+        event.setCancelled(battleCommandEvent.isCancelled());
     }
 
     @EventHandler
