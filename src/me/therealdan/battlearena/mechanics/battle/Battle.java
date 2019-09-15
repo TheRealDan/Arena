@@ -179,23 +179,27 @@ public interface Battle {
     }
 
     default void kill(Player player, Player killer, String battleMessage) {
-        getKillCounter().addDeath(player.getUniqueId());
-        if (killer != null) getKillCounter().addKill(killer.getUniqueId());
-
         BattleDeathEvent event = new BattleDeathEvent(this, player, killer);
-        event.setBattleMessage(battleMessage
-                .replace("%playerkills%", Long.toString(getKillCounter().getKills(player.getUniqueId())))
-                .replace("%playerdeaths%", Long.toString(getKillCounter().getDeaths(player.getUniqueId())))
-                .replace("%killerkills%", killer != null ? Long.toString(getKillCounter().getKills(killer.getUniqueId())) : "0")
-                .replace("%killerdeaths%", killer != null ? Long.toString(getKillCounter().getDeaths(killer.getUniqueId())) : "0")
-        );
-        Bukkit.getPluginManager().callEvent(event);
+        event.setBattleMessage(battleMessage);
 
-        if (event.getBattleMessage() != null)
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.getPlayer() == null) return;
+
+        getKillCounter().addDeath(event.getPlayer().getUniqueId());
+        if (event.getKiller() != null) getKillCounter().addKill(event.getKiller().getUniqueId());
+
+        if (event.getBattleMessage() != null) {
+            event.setBattleMessage(event.getBattleMessage()
+                    .replace("%playerkills%", Long.toString(getKillCounter().getKills(event.getPlayer().getUniqueId())))
+                    .replace("%playerdeaths%", Long.toString(getKillCounter().getDeaths(event.getPlayer().getUniqueId())))
+                    .replace("%killerkills%", event.getKiller() != null ? Long.toString(getKillCounter().getKills(event.getKiller().getUniqueId())) : "0")
+                    .replace("%killerdeaths%", event.getKiller() != null ? Long.toString(getKillCounter().getDeaths(event.getKiller().getUniqueId())) : "0")
+            );
             for (Player each : getPlayers())
                 each.sendMessage(event.getBattleMessage());
+        }
 
-        respawn(player);
+        respawn(event.getPlayer());
     }
 
     default void respawn(Player player) {

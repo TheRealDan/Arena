@@ -20,6 +20,14 @@ public class BattleDeathEvent extends Event {
         this.killer = killer;
     }
 
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public void setKiller(Player killer) {
+        this.killer = killer;
+    }
+
     public void setBattleMessage(String battleMessage) {
         this.battleMessage = battleMessage;
     }
