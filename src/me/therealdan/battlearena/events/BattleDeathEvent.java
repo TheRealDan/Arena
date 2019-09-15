@@ -11,13 +11,15 @@ public class BattleDeathEvent extends Event {
 
     private Battle battle;
     private Player player, killer;
+    private Reason reason;
 
     private String battleMessage;
 
-    public BattleDeathEvent(Battle battle, Player player, Player killer) {
+    public BattleDeathEvent(Battle battle, Player player, Player killer, Reason reason) {
         this.battle = battle;
         this.player = player;
         this.killer = killer;
+        this.reason = reason;
     }
 
     public void setPlayer(Player player) {
@@ -26,6 +28,10 @@ public class BattleDeathEvent extends Event {
 
     public void setKiller(Player killer) {
         this.killer = killer;
+    }
+
+    public void setReason(Reason reason) {
+        this.reason = reason;
     }
 
     public void setBattleMessage(String battleMessage) {
@@ -44,6 +50,10 @@ public class BattleDeathEvent extends Event {
         return killer;
     }
 
+    public Reason getReason() {
+        return reason;
+    }
+
     public String getBattleMessage() {
         return battleMessage;
     }
@@ -55,5 +65,12 @@ public class BattleDeathEvent extends Event {
 
     public static HandlerList getHandlerList() {
         return handlerList;
+    }
+
+    public enum Reason {
+        PLAYER,
+        SUICIDE,
+        FLEE,
+        CUSTOM,
     }
 }

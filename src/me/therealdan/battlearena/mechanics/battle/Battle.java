@@ -173,13 +173,28 @@ public interface Battle {
     }
 
     default void kill(Player player, Player killer) {
-        kill(player, killer, killer != null ?
-                BattleArena.SECOND + player.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + "%playerdeaths%" + BattleArena.MAIN + " deaths) was killed by " + BattleArena.SECOND + killer.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + "%killerkills%" + BattleArena.MAIN + " kills)" :
-                BattleArena.SECOND + player.getName() + BattleArena.MAIN + " killed themselves. (" + BattleArena.SECOND + "%playerdeaths%" + BattleArena.MAIN + " deaths)");
+        kill(player, killer, killer != null ? BattleDeathEvent.Reason.PLAYER : BattleDeathEvent.Reason.SUICIDE);
     }
 
-    default void kill(Player player, Player killer, String battleMessage) {
-        BattleDeathEvent event = new BattleDeathEvent(this, player, killer);
+    default void kill(Player player, Player killer, BattleDeathEvent.Reason reason) {
+        String battleMessage = null;
+        switch (reason) {
+            case PLAYER:
+                battleMessage = BattleArena.SECOND + player.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + "%playerdeaths%" + BattleArena.MAIN + " deaths) was killed by " + BattleArena.SECOND + killer.getName() + BattleArena.MAIN + " (" + BattleArena.SECOND + "%killerkills%" + BattleArena.MAIN + " kills)";
+                break;
+            case SUICIDE:
+                battleMessage = BattleArena.SECOND + player.getName() + BattleArena.MAIN + " killed themselves. (" + BattleArena.SECOND + "%playerdeaths%" + BattleArena.MAIN + " deaths)";
+                break;
+            case FLEE:
+                battleMessage = BattleArena.SECOND + player.getName() + BattleArena.MAIN + " tried to flee the battle (" + BattleArena.SECOND + (getKillCounter().getDeaths(player.getUniqueId()) + 1) + BattleArena.MAIN + " deaths)";
+                break;
+        }
+
+        kill(player, killer, reason, battleMessage);
+    }
+
+    default void kill(Player player, Player killer, BattleDeathEvent.Reason reason, String battleMessage) {
+        BattleDeathEvent event = new BattleDeathEvent(this, player, killer, reason);
         event.setBattleMessage(battleMessage);
 
         Bukkit.getPluginManager().callEvent(event);

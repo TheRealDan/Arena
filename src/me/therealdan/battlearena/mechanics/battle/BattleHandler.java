@@ -3,6 +3,7 @@ package me.therealdan.battlearena.mechanics.battle;
 import me.therealdan.battlearena.BattleArena;
 import me.therealdan.battlearena.events.BattleCommandEvent;
 import me.therealdan.battlearena.events.BattleDamageEvent;
+import me.therealdan.battlearena.events.BattleDeathEvent;
 import me.therealdan.battlearena.events.BattleLeaveEvent;
 import me.therealdan.battlearena.mechanics.arena.Arena;
 import me.therealdan.battlearena.mechanics.battle.battles.Team;
@@ -60,7 +61,7 @@ public class BattleHandler implements Listener {
                                         player.damage(0.2);
                                         break;
                                     case KILL:
-                                        battle.kill(player, null, BattleArena.SECOND + player.getName() + BattleArena.MAIN + " tried to flee the battle (" + BattleArena.SECOND + (battle.getKillCounter().getDeaths(player.getUniqueId()) + 1) + BattleArena.MAIN + " deaths)");
+                                        battle.kill(player, null, BattleDeathEvent.Reason.FLEE);
                                         break;
                                     case RESPAWN:
                                         battle.respawn(player);
