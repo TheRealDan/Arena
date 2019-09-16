@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 public class FFA implements Battle {
 
     public FFA(Arena arena, Player started, Party party, Settings settings) {
-        init(arena, BattleType.byName("FFA"), started, party, settings);
+        init(arena, BattleType.byName("FFA"), started, settings);
 
         add(started);
         if (party != null)

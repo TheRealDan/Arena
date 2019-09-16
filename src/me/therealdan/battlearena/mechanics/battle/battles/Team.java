@@ -21,7 +21,7 @@ public class Team implements Battle {
     private HashSet<UUID> team2 = new HashSet<>();
 
     public Team(Arena arena, Player started, Party party, Settings settings) {
-        init(arena, BattleType.byName("Team"), started, party, settings);
+        init(arena, BattleType.byName("Team"), started, settings);
 
         if (party != null)
             for (Player player : party.getPlayers())
@@ -36,7 +36,8 @@ public class Team implements Battle {
         String mostKillsTeam = team1Kills >= team2Kills ? "Team 1" : "Team 2";
 
         String battleMessage = null;
-        if (mostKills > 0) battleMessage = BattleArena.SECOND + mostKillsTeam + BattleArena.MAIN + " got the most kills, with " + BattleArena.SECOND + mostKills + BattleArena.MAIN + " kills.";
+        if (mostKills > 0)
+            battleMessage = BattleArena.SECOND + mostKillsTeam + BattleArena.MAIN + " got the most kills, with " + BattleArena.SECOND + mostKills + BattleArena.MAIN + " kills.";
         end(reason, battleMessage);
     }
 

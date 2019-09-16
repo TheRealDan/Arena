@@ -7,7 +7,6 @@ import me.therealdan.battlearena.mechanics.lobby.Lobby;
 import me.therealdan.battlearena.mechanics.setup.Settings;
 import me.therealdan.battlearena.mechanics.statistics.KillCounter;
 import me.therealdan.battlearena.util.PlayerHandler;
-import me.therealdan.party.Party;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -36,7 +35,7 @@ public interface Battle {
     HashMap<Battle, BossBar> timeRemainingBar = new HashMap<>();
     HashMap<Battle, LinkedHashSet<UUID>> players = new HashMap<>();
 
-    default void init(Arena arena, BattleType battleType, Player started, Party party, Settings settings) {
+    default void init(Arena arena, BattleType battleType, Player started, Settings settings) {
         Battle.battleID.put(this, UUID.randomUUID());
         Battle.arena.put(this, arena);
         Battle.battleType.put(this, battleType);
@@ -68,8 +67,6 @@ public interface Battle {
         if (event.getLobbyMessage() != null)
             for (Player player : Lobby.getInstance().getPlayers())
                 player.sendMessage(event.getLobbyMessage());
-
-        if (party != null) setOpen(party.isOpen());
 
         Battle.battles.add(this);
     }
