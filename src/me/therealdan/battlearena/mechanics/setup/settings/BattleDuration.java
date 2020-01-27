@@ -34,7 +34,7 @@ public class BattleDuration extends Setting {
 
     @Override
     public Material getMaterial() {
-        return Material.WATCH;
+        return Material.CLOCK;
     }
 
     @Override

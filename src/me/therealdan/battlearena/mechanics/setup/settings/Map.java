@@ -65,11 +65,6 @@ public class Map extends Setting {
     }
 
     @Override
-    public short getDurability() {
-        return getArena().getDurability();
-    }
-
-    @Override
     public List<String> getDescription() {
         List<String> description = new ArrayList<>();
         description.add("&7Map: &f" + getArena().getName());
@@ -82,7 +77,7 @@ public class Map extends Setting {
     }
 
     private ItemStack getIcon(Arena arena) {
-        return Icon.build(arena.getMaterial(), arena.getDurability(), false, arena.getName(), "&7Recommended Players: &f" + arena.getRecommendedPlayers());
+        return Icon.build(arena.getMaterial(), false, arena.getName(), "&7Recommended Players: &f" + arena.getRecommendedPlayers());
     }
 
     @Override

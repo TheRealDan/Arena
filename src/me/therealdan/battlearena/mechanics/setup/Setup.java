@@ -27,11 +27,11 @@ public class Setup {
     }
 
     public ItemStack getSettingIcon(Setting setting) {
-        return Icon.build(setting.getMaterial(), setting.getDurability(), false, BattleArena.MAIN + setting.getName(), setting.getDescription());
+        return Icon.build(setting.getMaterial(), false, BattleArena.MAIN + setting.getName(), setting.getDescription());
     }
 
     public ItemStack getStartIcon() {
-        return Icon.build(Material.DIAMOND_SWORD, 0, false, BattleArena.MAIN + "Start Game");
+        return Icon.build(Material.DIAMOND_SWORD, false, BattleArena.MAIN + "Start Game");
     }
 
     public Settings getSettings() {

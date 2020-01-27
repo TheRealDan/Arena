@@ -66,21 +66,21 @@ public class ConsequenceEditor implements Listener {
     }
 
     private ItemStack getTopIcon(Arena arena) {
-        return Icon.build(Material.STONE, 0, false, BattleArena.MAIN + "Top",
+        return Icon.build(Material.STONE, false, BattleArena.MAIN + "Top",
                 "&7Consequence: " + arena.getTopConsequence().getName(),
                 "&7" + arena.getTopConsequence().getDescription()
         );
     }
 
     private ItemStack getSidesIcon(Arena arena) {
-        return Icon.build(Material.STONE, 0, false, BattleArena.MAIN + "Sides",
+        return Icon.build(Material.STONE, false, BattleArena.MAIN + "Sides",
                 "&7Consequence: " + arena.getSidesConsequence().getName(),
                 "&7" + arena.getSidesConsequence().getDescription()
         );
     }
 
     private ItemStack getFloorIcon(Arena arena) {
-        return Icon.build(Material.STONE, 0, false, BattleArena.MAIN + "Floor",
+        return Icon.build(Material.STONE, false, BattleArena.MAIN + "Floor",
                 "&7Consequence: " + arena.getFloorConsequence().getName(),
                 "&7" + arena.getFloorConsequence().getDescription()
         );

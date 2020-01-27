@@ -20,23 +20,22 @@ public class Icon {
     public static ItemStack build(FileConfiguration data, String path, boolean enchant) {
         return build(
                 Material.valueOf(data.getString(path + ".Material")),
-                data.getInt(path + ".Durability"),
                 enchant,
                 data.getString(path + ".Name"),
                 data.getStringList(path + ".Lore")
         );
     }
 
-    public static ItemStack build(Material material, int durability, boolean enchant, String name, String... description) {
+    public static ItemStack build(Material material, boolean enchant, String name, String... description) {
         List<String> lore = new ArrayList<>();
         for (String line : description)
             if (line != null)
                 lore.add(line);
 
-        return build(material, durability, enchant, name, lore);
+        return build(material, enchant, name, lore);
     }
 
-    public static ItemStack build(Material material, int durability, boolean enchant, String name, List<String> description) {
+    public static ItemStack build(Material material, boolean enchant, String name, List<String> description) {
         List<String> lore = new ArrayList<>();
         for (String line : description)
             if (line != null)
@@ -50,7 +49,6 @@ public class Icon {
         itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         icon.setItemMeta(itemMeta);
-        icon.setDurability((short) durability);
         if (enchant) icon.addEnchantment(Enchantment.DURABILITY, 1);
 
         return icon;

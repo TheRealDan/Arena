@@ -29,7 +29,7 @@ public class LocationsEditor implements Listener {
     private HashMap<UUID, HashMap<Integer, ItemStack>> armor = new HashMap<>();
 
     private LocationsEditor() {
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(BattleArena.getInstance(), () -> tick(), 100, 20);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(BattleArena.getInstance(), this::tick, 100, 20);
     }
 
     private void tick() {
@@ -46,7 +46,7 @@ public class LocationsEditor implements Listener {
     private void show(Player player, Arena arena) {
         for (int group = 1; group <= 4; group++) {
             for (Location location : arena.getLocations(group)) {
-                player.sendBlockChange(location, Material.STAINED_GLASS, (byte) group);
+                player.sendBlockChange(location, getMaterialForGroup(group).createBlockData());
             }
         }
     }
@@ -72,9 +72,7 @@ public class LocationsEditor implements Listener {
         if (!isEditing(player)) return;
         event.setCancelled(true);
 
-        int group = -1;
-        if (player.getEquipment().getItemInMainHand() != null && player.getEquipment().getItemInMainHand().getType().equals(Material.STAINED_GLASS))
-            group = player.getEquipment().getItemInMainHand().getDurability();
+        int group = getGroupFromMaterial(player.getEquipment().getItemInMainHand().getType());
 
         if (group < 1 || group > 9) {
             player.sendMessage(BattleArena.MAIN + "Invalid block.");
@@ -161,15 +159,46 @@ public class LocationsEditor implements Listener {
     }
 
     private void loadSpecialBlocks(Player player) {
-        player.getInventory().setItem(0, Icon.build(Material.STAINED_GLASS, 1, false, BattleArena.MAIN + "General Spawnpoints"));
-        player.getInventory().setItem(1, Icon.build(Material.STAINED_GLASS, 2, false, BattleArena.MAIN + "Team 1 Spawnpoints"));
-        player.getInventory().setItem(2, Icon.build(Material.STAINED_GLASS, 3, false, BattleArena.MAIN + "Team 2 Spawnpoints"));
-        player.getInventory().setItem(3, Icon.build(Material.STAINED_GLASS, 4, false, BattleArena.MAIN + "Location 4"));
-        player.getInventory().setItem(4, Icon.build(Material.STAINED_GLASS, 5, false, BattleArena.MAIN + "Location 5"));
-        player.getInventory().setItem(5, Icon.build(Material.STAINED_GLASS, 6, false, BattleArena.MAIN + "Location 6"));
-        player.getInventory().setItem(6, Icon.build(Material.STAINED_GLASS, 7, false, BattleArena.MAIN + "Location 7"));
-        player.getInventory().setItem(7, Icon.build(Material.STAINED_GLASS, 8, false, BattleArena.MAIN + "Location 8"));
-        player.getInventory().setItem(8, Icon.build(Material.STAINED_GLASS, 9, false, BattleArena.MAIN + "Location 9"));
+        player.getInventory().setItem(0, Icon.build(getMaterialForGroup(1), false, BattleArena.MAIN + "General Spawnpoints"));
+        player.getInventory().setItem(1, Icon.build(getMaterialForGroup(2), false, BattleArena.MAIN + "Team 1 Spawnpoints"));
+        player.getInventory().setItem(2, Icon.build(getMaterialForGroup(3), false, BattleArena.MAIN + "Team 2 Spawnpoints"));
+        player.getInventory().setItem(3, Icon.build(getMaterialForGroup(4), false, BattleArena.MAIN + "Location 4"));
+        player.getInventory().setItem(4, Icon.build(getMaterialForGroup(5), false, BattleArena.MAIN + "Location 5"));
+        player.getInventory().setItem(5, Icon.build(getMaterialForGroup(6), false, BattleArena.MAIN + "Location 6"));
+        player.getInventory().setItem(6, Icon.build(getMaterialForGroup(7), false, BattleArena.MAIN + "Location 7"));
+        player.getInventory().setItem(7, Icon.build(getMaterialForGroup(8), false, BattleArena.MAIN + "Location 8"));
+        player.getInventory().setItem(8, Icon.build(getMaterialForGroup(9), false, BattleArena.MAIN + "Location 9"));
+    }
+
+    private int getGroupFromMaterial(Material material) {
+        for (int group = 1; group <= 9; group++)
+            if (getMaterialForGroup(group).equals(material))
+                return group;
+        return -1;
+    }
+
+    private Material getMaterialForGroup(int group) {
+        switch (group) {
+            case 1:
+                return Material.RED_STAINED_GLASS;
+            case 2:
+                return Material.ORANGE_STAINED_GLASS;
+            case 3:
+                return Material.YELLOW_STAINED_GLASS;
+            case 4:
+                return Material.GREEN_STAINED_GLASS;
+            case 5:
+                return Material.BLUE_STAINED_GLASS;
+            case 6:
+                return Material.PURPLE_STAINED_GLASS;
+            case 7:
+                return Material.MAGENTA_STAINED_GLASS;
+            case 8:
+                return Material.WHITE_STAINED_GLASS;
+            case 9:
+                return Material.BLACK_STAINED_GLASS;
+        }
+        return null;
     }
 
     public boolean isEditing(Player player) {

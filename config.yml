@@ -16,7 +16,6 @@ Join_UI:
     Icon:
       Name: "&6Join Battle"
       Material: IRON_SWORD
-      Durability: 0
       Lore:
       - "&7Battle: &f%battle%"
       - "&7Map: &f%arena%"
@@ -25,7 +24,6 @@ Join_UI:
     Icon:
       Name: "&6Create Duel"
       Material: DIAMOND_SWORD
-      Durability: 0
       Lore: []
 #
 # Icons for the Battle Picker UI
@@ -33,34 +31,28 @@ Battle_Creator:
   Start_Game:
     Name: "&6Start Game"
     Material: DIAMOND_SWORD
-    Durability: 0
     Lore: []
   No_Free_Arena:
     Name: "&6No Free Arenas"
     Material: BARRIER
-    Durability: 0
     Lore: []
   FFA:
     Name: "&6FFA"
     Material: IRON_SWORD
-    Durability: 0
     Lore:
     - "&7No teams, all against all"
   Team:
     Name: "&6Team Battle"
     Material: IRON_CHESTPLATE
-    Durability: 0
     Lore:
     - "&7Two teams, friendly fire disabled"
   Grace_Period:
     Name: "&6Grace Period"
     Material: IRON_CHESTPLATE
-    Durability: 0
     Lore:
     - "&7Duration: &f%graceperiod%"
   Battle_Duration:
     Name: "&6Battle Duration"
-    Material: WATCH
-    Durability: 0
+    Material: CLOCK
     Lore:
     - "&7Time Limit: &f%battleduration%"

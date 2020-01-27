@@ -61,10 +61,6 @@ public class Setting {
         return Material.GRASS;
     }
 
-    public short getDurability() {
-        return 0;
-    }
-
     public List<String> getDescription() {
         return new ArrayList<>();
     }

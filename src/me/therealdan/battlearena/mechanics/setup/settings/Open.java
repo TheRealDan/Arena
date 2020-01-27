@@ -27,12 +27,7 @@ public class Open extends Setting {
 
     @Override
     public Material getMaterial() {
-        return Material.STAINED_GLASS_PANE;
-    }
-
-    @Override
-    public short getDurability() {
-        return (short) (isOpen() ? 5 : 14);
+        return isOpen() ? Material.GREEN_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
     }
 
     @Override
