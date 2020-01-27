@@ -16,7 +16,7 @@ import java.util.List;
 public class Map extends Setting {
 
     public Map() {
-        super("Map", Arena.count() == 0 ? "" : Arena.getFree());
+        super("Map", Arena.count() == 0 ? "" : Arena.getFree().getID());
     }
 
     @Override
