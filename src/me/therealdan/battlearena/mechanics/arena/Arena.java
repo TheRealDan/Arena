@@ -238,6 +238,10 @@ public class Arena {
         }
     }
 
+    public static int count() {
+        return arenas.size();
+    }
+
     public static Arena getFree() {
         if (available().size() == 0) return null;
 

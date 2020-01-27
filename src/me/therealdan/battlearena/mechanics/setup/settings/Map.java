@@ -15,8 +15,8 @@ import java.util.List;
 
 public class Map extends Setting {
 
-    public Map(Arena arena) {
-        super("Map", arena.getID());
+    public Map() {
+        super("Map", Arena.count() == 0 ? "" : Arena.getFree());
     }
 
     @Override
@@ -82,6 +82,6 @@ public class Map extends Setting {
 
     @Override
     public Map clone() {
-        return new Map(getArena());
+        return new Map();
     }
 }
