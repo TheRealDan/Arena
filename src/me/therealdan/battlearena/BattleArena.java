@@ -21,7 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class BattleArena extends JavaPlugin {
 
     private static BattleArena battleArena;
-    public static String MAIN, SECOND;
+    public static String MAIN, SECOND, ERROR;
 
     @Override
     public void onEnable() {
@@ -30,6 +30,7 @@ public class BattleArena extends JavaPlugin {
         saveDefaultConfig();
         MAIN = ChatColor.translateAlternateColorCodes('&', getConfig().getString("Color.Main"));
         SECOND = ChatColor.translateAlternateColorCodes('&', getConfig().getString("Color.Secondary"));
+        ERROR = ChatColor.translateAlternateColorCodes('&', getConfig().getString("Color.Error"));
 
         Arena.load();
 

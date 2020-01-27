@@ -2,6 +2,7 @@
 Color:
   Main: "&6"
   Secondary: "&f"
+  Error: "&c"
 #
 #
 Load_Default_Battles: true
@@ -17,9 +18,9 @@ Join_UI:
       Name: "&6Join Battle"
       Material: IRON_SWORD
       Lore:
-      - "&7Battle: &f%battle%"
-      - "&7Map: &f%arena%"
-      - "&7Players: &f%players%"
+        - "&7Battle: &f%battle%"
+        - "&7Map: &f%arena%"
+        - "&7Players: &f%players%"
   Create_Battle:
     Icon:
       Name: "&6Create Duel"
@@ -40,19 +41,19 @@ Battle_Creator:
     Name: "&6FFA"
     Material: IRON_SWORD
     Lore:
-    - "&7No teams, all against all"
+      - "&7No teams, all against all"
   Team:
     Name: "&6Team Battle"
     Material: IRON_CHESTPLATE
     Lore:
-    - "&7Two teams, friendly fire disabled"
+      - "&7Two teams, friendly fire disabled"
   Grace_Period:
     Name: "&6Grace Period"
     Material: IRON_CHESTPLATE
     Lore:
-    - "&7Duration: &f%graceperiod%"
+      - "&7Duration: &f%graceperiod%"
   Battle_Duration:
     Name: "&6Battle Duration"
     Material: CLOCK
     Lore:
-    - "&7Time Limit: &f%battleduration%"
+      - "&7Time Limit: &f%battleduration%"
