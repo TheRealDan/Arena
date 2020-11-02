@@ -1,7 +1,7 @@
 name: BattleArena
 version: "1.2"
 main: me.therealdan.battlearena.BattleArena
-api-version: "1.15"
+api-version: "1.16"
 author: TheRealDan
 commands:
   BattleArena:
